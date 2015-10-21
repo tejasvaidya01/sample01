@@ -3,6 +3,8 @@
 
 declare(strict_types = 1);
 
+error_log(__FILE__);
+
 class Users
 {
     const TABLE = 'users';
@@ -23,6 +25,7 @@ This is a simple users system, you can
         'email'     => '',
         'passwd'    => '',
         'pwkey'     => '',
+        'anote'     => '',
         'updated'   => '',
         'created'   => '',
     ];

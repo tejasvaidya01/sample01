@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(63) NOT NULL,
   `pwkey` varchar(8) NOT NULL,
   `passwd` varchar(255) NOT NULL,
+  `anote` text NOT NULL,
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL
 );
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 CREATE UNIQUE INDEX `uid_UNIQUE` ON `users` (`uid` ASC);
 CREATE UNIQUE INDEX `email_UNIQUE` ON `users` (`email` ASC);
 
-INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `email`, `pwkey`, `passwd`, `updated`, `created`) VALUES
-(1, 127, 'admin', 'System', 'Administrator', 'admin@example.org', '', 'changeme', '0000-00-00 00:00:00', '0000-00-00 00:00:00'),
-(2, 2, 'user1', 'User', 'One', 'user1@example.org', '', 'changeme', '0000-00-00 00:00:00', '0000-00-00 00:00:00');
+INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `email`, `pwkey`, `passwd`, `anote`, `updated`, `created`) VALUES
+(1, 127, 'admin', 'System', 'Administrator', 'admin@example.org', '', 'changeme', '', datetime('now', 'localtime'), datetime('now', 'localtime')),
+(2, 2, 'user1', 'User', 'One', 'user1@example.org', '', 'changeme', '', datetime('now', 'localtime'), datetime('now', 'localtime'));
 

@@ -61,6 +61,8 @@ class Widgets
       </form>';
     }
 
+    // Notes
+
     public function notes_item($ary) : string
     {
         $v = 'veto_notes_item';
@@ -112,11 +114,12 @@ class Widgets
       </form>';
     }
 
+    // Users
+
     public function users_list(string $str) : string
     {
-//        $v = 'veto_users_item';
-//        if (method_exists($this, $v)) return $this->$v($ary);
-//error_log(var_export($ary,true));
+        $v = 'veto_users_list';
+        if (method_exists($this, $v)) return $this->$v($str);
         return '
       <table>' . $str . '
       </table>';
@@ -124,9 +127,8 @@ class Widgets
 
     public function users_list_row(array $ary) : string
     {
-//        $v = 'veto_users_item';
-//        if (method_exists($this, $v)) return $this->$v($ary);
-error_log(var_export($ary,true));
+        $v = 'veto_users_list_row';
+        if (method_exists($this, $v)) return $this->$v($ary);
         extract($ary);
         return '
         <tr>
@@ -145,9 +147,8 @@ error_log(var_export($ary,true));
 
     public function users_item(array $ary) : string
     {
-//        $v = 'veto_users_item';
-//        if (method_exists($this, $v)) return $this->$v($ary);
-error_log(var_export($ary,true));
+        $v = 'veto_users_item';
+        if (method_exists($this, $v)) return $this->$v($ary);
         extract($ary);
         return '
       <hr>
@@ -159,11 +160,13 @@ error_log(var_export($ary,true));
         <tr><td></td><td>Email:</td><td>' . $email . '</td><td></td></tr>
         <tr><td></td><td>Created:</td><td>' . $created . '</td><td></td></tr>
         <tr><td></td><td>Updated:</td><td>' . $updated . '</td><td></td></tr>
-        <tr><td></td><td colspan="2"><pre>' . nl2br('user notes') . '</pre></td><td></td></tr>
+        <tr><td></td><td colspan="2"><p><em>' . nl2br($anote) . '</em></p></td><td></td></tr>
         <tr><td></td>
           <td colspan="2" style="text-align:center">
-              <a class="btn" href="?p=users&a=update&i=' . $id . '" title="Update">Edit</a>
-              <a class="btn" href="?p=users&a=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">Delete</a>
+            <p>
+            '.$this->a('?p=users&a=update&i='.$id, 'Edit', 'btn').'
+            '.$this->a('?p=users&a=delete&i='.$id, 'Delete', 'btn danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"').'
+            </p>
           </td>
         </tr>
       </table>';
@@ -171,8 +174,8 @@ error_log(var_export($ary,true));
 
     public function users_form(array $ary) : string
     {
-//        $v = 'veto_users_form';
-//        if (method_exists($this, $v)) return $this->$v($ary);
+        $v = 'veto_users_form';
+        if (method_exists($this, $v)) return $this->$v($ary);
         extract($ary);
         return '
       <form action="" method="POST">
@@ -191,6 +194,10 @@ error_log(var_export($ary,true));
         <p>
           <label for="email">Email</label>
           <input type="text" id="email" name="email" value="' . $email . '">
+        </p>
+        <p>
+          <label for="anote">Note</label>
+          <textarea rows="3" name="anote" id="anote">' . $anote . '</textarea>
         </p>
         <p>'.$this->button('Submit', 'submit', 'primary').'
         <input type="hidden" name="p" value="' . $this->g->in['p'] . '">

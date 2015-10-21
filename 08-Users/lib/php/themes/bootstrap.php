@@ -3,6 +3,8 @@
 
 declare(strict_types = 1);
 
+error_log(__FILE__);
+
 class Themes_Bootstrap extends View
 {
     public function css() : string
@@ -20,6 +22,7 @@ body {
 .demo-content {
   background-color: #FFF;
   margin-bottom: 4em;
+  padding-bottom: 1em;
 }
 footer {
   background-color: #424242;
@@ -29,6 +32,9 @@ footer {
   position: fixed;
   width: 100%;
   z-index: -99;
+}
+td {
+    white-space: nowrap;
 }
 @media(min-width:767px){
   .alert { margin-top: 1em; }
@@ -151,6 +157,8 @@ footer {
       </form>';
     }
 
+    // Notes
+
     public function veto_notes_item($ary) : string
     {
         extract($ary);
@@ -204,4 +212,125 @@ footer {
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
     }
+
+    // Users
+
+    public function veto_users_list(string $str) : string
+    {
+        return '
+      <div class="responsive">
+        <table class="table">' . $str . '
+        </table>
+      </div>';
+    }
+
+    public function veto_users_item(array $ary) : string
+    {
+        extract($ary);
+        return '
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>ID</label></div>
+        <div class="col-md-3 col-xs-8">' . $id . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>UID</label></div>
+        <div class="col-md-3 col-xs-8">' . $uid . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>FirstName</label></div>
+        <div class="col-md-3 col-xs-8">' . $fname . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>LastName</label></div>
+        <div class="col-md-3 col-xs-8">' . $lname . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>Email</label></div>
+        <div class="col-md-3 col-xs-8">' . $email . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>Updated</label></div>
+        <div class="col-md-3 col-xs-8">' . $updated . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>Created</label></div>
+        <div class="col-md-3 col-xs-8">' . $created . '</div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-1 col-xs-4"><label>Note</label></div>
+        <div class="col-md-3 col-xs-8"><em>' . nl2br($anote) . '</em></div>
+        <div class="col-md-4"></div>
+      </div>
+      <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4 col-xs-12 text-right">
+          <br>
+          '.$this->a('?p=users&a=update&i='.$id, 'Edit', 'btn btn-primary').'
+          '.$this->a('?p=users&a=delete&i='.$id, 'Delete', 'btn btn-danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"').'
+        </div>
+        <div class="col-md-4"></div>
+      </div>';
+    }
+
+    public function veto_users_form(array $ary) : string
+    {
+        extract($ary);
+        return '
+      <form class="form-horizontal" role="form" method="post"">
+        <div class="form-group">
+          <label for="uid" class="col-sm-2 col-md-3 col-lg-4 control-label">UID</label>
+          <div class="col-sm-9 col-md-7 col-lg-5">
+            <input type="text" class="form-control" id="uid" name="uid" placeholder="Username" value="' . $uid . '" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="fname" class="col-sm-2 col-md-3 col-lg-4 control-label">FirstName</label>
+          <div class="col-sm-9 col-md-7 col-lg-5">
+            <input type="text" class="form-control" id="fname" name="fname" placeholder="FirstName" value="' . $fname . '" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="lname" class="col-sm-2 col-md-3 col-lg-4 control-label">LastName</label>
+          <div class="col-sm-9 col-md-7 col-lg-5">
+            <input type="text" class="form-control" id="lname" name="lname" placeholder="LastName" value="' . $lname . '" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="email" class="col-sm-2 col-md-3 col-lg-4 control-label">Email</label>
+          <div class="col-sm-9 col-md-7 col-lg-5">
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email Address" value="' . $email . '" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="anote" class="col-sm-2 col-md-3 col-lg-4 control-label">Note</label>
+          <div class="col-sm-9 col-md-7 col-lg-5">
+            <textarea class="form-control" id="anote" name="anote" rows="3" placeholder="Admin Note">' . $anote . '</textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="col-md-2 col-sm-offset-2 col-md-offset-3 col-lg-offset-4">'
+          .$this->button('Save', 'submit', 'primary').'
+          </div>
+        </div>
+        <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+      </form>';
+//        <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
+//        <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
+    }
+
 }

@@ -9,5 +9,5 @@ CREATE TABLE IF NOT EXISTS `notes` (
 );
 
 INSERT INTO `notes` (`id`, `title`, `content`, `author`, `updated`, `created`) VALUES
-(1, 'What does CRUD mean?', 'In computer programming, create, read, update and delete (CRUD) are the four basic functions of persistent storage.', 'admin', '2013-04-15 12:01:01', '2013-04-15 12:01:01'),
-(2, 'When was it first used?', 'The term was likely first popularized by James Martin in his 1983 book Managing the Data-base Environment.', 'admin', '2013-04-15 12:01:02', '2013-04-15 12:01:02');
+(1, 'What does CRUD mean?', 'In computer programming, create, read, update and delete (CRUD) are the four basic functions of persistent storage.', 'admin', datetime('now','localtime'), datetime('now','localtime')),
+(2, 'When was it first used?', 'The term was likely first popularized by James Martin in his 1983 book Managing the Data-base Environment.', 'admin', datetime('now','localtime'), datetime('now','localtime'));

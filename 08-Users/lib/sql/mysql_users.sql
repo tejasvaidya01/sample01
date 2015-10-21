@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(63) NOT NULL,
   `pwkey` varchar(8) NOT NULL,
   `passwd` varchar(255) NOT NULL,
+  `anote` text NOT NULL,
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL
 );
@@ -17,6 +18,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 ALTER TABLE `users` ADD UNIQUE (`uid`);
 ALTER TABLE `users` ADD UNIQUE (`email`);
 
-INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `email`, `pwkey`, `passwd`, `updated`, `created`) VALUES
-(1, 127, 'admin', 'System', 'Administrator', 'admin@example.org', '', 'changeme', NOW(), NOW()),
-(2, 2, 'user1', 'User', 'One', 'user1@example.org', '', 'changeme', NOW(), NOW());
+INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `email`, `pwkey`, `passwd`, `anote`, `updated`, `created`) VALUES
+(1, 127, 'admin', 'System', 'Administrator', 'admin@example.org', '', 'changeme', '', NOW(), NOW()),
+(2, 2, 'user1', 'User', 'One', 'user1@example.org', '', 'changeme', '', NOW(), NOW());
