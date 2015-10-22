@@ -27,7 +27,7 @@ class View extends Widgets
             $c = $p === $n[1] ? ' class="active"' : '';
             return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, array_merge($this->g->nav1, $this->g->nav2))) . '
+        }, array_merge(util::which_nav($this->g->nav1), $this->g->nav2))) . '
       </nav>';
     }
 

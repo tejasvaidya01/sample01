@@ -4,7 +4,7 @@
 declare(strict_types = 1);
 
 session_start();
-$_SESSION = [];
+//$_SESSION = [];
 
 class Controller
 {
@@ -22,14 +22,16 @@ class Controller
         foreach ($g->in as $k => $v)
             $g->in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
+error_log('a '.var_export($g->in, true));
 
         foreach($this->g->ses as $k => $v) {
             $_SESSION[$k] = $_SESSION[$k] ?? $v;
-            if (isset($_REQUEST[$k]) && $this->g->in[$k] !== $_SESSION[$k])
-                $_SESSION[$k] = $this->g->in[$k];
+            if (isset($_REQUEST[$k]) && ($this->g->in[$k] !== $_SESSION[$k]))
+                $_SESSION[$k] = $g->in[$k];
         }
+error_log('b '.var_export($g->in, true));
 
-        $theme = 'themes_'.$g->in['t'];
+        $theme = 'themes_'.$_SESSION['t'];
         if (class_exists($theme)) {
             $t = $this->t = new $theme($g);
             $m = new Model($t, $g); // throwaway returned object
