@@ -3,12 +3,12 @@
 
 declare(strict_types = 1);
 
-class Themes_Simple extends View
+class Themes_Simple_View extends View
 {
     function css()
     {
         return '
-    <link href="//fonts.googleapis.com/css?family=Roboto:400,100,300,100italic" rel="stylesheet" type="text/css">
+    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,100,100italic" rel="stylesheet" type="text/css">
     <link href="../lib/css/simple.css" media="all" rel="stylesheet">
 <style>
 nav > ul { display: inline-block; list-style: none; padding: 0; margin: 0; }
@@ -20,16 +20,17 @@ nav > ul > li > ul > li { text-align: left; }
 </style>';
     }
 
-    public function nav1() : string
+    public function nav1(array $a = []) : string
     {
-        $p = '?p='.$this->g->in['p'];
-        $t = '?t='.$this->g->in['t'];
+        $a = isset($a[0]) ? $a : util::which_nav($this->g->nav1);
+        $p = '?p='.$_SESSION['p'];
+        $t = '?t='.$_SESSION['t'];
         return '
       <nav>'.join('', array_map(function ($n) use ($p, $t) {
             $c = $p === $n[1] ? ' class="active"' : '';
             return '
         <a'.$c.' href="'.$n[1].'">'.$n[0].'</a>';
-        }, $this->g->nav1)).'
+        }, $a)).'
         <ul>
           <li>
             <a href="#">Themes</a>
@@ -41,11 +42,10 @@ nav > ul > li > ul > li { text-align: left; }
             </ul>
           </li>
         </ul>
-      </nav>
-      ';
+      </nav>';
     }
 
-    public function veto_a($href, $label, $class, $extra)
+    public function veto_a(string $href, string $label, string $class, string $extra) : array
     {
         return ['class' => 'btn '.$class];
     }

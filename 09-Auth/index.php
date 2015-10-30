@@ -22,19 +22,22 @@ echo new Controller(new class
     ],
     $in = [
         'a'         => 'read',                  // Action
+        'g'         => 0,                       // Group (category)
         'i'         => 0,                       // Item or ID
-        'l'         => '',                      // Message level
-        'm'         => '',                      // Message area
+        'l'         => '',                      // Logging [lvl:msg]
+        'm'         => '',                      // Method action
+        'n'         => 1,                       // Navigation
+        'o'         => 'read',                  // Object module
         'p'         => 'home',                  // Page [home|about|contact]
         't'         => 'simple',                // current Theme
-        'x'         => '',                      // API [html(default)|json]
+        'z'         => '',                      // API [html(default)|json]
     ],
     $out = [
         'top'       => '',
         'meta'      => '',
         'doc'       => 'SPE::09',
         'css'       => '',
-        'msg'       => '',
+        'log'       => '',
         'nav1'      => '',
         'nav2'      => '',
         'nav3'      => '',
@@ -44,17 +47,18 @@ echo new Controller(new class
         'end'       => '',
     ],
     $ses = [
-        'a'         => '',
+        'a'         => 'read',
+        'i'         => '',
         'l'         => '',
         'm'         => '',
-        'p'         => '',
-        't'         => '',
+        'p'         => 'home',
+        't'         => 'simple',
     ],
     $db = [
         'host'      => '127.0.0.1',
         'name'      => 'spe',
-        'pass'      => 'lib'.DS.'.ht_pw.php',
-        'path'      => 'lib'.DS.'.ht_spe.sqlite',
+        'pass'      => 'lib' . DS . '.ht_pw.php',
+        'path'      => 'lib' . DS . '.ht_spe.sqlite',
         'port'      => '3306',
         'sock'      => '', // '/run/mysqld/mysqld.sock',
         'type'      => 'sqlite', // mysql|sqlite

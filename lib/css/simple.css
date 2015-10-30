@@ -58,26 +58,24 @@ input[type="text"], input[type="password"], input[type="email"], textarea, pre {
     width: 100%;
 }
 nav a, button, input[type="submit"], .btn {
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    background-color: #DDD;
-    border: 0.01em solid #CCC;
     border-radius: 0.2em;
+    border: 0.01em solid #CCC;
     display: inline-block;
+    font-family: "Roboto", sans-serif;
     font-size: 0.9rem;
+    font-weight: 300;
+    font-weight: 300;
+    line-height: 1.33;
     padding: 0.5em 1em;
 }
-input[type="submit"] {
-    color: #E91E63;
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-}
-nav a:hover, button:hover, input[type="submit"]:hover  {
+nav a:hover, button:hover, input[type="submit"]:hover, .btn:hover  {
     background-color: #CFCFCF;
     color: #000000;
     text-decoration: none;
 }
 nav a {
+    background-color: #DDD;
+    color: #E91E63;
     border-bottom: none;
     border-radius: 0.2em 0.2em 0 0;
 }
@@ -92,6 +90,10 @@ table {
 hr {
     border: none;
     border-top: 1px solid #F7F7F7;
+}
+form {
+    margin: 0 auto;
+    width: 24em;
 }
 .active {
     background-color: #EFEFEF;
@@ -114,7 +116,7 @@ main, main div {
     color: #A94442;
     background-color: #F2DEDE;
 }
-.primary {
+.primary, a.primary {
     color: #FFF;
     background-color: #337AB7;
 }

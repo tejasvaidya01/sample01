@@ -2,7 +2,7 @@
 // contact.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 return '
-      <h3>Email Contact Form</h3>'.$t->email_contact_form().'
+      <h2>Email Contact Form</h2>'.$t->contact().'
       <script>
 function mailform(form) {
   location.href = "mailto:'.$g->cfg['email'].'"

@@ -2,15 +2,15 @@
 // about.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 return '
-      <h3>About</h3>
+      <h2>About</h2>
       <p>
 This is an example of a simple PHP7 "framework" to provide the core
 structure for further experimental development with both the framework
 design and some of the new features of PHP7.
       </p>
       <form method="post">
-        <p>'.$t->button('Success Message', 'submit', 'success', 'm', 'success:Howdy, all is okay.')
-            .$t->button('Danger Message', 'submit', 'danger', 'm', 'danger:Houston, we have a problem.')
+        <p>'.$t->button('Success Message', 'submit', 'success', 'l', 'success:Howdy, all is okay.')
+            .$t->button('Danger Message', 'submit', 'danger', 'l', 'danger:Houston, we have a problem.')
             .$t->button('API Debug', 'button', 'default', '', '', ' onclick="ajax()"').'
         </p>
       </form>

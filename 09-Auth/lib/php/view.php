@@ -12,9 +12,27 @@ class View extends Widgets
         $this->g = $g;
     }
 
-    public function msg() : string
+    public function __call(string $name, array $args) : string
     {
-        list($l, $m) = util::msg();
+error_log(__METHOD__);
+error_log(var_export($args, true));
+
+        $t1 = INC.'themes' . DS . $_SESSION['t'] . DS . str_replace('_', DS, $name).'.php';
+        $t2 = INC.'themes' . DS . 'none' . DS . str_replace('_', DS, $name).'.php';
+
+        if (isset($args[0]))
+            extract($args[0]);
+        else extract($args);
+
+        if (file_exists($t1)) return include $t1;
+        elseif (file_exists($t2)) return include $t2;
+        elseif (method_exists($this, $name)) return $this->$name($args);
+        else return 'Error: widget view does not exist: ' . $name;
+    }
+
+    public function log() : string
+    {
+        list($l, $m) = util::log();
         return $m ? '
       <p class="alert ' . $l . '">' . $m . '</p>' : '';
     }
@@ -42,7 +60,7 @@ class View extends Widgets
     public function main() : string
     {
         return '
-    <main>' . $this->g->out['msg'] . $this->g->out['main'] . '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
     </main>';
     }
 

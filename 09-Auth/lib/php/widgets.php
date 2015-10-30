@@ -18,7 +18,7 @@ class Widgets
         $label = $label ?? $href;
         $class = $class ? ' class="'.$class.'"' : '';
         return '
-        <a'.$class.' href="'.$href.'"'.$extra.'>'.$label.'</a>';
+          <a'.$class.' href="'.$href.'"'.$extra.'>'.$label.'</a>';
     }
 
     public function button(
@@ -41,7 +41,7 @@ class Widgets
         return '
           <button'.$class.$type.$name.$value.$extra.'>'.$label.'</button>';
     }
-
+/*
     public function email_contact_form() : string
     {
         $v = 'veto_email_contact_form';
@@ -56,7 +56,7 @@ class Widgets
           <label for="message">Your Message</label>
           <textarea type="text" rows= "5" id="message" maxlength="1024" minlength="5"></textarea>
         </p>
-        <p>'.$this->button('Send', 'submit', 'primary').'
+        <p>' . $this->button('Send', 'submit', 'primary') . '
         </p>
       </form>';
     }
@@ -107,15 +107,15 @@ class Widgets
           <label for="content">Note</label>
           <textarea rows="7" name="content" id="content">' . $content . '</textarea>
         </p>
-        <p>'.$this->button('Submit', 'submit', 'primary').'
+        <p>' . $this->button('Submit', 'submit', 'primary') . '</p>
         <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
         <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
     }
-
+*/
     // Users
-
+/*
     public function users_list(string $str) : string
     {
         $v = 'veto_users_list';
@@ -199,71 +199,50 @@ class Widgets
           <label for="anote">Note</label>
           <textarea rows="3" name="anote" id="anote">' . $anote . '</textarea>
         </p>
-        <p>'.$this->button('Submit', 'submit', 'primary').'
+        <p>' . $this->button('Submit', 'submit', 'primary') . '
         <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
         <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
     }
-
+*/
     // Auth
-
-    public function auth_signin($uid = '')
+/*
+    public function auth_signin(string $uid = '') : string
     {
 error_log(__METHOD__);
 
         $v = 'veto_auth_signin';
-        //if (method_exists($this, $v)) return $this->$v($ary);
+        if (method_exists($this, $v)) return $this->$v($uid);
         return '
-        <h2><i class="fa fa-sign-in fa-fw"></i> Sign in</h2>
-        <div class="col-md-6 col-md-offset-3">
-          <form class="form" role="form" action="" method="post">
-            <input type="hidden" name="p" value="auth">
-            <div class="row">
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><span class="fa fa-user fa-fw"></span></span>
-                  <input type="text" name="uid" id="uid" class="form-control" placeholder="Your Email Address" value="'.$uid.'" required autofocus>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group">
-                <div class="input-group">
-                  <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                  <input type="password" name="webpw" id="webpw" class="form-control" placeholder="Your Password">
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group">
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="remember" id="remember" value="yes"> Remember me on this computer
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="form-group">
-                <div class="text-right">
-                  <a class="btn btn-md btn-default" href="?p=auth&amp;a=forgotpw">Forgot password</a>
-                  <button class="btn btn-md btn-primary" type="submit" name="a" value="signin">Sign in</button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>';
+      <h2>Sign in</h2>
+      <form class="form" role="form" action="" method="post">
+        <input type="hidden" name="p" value="auth">
+        <p>
+          <label for="uid">Login ID</label>
+          <input type="text" name="uid" id="uid" placeholder="Your Email Address" value="' . $uid  . '" required autofocus>
+        </p>
+        <p>
+          <label for="uid">Password</label>
+          <input type="password" name="webpw" id="webpw" placeholder="Your Password">
+        </p>
+        <p>
+          <input type="checkbox" name="remember" id="remember" value="yes"> Remember me on this computer
+        </p>
+        <p>' . $this->a('?p=auth&amp;a=forgotpw', 'Forgot password')
+             . $this->button('Log me in', 'submit', 'primary') . '
+        </p>
+      </form>';
     }
 
-    public function auth_forgotpw($uid='')
+    public function auth_forgotpw(string $uid = '') : string
     {
 error_log(__METHOD__);
 
         $v = 'veto_auth_forgotpw';
-        //if (method_exists($this, $v)) return $this->$v($ary);
+        if (method_exists($this, $v)) return $this->$v($uid);
         return '
-        <h2><i class="fa fa-key fa-fw"></i> Reset password</h2>
+        <h2>Reset password</h2>
         <div class="col-md-6 col-md-offset-3">
           <form class="form" role="form" action="?p=auth&amp;a=forgotpw" method="post">
             <input type="hidden" name="p" value="auth">
@@ -291,12 +270,12 @@ error_log(__METHOD__);
         </div>';
     }
 
-    public function auth_newpw($id, $uid)
+    public function auth_newpw(int $id, string $uid) : string
     {
 error_log(__METHOD__." id=".$id);
 
         $v = 'veto_auth_newpw';
-        //if (method_exists($this, $v)) return $this->$v($ary);
+        if (method_exists($this, $v)) return $this->$v($id, $uid);
         return '
         <h2><i class="fa fa-key fa-fw"></i> Reset Password</h2>
         <div class="col-md-6 col-md-offset-3">
@@ -329,5 +308,5 @@ error_log(__METHOD__." id=".$id);
           </form>
         </div>';
     }
-
+*/
 }

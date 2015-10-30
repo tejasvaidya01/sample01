@@ -3,7 +3,7 @@
 
 declare(strict_types = 1);
 
-class Themes_Material extends View
+class Themes_Material_View extends View
 {
     public function css() : string
     {

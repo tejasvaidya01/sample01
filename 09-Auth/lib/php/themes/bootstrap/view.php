@@ -5,7 +5,7 @@ declare(strict_types = 1);
 
 error_log(__FILE__);
 
-class Themes_Bootstrap extends View
+class Themes_Bootstrap_View extends View
 {
     public function css() : string
     {
@@ -88,8 +88,8 @@ td {
     public function nav1(array $a = []) : string
     {
         $a = isset($a[0]) ? $a : util::which_nav($this->g->nav1);
-        $p = '?p='.$this->g->in['p'];
-        $t = '?t='.$this->g->in['t'];
+        $p = '?p='.$_SESSION['p'];
+        $t = '?t='.$_SESSION['t'];
         return join('', array_map(function ($n) use ($p, $t) {
             $c = $p === $n[1] || $t === $n[1] ? ' class="active"' : '';
             return '
@@ -336,17 +336,15 @@ td {
 
     // Auth
 
-    public function veto_auth_signin($uid = '')
+    public function auth_signin(string $uid = '') : string
     {
 error_log(__METHOD__);
 
-        $v = 'veto_auth_signin';
-        if (method_exists($this, $v)) return $this->$v($ary);
         return '
         <h2><i class="fa fa-sign-in fa-fw"></i> Sign in</h2>
         <div class="col-md-6 col-md-offset-3">
           <form class="form" role="form" action="" method="post">
-            <input type="hidden" name="o" value="auth">
+            <input type="hidden" name="p" value="auth">
             <div class="row">
               <div class="form-group">
                 <div class="input-group">
@@ -375,8 +373,8 @@ error_log(__METHOD__);
             <div class="row">
               <div class="form-group">
                 <div class="text-right">
-                  <a class="btn btn-md btn-default" href="?o=auth&amp;m=forgotpw">Forgot password</a>
-                  <button class="btn btn-md btn-primary" type="submit" name="m" value="signin">Sign in</button>
+                  <a class="btn btn-md btn-default" href="?p=auth&amp;a=forgotpw">Forgot password</a>
+                  <button class="btn btn-md btn-primary" type="submit" name="a" value="signin">Sign in</button>
                 </div>
               </div>
             </div>
@@ -384,17 +382,15 @@ error_log(__METHOD__);
         </div>';
     }
 
-    public function veto_auth_forgotpw($uid='')
+    public function auth_forgotpw(string $uid = '') : string
     {
 error_log(__METHOD__);
 
-        $v = 'veto_auth_forgotpw';
-        if (method_exists($this, $v)) return $this->$v($ary);
         return '
         <h2><i class="fa fa-key fa-fw"></i> Reset password</h2>
         <div class="col-md-6 col-md-offset-3">
-          <form class="form" role="form" action="?o=auth&amp;m=forgotpw" method="post">
-            <input type="hidden" name="o" value="auth">
+          <form class="form" role="form" action="?p=auth&amp;a=forgotpw" method="post">
+            <input type="hidden" name="p" value="auth">
             <div class="row">
               <div class="form-group">
                 <div class="input-group">
@@ -406,7 +402,7 @@ error_log(__METHOD__);
             <div class="row">
               <div class="form-group">
                 <div class="text-right">
-                  <a class="btn btn-md btn-default" href="?o=auth&amp;m=signin">&laquo; Back</a>
+                  <a class="btn btn-md btn-default" href="?p=auth&amp;a=signin">&laquo; Back</a>
                   <button class="btn btn-md btn-primary" type="submit">Send</button>
                 </div>
               </div>
@@ -419,23 +415,21 @@ error_log(__METHOD__);
         </div>';
     }
 
-    public function veto_auth_newpw($id, $uid)
+    public function auth_newpw(int $id, string $uid) : string
     {
-error_log(__METHOD__." id=".$this->id);
+error_log(__METHOD__." id=".$id);
 
-        $v = 'veto_auth_newpw';
-        if (method_exists($this, $v)) return $this->$v($ary);
         return '
         <h2><i class="fa fa-key fa-fw"></i> Reset Password</h2>
         <div class="col-md-6 col-md-offset-3">
-          <form class="form" role="form" action="?o=auth&amp;m=resetpw" method="post">
+          <form class="form" role="form" action="?p=auth&amp;a=resetpw" method="post">
             <input type="hidden" name="i" value="'.$id.'">
             <div class="row">
               <p class="text-center"><b>'.$uid.'</b></p>
               <div class="form-group">
                 <div class="input-group">
                   <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                  <input type="password" name="passwd" id="passwd" class="form-control" placeholder="New Password" value="" required autofocus>
+                  <input type="password" name="passwd1" id="passwd1" class="form-control" placeholder="New Password" value="" required autofocus>
                 </div>
               </div>
             </div>

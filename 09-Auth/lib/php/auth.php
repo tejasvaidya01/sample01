@@ -7,9 +7,9 @@ class auth
 {
     const TABLE = 'users';
 
-    private $g = null;
-    private $t = null;
-    private $b = '';
+    private $g  = null;
+    private $t  = null;
+    private $b  = '';
     private $in = [
         'uid'           => '',
         'webpw'         => '',
@@ -21,11 +21,11 @@ class auth
 
     public function __construct(View $t, $g)
     {
-        $this->t = $t;
-        $this->g = $g;
-        db::$tbl = self::TABLE;
+        $this->t  = $t;
+        $this->g  = $g;
+        db::$tbl  = self::TABLE;
         $this->in = util::esc($this->in);
-        $this->{$g->in['a']}();
+        $this->b  = $this->{$g->in['a']}();
     }
 
     public function __toString() : string
@@ -33,7 +33,7 @@ class auth
         return $this->b;
     }
 
-    public function signin()
+    public function signin() : string
     {
         $u = $this->in['uid'];
         $p = $this->in['webpw'];
@@ -51,34 +51,34 @@ class auth
                             $tmp = $uniq;
                         } else $tmp = '';
                         $_SESSION['usr'] = [$usr['id'], $usr['acl'], $u, $tmp];
-                        util::msg($usr['uid'].' is now logged in', 'success');
+                        util::log($usr['uid'].' is now logged in', 'success');
                         if ($usr['acl'] == 1) $_SESSION['adm'] = $usr['id'];
                         header('Location: '.$_SERVER['PHP_SELF']);
                         exit();
-                    } else util::msg('Incorrect password');
-                } else util::msg('Account is disabled, contact your System Administrator');
-            } else util::msg('Username does not exist');
+                    } else util::log('Incorrect password');
+                } else util::log('Account is disabled, contact your System Administrator');
+            } else util::log('Username does not exist');
         }
-        $this->b = $this->t->auth_signin($u);
+        return $this->t->auth_signin(['uid' => $u]);
     }
 
-    public static function signout()
+    public static function signout() : string
     {
         $u = $_SESSION['usr'][2];
         if (isset($_SESSION['adm']) and $_SESSION['usr'][0] === $_SESSION['adm'])
             unset($_SESSION['adm']);
         unset($_SESSION['usr']);
         util::cookie_del('remember');
-        util::msg($u.' is now logged out', 'success');
+        util::log($u . ' is now logged out', 'success');
         header('Location: '.$_SERVER['PHP_SELF']);
         exit();
     }
 
-    public function forgotpw()
+    public function forgotpw() : string
     {
         $u = $this->in['uid'];
 
-        if ($_POST) {
+        if (count($_POST)) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'uid', $u, '', 'one')) {
                     if ($usr['acl']) {
@@ -88,34 +88,32 @@ class auth
                                 'otp' => $newpass,
                                 'otpttl' => time()
                             ], [['id', '=', $usr['id']]]);
-                            util::msg('Sent reset password key for '.$u.' so please check your mailbox and click on the supplied link.', 'success');
-                        } else util::msg('Problem sending message to '.$u, 'danger');
-                        $this->b = $this->t->auth_signin($u);
-                        return;
-                    } else util::msg('Account is disabled, contact your System Administrator');
-                } else util::msg('User does not exist');
-            } else util::msg('You must provide a valid email address');
+                            util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
+                        } else util::log('Problem sending message to ' . $u, 'danger');
+                        return $this->t->auth_signin(['uid' => $u]);
+                    } else util::log('Account is disabled, contact your System Administrator');
+                } else util::log('User does not exist');
+            } else util::log('You must provide a valid email address');
         }
-        $this->b = $this->t->auth_forgotpw($u);
+        return $this->t->auth_forgotpw(['uid' => $u]);
     }
 
-    public function newpw()
+    public function newpw() : string
     {
         $otp = html_entity_decode($this->in['otp']);
         if (strlen($otp) === 10) {
             if ($usr = db::read('id,uid,acl,otp,otpttl', 'otp', $otp, '', 'one')) {
                 if ($usr['otpttl'] && (($usr['otpttl'] + 3600) > time())) {
                     if ($usr['acl']) {
-                        $this->b = $this->t->auth_newpw($usr['id'], $usr['uid']);
-                        return;
-                    } else util::msg('Error: '.$usr['uid'].' is not allowed access');
-                } else util::msg('Error: your one time password key has expired');
-            } else util::msg('Error: your one time password key no longer exists');
-        } else util::msg('Error: incorrect one time password key');
-        $this->b = $this->t->auth_forgotpw();
+                        return $this->t->auth_newpw($usr['id'], $usr['uid']);
+                    } else util::log($usr['uid'] . ' is not allowed access');
+                } else util::log('Your one time password key has expired');
+            } else util::log('Your one time password key no longer exists');
+        } else util::log('Incorrect one time password key');
+        return $this->t->auth_forgotpw(['uid' => '']);
     }
 
-    public function resetpw()
+    public function resetpw() : string
     {
         if (count($_POST)) {
             $id = $this->g->in['i'];
@@ -126,24 +124,24 @@ class auth
                     if ($usr['otpttl'] && (($usr['otpttl'] + 3600) > time())) {
                         if ($usr['acl']) {
                             if (db::update([
-                                    'webpw'     => password_hash($p1, PASSWORD_DEFAULT),
-                                    'otp'       => '',
-                                    'otpttl'    => '',
-                                    'updated'   => date('Y-m-d H:i:s'),
+                                    'webpw'   => password_hash($p1, PASSWORD_DEFAULT),
+                                    'otp'     => '',
+                                    'otpttl'  => '',
+                                    'updated' => date('Y-m-d H:i:s'),
                                 ], [['id', '=', $id]])) {
-                                util::msg('Password reset for '.$usr['uid'], 'success');
-                                $this->b = $this->t->auth_signin($usr['uid']);
+                                util::log('Password reset for '.$usr['uid'], 'success');
+                                return $this->t->auth_signin(['uid' => $usr['uid']]);
                                 return;
-                            } else util::msg('Error: problem updating database');
-                        } else util::msg('Error: '.$usr['uid'].' is not allowed access');
-                    } else util::msg('Error: your one time password key has expired');
+                            } else util::log('Problem updating database');
+                        } else util::log($usr['uid'] . ' is not allowed access');
+                    } else util::log('Your one time password key has expired');
                 }
-            } else util::msg('Error: user does not exist');
+            } else util::log('User does not exist');
         }
-        $this->b = $this->t->auth_newpw($id, $usr['uid']);
+        return $this->t->auth_newpw(['id' => $id, 'uid' => $usr['uid']]);
     }
 
-    private function mail_forgotpw($email, $newpass, $headers = '')
+    private function mail_forgotpw(string $email, string $newpass, string $headers = '') : bool
     {
         return mail(
             $email,

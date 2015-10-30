@@ -5,7 +5,19 @@ declare(strict_types = 1);
 
 class Util
 {
-    public static function msg(string $msg = '', string $lvl = 'danger') : array
+    public static function log(string $msg = '', string $lvl = 'danger') : array
+    {
+        if ($msg) {
+            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
+            $_SESSION['l'] = $lvl . ':' . $msg;
+        } elseif ($_SESSION['l']) {
+            $l = $_SESSION['l']; $_SESSION['l'] = '';
+            return explode(':', $l);
+        }
+        return ['', ''];
+    }
+
+    public static function msg2(string $msg = '', string $lvl = 'danger') : array
     {
         if ($msg) {
             if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
@@ -24,7 +36,7 @@ class Util
         return ['', ''];
     }
 
-    public static function esc(array $in)
+    public static function esc(array $in) : array
     {
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k])
