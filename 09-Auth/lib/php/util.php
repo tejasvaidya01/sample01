@@ -44,7 +44,7 @@ class Util
         return $in;
     }
 
-    public static function which_nav(array $nav = []) : array
+    public static function which_usr(array $nav = []) : array
     {
         return isset($_SESSION['usr'])
             ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])

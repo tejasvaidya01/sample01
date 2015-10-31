@@ -22,7 +22,7 @@ nav > ul > li > ul > li { text-align: left; }
 
     public function nav1(array $a = []) : string
     {
-        $a = isset($a[0]) ? $a : util::which_nav($this->g->nav1);
+        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
         $p = '?p='.$_SESSION['p'];
         $t = '?t='.$_SESSION['t'];
         return '
