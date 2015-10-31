@@ -7,17 +7,18 @@ CREATE TABLE IF NOT EXISTS `users` (
   `uid` varchar(31) NOT NULL,
   `fname` varchar(31) NOT NULL,
   `lname` varchar(31) NOT NULL,
-  `email` varchar(63) NOT NULL,
-  `pwkey` varchar(8) NOT NULL,
-  `passwd` varchar(255) NOT NULL,
+  `altemail` varchar(63) NOT NULL,
+  `webpw` varchar(255) NOT NULL,
+  `otp` varchar(8) NOT NULL,
+  `otpttl` int(10) NOT NULL,
+  `cookie` varchar(255) NOT NULL,
   `anote` text NOT NULL,
   `updated` datetime NOT NULL,
   `created` datetime NOT NULL
 );
 
 ALTER TABLE `users` ADD UNIQUE (`uid`);
-ALTER TABLE `users` ADD UNIQUE (`email`);
 
-INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `email`, `pwkey`, `passwd`, `anote`, `updated`, `created`) VALUES
-(1, 127, 'admin', 'System', 'Administrator', 'admin@example.org', '', 'changeme', '', NOW(), NOW()),
-(2, 2, 'user1', 'User', 'One', 'user1@example.org', '', 'changeme', '', NOW(), NOW());
+INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `altemail`, `webpw`, `otp`, `otpttl`, `cookie`, `anote`, `updated`, `created`) VALUES
+(1, 1, 'admin', 'System', 'Administrator', 'admin@example.org', 'changeme', '', '', '', '', NOW(), NOW()),
+(2, 2, 'user1', 'User', 'One', 'user1@example.org', 'changeme', '', '', '', '', NOW(), NOW());

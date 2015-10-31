@@ -10,7 +10,7 @@ class Notes
     private $g  = null;
     private $t  = null;
     private $b  = '
-    <h2>Notes</h3>
+    <h2>Notes</h2>
     <p>
 This is a simple note system, you can
 <a href="?p=notes&a=create" title="Create">create</a> a new note or

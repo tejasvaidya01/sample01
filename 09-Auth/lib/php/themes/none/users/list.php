@@ -1,9 +1,11 @@
 <?php
+// users/list.php 20151030 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 $buf = '';
 foreach ($users as $user) $buf .= users_list_row($user);
 return '
-      <table>' . $buf . '
+      <table>
+        <tr><th>UID</th><th>FirstName</th><th>LastName</th><th>Alt Email</th><th></th></tr>' . $buf . '
       </table>';
 
     function users_list_row(array $ary) : string
@@ -14,7 +16,7 @@ return '
           <td><a href="?p=users&a=read&i=' . $id . '">' . $uid . '</a></td>
           <td>' . $fname . '</td>
           <td>' . $lname . '</td>
-          <td>' . $email . '</td>
+          <td>' . $altemail . '</td>
           <td style="text-align:right">
             <small>
               <a href="?p=users&a=update&i=' . $id . '" title="Update">E</a>

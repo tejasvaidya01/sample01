@@ -6,11 +6,10 @@ return '
       <table>
         <tr>
           <td><h3><a href="?p=notes&a=read&i=' . $id . '">' . $title . '</a></h3></td>
-          <td style="text-align:right">by <b>' . $author . '</b>
-          </td>
+          <td style="text-align:right"><em><i>' . util::now($updated) . '</em></i></td>
         </tr>
         <tr>
-          <td><em><i>' . util::now($updated) . '</em></i></td>
+          <td>by <b>' . $author . '</b></td>
           <td style="text-align:right">
             <small>
               <a href="?p=notes&a=update&i=' . $id . '" title="Update">E</a>

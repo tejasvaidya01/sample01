@@ -8,16 +8,8 @@ class Themes_Simple_View extends View
     function css()
     {
         return '
-    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,100,100italic" rel="stylesheet" type="text/css">
-    <link href="../lib/css/simple.css" media="all" rel="stylesheet">
-<style>
-nav > ul { display: inline-block; list-style: none; padding: 0; margin: 0; }
-nav > ul > li > ul { display: none; padding: 0; margin: 0; }
-nav > ul > li { position: relative; list-style: none; padding: 0; margin: 0; }
-nav > ul > li:hover > ul { display: block; position: absolute; list-style: none; }
-nav > ul > li > ul > li a { border-radius: 0; width: 100%; padding: 0.25em 1em; }
-nav > ul > li > ul > li { text-align: left; }
-</style>';
+    <link href="//fonts.googleapis.com/css?family=Roboto:500,400,300,300italic,100,100italic" rel="stylesheet" type="text/css">
+    <link href="../lib/css/simple.css" media="all" rel="stylesheet">';
     }
 
     public function nav1(array $a = []) : string

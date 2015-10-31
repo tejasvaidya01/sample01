@@ -94,5 +94,11 @@ echo new Controller(new class
         ['Bootstrap', '?t=bootstrap'],
         ['Material', '?t=material'],
     ],
-    $nav3 = [];
+    $nav3 = [],
+    $acl = [
+        0 => 'Anonymous',
+        1 => 'Administrator',
+        2 => 'User',
+        3 => 'Suspended',
+    ];
 });

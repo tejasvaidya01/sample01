@@ -1,4 +1,5 @@
 <?php
+// users/form.php 20151030 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 return '
       <form method="post">
@@ -15,14 +16,14 @@ return '
           <input type="text" id="lname" name="lname" value="' . $lname . '">
         </p>
         <p>
-          <label for="email">Email</label>
-          <input type="text" id="email" name="email" value="' . $email . '">
+          <label for="altemail">Email</label>
+          <input type="text" id="altemail" name="altemail" value="' . $altemail . '">
         </p>
         <p>
           <label for="anote">Note</label>
           <textarea rows="3" name="anote" id="anote">' . $anote . '</textarea>
         </p>
-        <p>' . $this->button('Submit', 'submit', 'primary') . '</p>
+        <p style="text-align:right">' . $this->button($submit, 'submit', 'primary') . '</p>
         <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
         <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">

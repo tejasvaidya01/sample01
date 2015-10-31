@@ -52,8 +52,8 @@ class auth
                         } else $tmp = '';
                         $_SESSION['usr'] = [$usr['id'], $usr['acl'], $u, $tmp];
                         util::log($usr['uid'].' is now logged in', 'success');
-                        if ($usr['acl'] == 1) $_SESSION['adm'] = $usr['id'];
-                        header('Location: '.$_SERVER['PHP_SELF']);
+                        if ((int) $usr['acl'] === 1) $_SESSION['adm'] = $usr['id'];
+                        header('Location: ' . $_SERVER['PHP_SELF']);
                         exit();
                     } else util::log('Incorrect password');
                 } else util::log('Account is disabled, contact your System Administrator');

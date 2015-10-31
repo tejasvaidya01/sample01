@@ -12,7 +12,7 @@ class Users
     private $g = null;
     private $t = null;
     private $b = '
-    <h2>Users</h3>
+    <h2>Users</h2>
     <p>
 This is a simple users system, you can
 <a href="?p=users&a=create" title="Create">create</a> a new user or
@@ -22,7 +22,7 @@ This is a simple users system, you can
         'uid'       => '',
         'fname'     => '',
         'lname'     => '',
-        'email'     => '',
+        'altemail'  => '',
         'webpw'     => '',
         'otp'       => '',
         'anote'     => '',
@@ -49,18 +49,14 @@ This is a simple users system, you can
         if (count($_POST)) {
             $this->in['updated'] = date('Y-m-d H:i:s');
             $this->in['created'] = date('Y-m-d H:i:s');
+            $this->in['otpttl'] = 0;
+            $this->in['cookie'] = '';
             db::create($this->in);
             return $this->read();
         } else {
+            $this->in['submit']  = 'Add new user';
             return $this->t->users_form($this->in);
         }
-    }
-
-    public function list()
-    {
-        $buf = '';
-        $users = db::read('*', '', '', 'ORDER BY `updated` DESC');
-        return $this->t->users_list();
     }
 
     public function read()
@@ -69,7 +65,9 @@ This is a simple users system, you can
             $note = db::read('*', 'id', $this->g->in['i'], '', 'one');
             return $this->t->users_item($note);
         } else {
-            return $this->list();
+            return $this->t->users_list([
+                'users' => db::read('*', '', '', 'ORDER BY `updated` DESC')
+            ]);
         }
     }
 
@@ -82,9 +80,11 @@ This is a simple users system, you can
             $this->g->in['i'] = 0;
             return $this->read();
         } elseif ($this->g->in['i']) {
-            $note = db::read('*', 'id', $this->g->in['i'], '', 'one');
-            return $this->t->users_form($note);
-        } else util::log('Error updating users');
+            return $this->t->users_form(array_merge(
+                db::read('*', 'id', $this->g->in['i'], '', 'one'),
+                ['submit' => 'Update user']
+            ));
+        } else return 'Error updating user';
     }
 
     public function delete()
@@ -93,6 +93,6 @@ This is a simple users system, you can
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             $this->g->in['i'] = 0;
             return $this->read();
-        } else util::log('Error deleting note');
+        } else return 'Error deleting user';
     }
 }

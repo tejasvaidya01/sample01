@@ -9,8 +9,8 @@ structure for further experimental development with both the framework
 design and some of the new features of PHP7.
       </p>
       <form method="post">
-        <p>'.$t->button('Success Message', 'submit', 'success', 'l', 'success:Howdy, all is okay.')
-            .$t->button('Danger Message', 'submit', 'danger', 'l', 'danger:Houston, we have a problem.')
+        <p>'.$t->button('Success', 'submit', 'success', 'l', 'success:Howdy, all is okay.')
+            .$t->button('Danger', 'submit', 'danger', 'l', 'danger:Houston, we have a problem.')
             .$t->button('API Debug', 'button', 'default', '', '', ' onclick="ajax()"').'
         </p>
       </form>

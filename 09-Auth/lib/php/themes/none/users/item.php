@@ -1,4 +1,5 @@
 <?php
+// users/item.php 20151030 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 return '
       <hr>
@@ -7,15 +8,15 @@ return '
         <tr><td></td><td>UID:</td><td>' . $uid . '</td><td></td></tr>
         <tr><td></td><td>FirstName:</td><td>' . $fname . '</td><td></td></tr>
         <tr><td></td><td>LastName:</td><td>' . $lname . '</td><td></td></tr>
-        <tr><td></td><td>Email:</td><td>' . $email . '</td><td></td></tr>
+        <tr><td></td><td>Email:</td><td>' . $altemail . '</td><td></td></tr>
         <tr><td></td><td>Created:</td><td>' . $created . '</td><td></td></tr>
         <tr><td></td><td>Updated:</td><td>' . $updated . '</td><td></td></tr>
         <tr><td></td><td colspan="2"><p><em>' . nl2br($anote) . '</em></p></td><td></td></tr>
         <tr><td></td>
-          <td colspan="2" style="text-align:center">
-            <p>
-            '.$this->a('?p=users&a=update&i='.$id, 'Edit', 'btn').'
-            '.$this->a('?p=users&a=delete&i='.$id, 'Delete', 'btn danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"').'
+          <td colspan="2" style="text-align:right">
+            <p>'
+            .$this->a('?p=users&a=delete&i=' . $id, 'Delete', 'danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"')
+            .$this->a('?p=users&a=update&i=' . $id, 'Edit', 'primary').'
             </p>
           </td>
         </tr>
