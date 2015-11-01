@@ -3,8 +3,6 @@
 
 declare(strict_types = 1);
 
-error_log(__FILE__);
-
 class Users
 {
     const TABLE = 'users';
@@ -15,8 +13,8 @@ class Users
     <h2>Users</h2>
     <p>
 This is a simple users system, you can
-<a href="?p=users&a=create" title="Create">create</a> a new user or
-<a href="?p=users&a=read" title="List">list</a> them at your leisure.
+<a href="?o=users&m=create" title="Create">create</a> a new user or
+<a href="?o=users&m=read" title="List">list</a> them at your leisure.
     </p>';
     private $in = [
         'uid'       => '',
@@ -36,7 +34,7 @@ This is a simple users system, you can
         $this->g  = $g;
         db::$tbl  = self::TABLE;
         $this->in = util::esc($this->in);
-        $this->b .= $this->{$g->in['a']}();
+        $this->b .= $this->{$g->in['m']}();
     }
 
     public function __toString() : string

@@ -7,15 +7,16 @@ class Model
 {
     public function __construct(View $t, $g)
     {
-        $p = INC.'pages/'.str_replace('_', DS, $g->in['p']).'.php';
+        $o = INC.'pages/'.str_replace('_', DS, $g->in['o']).'.php';
 
-        if (method_exists($this, $g->in['p'])) {
-            $g->out['main'] = $this->{$g->in['p']}();
-        } elseif (file_exists($p)) {
-            $g->out['main'] = include $p;
-        } elseif (class_exists($g->in['p'])) {
-            db::$dbh = $g->dbh =  new db($g->db);
-            $g->out['main'] = new $g->in['p']($t, $g);
+        if (method_exists($this, $g->in['o'])) {
+            $g->out['main'] = $this->{$g->in['o']}($t, $g);
+        } elseif (file_exists($o)) {
+            $g->out['main'] = include $o;
+        } elseif (class_exists($g->in['o'])) {
+            db::$dbh = $g->dbh = new db($g->db);
+            util::remember($g->db);
+            $g->out['main'] = new $g->in['o']($t, $g);
         }
     }
 

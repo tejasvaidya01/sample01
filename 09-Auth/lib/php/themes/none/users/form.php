@@ -4,7 +4,7 @@
 return '
       <form method="post">
         <p>
-          <label for="uid">UID</label>
+          <label for="uid">UserID</label>
           <input type="text" id="uid" name="uid" value="' . $uid . '">
         </p>
         <p>
@@ -16,7 +16,7 @@ return '
           <input type="text" id="lname" name="lname" value="' . $lname . '">
         </p>
         <p>
-          <label for="altemail">Email</label>
+          <label for="altemail">Alt Email</label>
           <input type="text" id="altemail" name="altemail" value="' . $altemail . '">
         </p>
         <p>
@@ -24,8 +24,8 @@ return '
           <textarea rows="3" name="anote" id="anote">' . $anote . '</textarea>
         </p>
         <p style="text-align:right">' . $this->button($submit, 'submit', 'primary') . '</p>
-        <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
-        <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
+        <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+        <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
 

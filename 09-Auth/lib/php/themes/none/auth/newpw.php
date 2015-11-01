@@ -3,7 +3,7 @@
 
 return '
         <h2>New Password</h2>
-        <form action="?p=auth&amp;a=resetpw" method="post">
+        <form method="post">
           <input type="hidden" name="i" value="'.$id.'">
           <p style="text-align:center"><b>' . $uid . '</b></p>
           <p>

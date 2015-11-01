@@ -10,28 +10,9 @@ class Util
         if ($msg) {
             if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
             $_SESSION['l'] = $lvl . ':' . $msg;
-        } elseif ($_SESSION['l']) {
+        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
             $l = $_SESSION['l']; $_SESSION['l'] = '';
             return explode(':', $l);
-        }
-        return ['', ''];
-    }
-
-    public static function msg2(string $msg = '', string $lvl = 'danger') : array
-    {
-        if ($msg) {
-            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
-            $_SESSION['m'] = $msg;
-            $_SESSION['l'] = $lvl;
-        } elseif ($_SESSION['m']) {
-            if (strpos($_SESSION['m'], ':')) {
-                list($l, $m) = explode(':', $_SESSION['m']);
-                $_SESSION['l'] = $l;
-                $_SESSION['m'] = $m;
-            }
-            $l = $_SESSION['l']; $_SESSION['l'] = '';
-            $m = $_SESSION['m']; $_SESSION['m'] = '';
-            return [$l, $m];
         }
         return ['', ''];
     }
@@ -42,6 +23,20 @@ class Util
             $in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
         return $in;
+    }
+
+    public static function ses(string $k, $v)
+    {
+        return $_SESSION[$k] =
+            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
+                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+    }
+
+    public static function cfg($g)
+    {
+        if (file_exists($g->cfg['file']))
+           foreach(include $g->cfg['file'] as $k => $v)
+               $g->$k = array_merge($g->$k, $v);
     }
 
     public static function which_usr(array $nav = []) : array
@@ -56,6 +51,21 @@ class Util
       return $sef
       ? preg_replace('/[\&].=/', '/', preg_replace('/[\?].=/', '', $url))
       : $url;
+    }
+
+    public static function remember($db)
+    {
+        if (!isset($_SESSION['usr'])) {
+            if ($c = self::cookie_get('remember')) {
+                db::$dbh = new db($db);
+                db::$tbl = 'users';
+                if ($u = db::read('id,acl,uid,cookie', 'cookie', $c, '', 'one')) {
+                    $_SESSION['usr'] = [$u['id'], $u['acl'], $u['uid'], $u['cookie']];
+                    if ($u['acl'] == 1) $_SESSION['adm'] = $u['id'];
+                    self::log($u['uid'].' is remembered and logged back in', 'success');
+                }
+            }
+        }
     }
 
     public static function cookie_get(string $name, string $default='') : string
@@ -81,11 +91,11 @@ class Util
                     if (preg_match('/[a-z]+/', $pw)) {
                         if ($pw === $pw2) {
                             return true;
-                        } else self::msg('Passwords do not match, please try again');
-                    } else self::msg('Password must contains at least one lower case letter');
-                } else self::msg('Password must contains at least one captital letter');
-            } else self::msg('Password must contains at least one number');
-        } else self::msg('Passwords must be at least 10 characters');
+                        } else util::log('Passwords do not match, please try again');
+                    } else util::log('Password must contains at least one lower case letter');
+                } else util::log('Password must contains at least one captital letter');
+            } else util::log('Password must contains at least one number');
+        } else util::log('Passwords must be at least 10 characters');
         return false;
     }
 

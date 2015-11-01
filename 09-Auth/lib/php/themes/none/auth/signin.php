@@ -3,8 +3,7 @@
 
 return '
       <h2>Sign in</h2>
-      <form class="form" role="form" action="" method="post">
-        <input type="hidden" name="p" value="auth">
+      <form method="post">
         <p>
           <label for="uid">Login ID</label>
           <input type="text" name="uid" id="uid" placeholder="Your Email Address" value="' . $uid  . '" required autofocus>
@@ -17,7 +16,7 @@ return '
           <input type="checkbox" name="remember" id="remember" value="yes"> Remember me on this computer
         </p>
         <p style="text-align:right">'
-           . $this->a('?p=auth&amp;a=forgotpw', 'Forgot password')
+           . $this->a('?o=auth&amp;m=forgotpw', 'Forgot password')
            . $this->button('Log me in', 'submit', 'primary') . '
         </p>
       </form>';

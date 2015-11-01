@@ -14,9 +14,6 @@ class View extends Widgets
 
     public function __call(string $name, array $args) : string
     {
-error_log(__METHOD__);
-error_log(var_export($args, true));
-
         $t1 = INC.'themes' . DS . $_SESSION['t'] . DS . str_replace('_', DS, $name).'.php';
         $t2 = INC.'themes' . DS . 'none' . DS . str_replace('_', DS, $name).'.php';
 
@@ -39,10 +36,10 @@ error_log(var_export($args, true));
 
     public function nav1() : string
     {
-        $p = '?p='.$this->g->in['p'];
+        $o = '?o='.$this->g->in['o'];
         return '
-      <nav>' . join('', array_map(function ($n) use ($p) {
-            $c = $p === $n[1] ? ' class="active"' : '';
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
             return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
         }, array_merge(util::which_usr($this->g->nav1), $this->g->nav2))) . '

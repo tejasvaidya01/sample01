@@ -3,7 +3,7 @@
 
 declare(strict_types = 1);
 
-class auth
+class Auth
 {
     const TABLE = 'users';
 
@@ -25,7 +25,7 @@ class auth
         $this->g  = $g;
         db::$tbl  = self::TABLE;
         $this->in = util::esc($this->in);
-        $this->b  = $this->{$g->in['a']}();
+        $this->b  = $this->{$g->in['m']}();
     }
 
     public function __toString() : string

@@ -15,8 +15,8 @@ return '
         <tr><td></td>
           <td colspan="2" style="text-align:right">
             <p>'
-            .$this->a('?p=users&a=delete&i=' . $id, 'Delete', 'danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"')
-            .$this->a('?p=users&a=update&i=' . $id, 'Edit', 'primary').'
+            .$this->a('?o=users&m=delete&i=' . $id, 'Delete', 'danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"')
+            .$this->a('?o=users&m=update&i=' . $id, 'Edit', 'primary').'
             </p>
           </td>
         </tr>

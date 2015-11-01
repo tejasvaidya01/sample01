@@ -13,8 +13,8 @@ class Notes
     <h2>Notes</h2>
     <p>
 This is a simple note system, you can
-<a href="?p=notes&a=create" title="Create">create</a> a new note or
-<a href="?p=notes&a=read" title="Read">read</a> them at your leisure.
+<a href="?o=notes&m=create" title="Create">create</a> a new note or
+<a href="?o=notes&m=read" title="Read">read</a> them at your leisure.
     </p>';
     private $in = [
         'title'     => '',
@@ -30,7 +30,7 @@ This is a simple note system, you can
         $this->g  = $g;
         db::$tbl  = self::TABLE;
         $this->in = util::esc($this->in);
-        $this->b .= $this->{$g->in['a']}();
+        $this->b .= $this->{$g->in['m']}();
     }
 
     public function __toString() : string

@@ -15,18 +15,18 @@ class Themes_Simple_View extends View
     public function nav1(array $a = []) : string
     {
         $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $p = '?p='.$_SESSION['p'];
-        $t = '?t='.$_SESSION['t'];
+        $o = '?o='.$this->g->in['o'];
+        $t = '?t='.$this->g->in['t'];
         return '
-      <nav>'.join('', array_map(function ($n) use ($p, $t) {
-            $c = $p === $n[1] ? ' class="active"' : '';
+      <nav>'.join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
             return '
         <a'.$c.' href="'.$n[1].'">'.$n[0].'</a>';
         }, $a)).'
         <ul>
           <li>
             <a href="#">Themes</a>
-            <ul>'.join('', array_map(function ($n) use ($p, $t) {
+            <ul>'.join('', array_map(function ($n) use ($t) {
             $c = $t === $n[1] ? ' class="active"' : '';
             return '
               <li><a'.$c.' href="'.$n[1].'">'.$n[0].'</a></li>';

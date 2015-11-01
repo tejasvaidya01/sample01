@@ -13,14 +13,14 @@ return '
         extract($ary);
         return '
         <tr>
-          <td><a href="?p=users&a=read&i=' . $id . '">' . $uid . '</a></td>
+          <td><a href="?o=users&m=read&i=' . $id . '">' . $uid . '</a></td>
           <td>' . $fname . '</td>
           <td>' . $lname . '</td>
           <td>' . $altemail . '</td>
           <td style="text-align:right">
             <small>
-              <a href="?p=users&a=update&i=' . $id . '" title="Update">E</a>
-              <a href="?p=users&a=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>
+              <a href="?o=users&m=update&i=' . $id . '" title="Update">E</a>
+              <a href="?o=users&m=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>
             </small>
           </td>
         </tr>';

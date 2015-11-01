@@ -18,8 +18,8 @@ return '
         <p style="text-align:right">' .
           $this->button($submit, 'submit', 'primary') . '
         </p>
-        <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
-        <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
+        <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+        <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
 

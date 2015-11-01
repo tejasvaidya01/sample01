@@ -20,5 +20,6 @@ CREATE TABLE IF NOT EXISTS `users` (
 ALTER TABLE `users` ADD UNIQUE (`uid`);
 
 INSERT INTO `users` (`id`, `acl`, `uid`, `fname`, `lname`, `altemail`, `webpw`, `otp`, `otpttl`, `cookie`, `anote`, `updated`, `created`) VALUES
-(1, 1, 'admin', 'System', 'Administrator', 'admin@example.org', 'changeme', '', '', '', '', NOW(), NOW()),
-(2, 2, 'user1', 'User', 'One', 'user1@example.org', 'changeme', '', '', '', '', NOW(), NOW());
+(1, 1, 'admin@example.org', 'System', 'Administrator', 'admin@example.com', '$2y$10$SwN3X.HFHdkTK8JH07RBWOxKHQ1JeUjCDpM8epozy5Y61OqpAZnbC', '', '', '', '', NOW(), NOW()),
+(2, 2, 'user1@example.org', 'User', 'One', 'user1@example.com', '$2y$10$SwN3X.HFHdkTK8JH07RBWOxKHQ1JeUjCDpM8epozy5Y61OqpAZnbC', '', '', '', '', NOW(), NOW()),
+(3, 2, 'user2@example.org', 'User', 'Two', 'user2@example.com', '$2y$10$SwN3X.HFHdkTK8JH07RBWOxKHQ1JeUjCDpM8epozy5Y61OqpAZnbC', '', '', '', '', NOW(), NOW());

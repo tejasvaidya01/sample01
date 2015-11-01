@@ -3,7 +3,7 @@
 
 declare(strict_types = 1);
 
-class db extends \PDO
+class Db extends \PDO
 {
     public static $dbh = null;
     public static $tbl = null;

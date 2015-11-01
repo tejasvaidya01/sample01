@@ -21,16 +21,14 @@ echo new Controller(new class
         'email'     => 'markc@renta.net',       // site admin email
     ],
     $in = [
-        'a'         => 'read',                  // Action
+        'a'         => '',                      // API [html(default)|json]
         'g'         => 0,                       // Group (category)
         'i'         => 0,                       // Item or ID
         'l'         => '',                      // Logging [lvl:msg]
-        'm'         => '',                      // Method action
+        'm'         => 'read',                  // Method action
         'n'         => 1,                       // Navigation
-        'o'         => 'read',                  // Object module
-        'p'         => 'home',                  // Page [home|about|contact]
+        'o'         => 'home',                  // Object module
         't'         => 'simple',                // current Theme
-        'z'         => '',                      // API [html(default)|json]
     ],
     $out = [
         'top'       => '',
@@ -46,14 +44,6 @@ echo new Controller(new class
         'foot'      => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
         'end'       => '',
     ],
-    $ses = [
-        'a'         => 'read',
-        'i'         => '',
-        'l'         => '',
-        'm'         => '',
-        'p'         => 'home',
-        't'         => 'simple',
-    ],
     $db = [
         'host'      => '127.0.0.1',
         'name'      => 'spe',
@@ -66,26 +56,26 @@ echo new Controller(new class
     ],
     $nav1 = [
         'non' => [
-            ['Home', '?p=home'],
-            ['About', '?p=about'],
-            ['Contact', '?p=contact'],
-            ['Notes', '?p=notes'],
-            ['Sign in', '?p=auth&a=signin'],
+            ['Home', '?o=home'],
+            ['About', '?o=about'],
+            ['Contact', '?o=contact'],
+            ['Notes', '?o=notes'],
+            ['Sign in', '?o=auth&m=signin'],
         ],
         'usr' => [
-            ['Home', '?p=home'],
-            ['About', '?p=about'],
-            ['Contact', '?p=contact'],
-            ['Notes', '?p=notes'],
-            ['Sign out', '?p=auth&a=signout'],
+            ['Home', '?o=home'],
+            ['About', '?o=about'],
+            ['Contact', '?o=contact'],
+            ['Notes', '?o=notes'],
+            ['Sign out', '?o=auth&m=signout'],
         ],
         'adm' => [
-            ['Home', '?p=home'],
-            ['About', '?p=about'],
-            ['Contact', '?p=contact'],
-            ['Notes', '?p=notes'],
-            ['Users', '?p=users'],
-            ['Sign out', '?p=auth&a=signout'],
+            ['Home', '?o=home'],
+            ['About', '?o=about'],
+            ['Contact', '?o=contact'],
+            ['Notes', '?o=notes'],
+            ['Users', '?o=users'],
+            ['Sign out', '?o=auth&m=signout'],
         ],
     ],
     $nav2 = [
@@ -94,7 +84,6 @@ echo new Controller(new class
         ['Bootstrap', '?t=bootstrap'],
         ['Material', '?t=material'],
     ],
-    $nav3 = [],
     $acl = [
         0 => 'Anonymous',
         1 => 'Administrator',
@@ -102,3 +91,14 @@ echo new Controller(new class
         3 => 'Suspended',
     ];
 });
+
+function dbg($var = null)
+{
+    if (is_object($var))
+        error_log(ReflectionObject::export($var, true));
+    ob_start();
+    print_r($var);
+    $ob = ob_get_contents();
+    ob_end_clean();
+    error_log($ob);
+}
