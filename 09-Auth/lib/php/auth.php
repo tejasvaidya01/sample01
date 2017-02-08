@@ -131,7 +131,6 @@ class Auth
                                 ], [['id', '=', $id]])) {
                                 util::log('Password reset for '.$usr['uid'], 'success');
                                 return $this->t->auth_signin(['uid' => $usr['uid']]);
-                                return;
                             } else util::log('Problem updating database');
                         } else util::log($usr['uid'] . ' is not allowed access');
                     } else util::log('Your one time password key has expired');

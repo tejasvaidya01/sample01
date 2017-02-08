@@ -47,10 +47,10 @@ td {
 </style>';
     }
 
-    public function msg() : string
+    public function log() : string
     {
-        list($l, $m) = $this->g->in['m']
-            ? explode(':', $this->g->in['m']) : util::msg();
+        list($l, $m) = $this->g->in['l']
+            ? explode(':', $this->g->in['l']) : util::log();
         return $m ? '
       <div class="alert alert-'.$l.'">'.$m.'
       </div>' : '';
@@ -108,7 +108,7 @@ td {
     <main class="container">
       <div class="row">
         <div class="col-md-1"></div>
-        <div class="demo-content col-md-10">'.$this->g->out['msg'].$this->g->out['main'].'
+        <div class="demo-content col-md-10">'.$this->g->out['log'].$this->g->out['main'].'
         </div>
         <div class="col-md-1"></div>
       </div>
