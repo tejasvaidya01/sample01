@@ -88,10 +88,10 @@ td {
     public function nav1(array $a = []) : string
     {
         $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $p = '?p='.$_SESSION['p'];
+        $o = '?o='.($_SESSION['o'] ?? $this->g->in['o']);
         $t = '?t='.$_SESSION['t'];
-        return join('', array_map(function ($n) use ($p, $t) {
-            $c = $p === $n[1] || $t === $n[1] ? ' class="active"' : '';
+        return join('', array_map(function ($n) use ($o, $t) {
+            $c = $o === $n[1] || $t === $n[1] ? ' class="active"' : '';
             return '
             <li'.$c.'><a href="'.$n[1].'">'.$n[0].'</a></li>';
         }, $a));

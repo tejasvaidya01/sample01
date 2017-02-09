@@ -7,10 +7,12 @@ class Themes_Material_View extends View
 {
     public function css() : string
     {
+error_log(__METHOD__);
+
         return '
     <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Roboto:400,300,300italic,500,400italic,700,700italic" rel="stylesheet" type="text/css">
-    <link href="//storage.googleapis.com/code.getmdl.io/1.3.0/material.blue_grey-pink.min.css" rel="stylesheet">
+    <link href="//storage.googleapis.com/code.getmdl.io/1.0.1/material.blue_grey-pink.min.css" rel="stylesheet">
 <style>
 * { transition: 0.2s linear; }
 .demo-main {
@@ -56,12 +58,16 @@ table {
 
     public function top() : string
     {
+error_log(__METHOD__);
+
         return '
     <div class="mdl-layout mdl-layout--fixed-header mdl-js-layout mdl-color--grey-100">';
     }
 
     public function log() : string
     {
+error_log(__METHOD__);
+
         list($lvl, $msg) = $this->g->in['l']
             ? explode(':', $this->g->in['l']) : util::log();
         return $msg ? '
@@ -71,8 +77,10 @@ table {
 
     public function head() : string
     {
+error_log(__METHOD__);
+
        return '
-      <header class="mdl-layout__header is-casting-shadow" role="banner">
+      <header class="mdl-layout__header">
         <div class="mdl-layout__header-row">
           <span class="mdl-layout-title">'.$this->g->out['head'].'</span>
           <div class="mdl-layout-spacer"></div>
@@ -103,18 +111,22 @@ table {
 
     public function nav1(array $a = []) : string
     {
+error_log(__METHOD__);
+
         $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $o = '?o='.($_SESSION['o'] ?? $this->g->in['o']);
-        $t = '?t='.$_SESSION['t'];
-        return join('', array_map(function ($n) use ($o, $t) {
-            $c = $o === $n[1] || $t === $n[1] ? ' is-active' : '';
+        $o = '?o='.$this->g->in['o'];
+        return join('', array_map(function ($n) use ($o) {
+//error_log(var_export($n,true));
+//            if (is_array($n[1])) return $this->more_nav($n[1]);
             return '
-            <a class="mdl-navigation__link'.$c.'" href="'.$n[1].'">'.$n[0].'</a>';
+            <a class="mdl-navigation__link'.($o===$n[1]?' is-active':'').'" href="'.$n[1].'">'.$n[0].'</a>';
         }, $a));
     }
 
     public function nav2() : string
     {
+error_log(__METHOD__);
+
         $t = '?t='.$this->g->in['t'];
         return join('', array_map(function ($n) use ($t) {
             return '
@@ -124,6 +136,8 @@ table {
 
     public function main() : string
     {
+error_log(__METHOD__);
+
         return '
       <div class="demo-ribbon"></div>
       <main class="demo-main mdl-layout__content">
@@ -137,6 +151,8 @@ table {
 
     public function foot() : string
     {
+error_log(__METHOD__);
+
         return '
     <footer class="mdl-mini-footer">
       <p><em><small>Copyright (C) 2015 Mark Constable (AGPL-3.0)</small></em></p>
@@ -145,25 +161,33 @@ table {
 
     public function end() : string
     {
+error_log(__METHOD__);
+
         return '
     </div>
-    <script src="//storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>';
+    <script src="//storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>';
     }
 
     public function veto_a($href, $label, $class, $extra)
     {
+error_log(__METHOD__);
+
         $class = $this->mdl_color($class);
         return ['class' => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'.$class];
     }
 
     public function veto_button($label, $type, $class, $name, $value, $extra)
     {
+error_log(__METHOD__);
+
         $class = $this->mdl_color($class);
         return ['class' => 'mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent'.$class];
     }
 
     public function veto_email_contact_form() : string
     {
+error_log(__METHOD__);
+
         return '
       <form action="#" method="post" onsubmit="return mailform(this);">
         <div class="mdl-cell--12-col mdl-grid">
@@ -188,6 +212,8 @@ table {
 
     public function veto_notes_item($ary) : string
     {
+error_log(__METHOD__);
+
         extract($ary);
         return '
       <table class="table">
@@ -210,6 +236,8 @@ table {
 
     public function veto_notes_form($ary) : string
     {
+error_log(__METHOD__);
+
         extract($ary);
         return '
       <form action="#" method="post"">
@@ -243,6 +271,8 @@ table {
 
     private function mdl_color($class)
     {
+error_log(__METHOD__);
+
         switch($class) {
             case 'success'  : return ' mdl-color--green';
             case 'danger'   : return ' mdl-color--red';
