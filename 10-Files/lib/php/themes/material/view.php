@@ -12,10 +12,15 @@ error_log(__METHOD__);
         return '
     <link href="//fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link href="//fonts.googleapis.com/css?family=Roboto:400,300,300italic,500,400italic,700,700italic" rel="stylesheet" type="text/css">
-    <link href="//storage.googleapis.com/code.getmdl.io/1.0.1/material.blue_grey-pink.min.css" rel="stylesheet">
+    <link href="//storage.googleapis.com/code.getmdl.io/1.3.0/material.blue_grey-pink.min.css" rel="stylesheet">
 <style>
 * { transition: 0.2s linear; }
 .demo-main {
+  background: url("https://source.unsplash.com/category/nature/1600x900") no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
   margin-top: -35vh;
   -webkit-flex-shrink: 0;
     -ms-flex-negative: 0;
@@ -26,19 +31,12 @@ error_log(__METHOD__);
   width: calc(100% - 16px);
   margin: 0 auto;
 }
-.demo-ribbon {
-  width: 100%;
-  height: 40vh;
-  background: url("/simple-php7-examples/lib/img/20130317_Albert_Park_800x144.jpg") fixed top no-repeat;
-  background-size: 100%;
-  -webkit-flex-shrink: 0;
-    -ms-flex-negative: 0;
-          flex-shrink: 0;
-}
 .demo-content {
   border-radius: 0.2em;
   padding: 0 2em 1em;
   margin-bottom: 4em;
+  margin-top: 40vh;
+  opacity: 0.9;
 }
 .demo-alert {
   border-radius: 0.1em;
@@ -139,7 +137,6 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return '
-      <div class="demo-ribbon"></div>
       <main class="demo-main mdl-layout__content">
         <div class="demo-container mdl-grid">
           <div class="mdl-cell mdl-cell--2-col mdl-cell--hide-tablet mdl-cell--hide-phone"></div>
