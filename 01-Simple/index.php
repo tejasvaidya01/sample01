@@ -1,6 +1,6 @@
 <?php
-// index.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
-// https://github.com/markc/simple-php7-examples/tree/master/01-Simplest/README.md
+// index.php 20150101 - 20170302
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 declare(strict_types = 1);
 
@@ -8,20 +8,26 @@ echo new class
 {
     private
     $in = [
-        'a'     => '',      // Api [html(default)|json]
-        'p'     => 'home',  // Page [home|about|contact]
+        'g'     => 0,           // Group (category)
+        'i'     => 0,           // Item or ID
+        'l'     => '',          // Logging [lvl:msg]
+        'm'     => 'home',      // Method action
+        'n'     => 1,           // Navigation
+        'o'     => 'home',      // Object module
+        't'     => '',          // current Theme
+        'x'     => '',          // XHR request
     ],
     $out = [
         'doct'  => 'SPE::01',
         'nav1'  => '',
-        'head'  => 'Simplest',
+        'head'  => 'Simple',
         'main'  => 'Error: missing page!',
-        'foot'  => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
+        'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
     ],
     $nav1 = [
-        ['Home', '?p=home'],
-        ['About', '?p=about'],
-        ['Contact', '?p=contact'],
+        ['Home', '?m=home'],
+        ['About', '?m=about'],
+        ['Contact', '?m=contact'],
     ];
 
     public function __construct()
@@ -30,13 +36,18 @@ echo new class
             $this->in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k])) : $v;
 
+        if (method_exists($this, $this->in['m']))
+            $this->out['main'] = $this->{$this->in['m']}();
+
         foreach ($this->out as $k => $v)
             $this->out[$k] = method_exists($this, $k) ? $this->$k() : $v;
     }
 
     public function __toString() : string
     {
-        if ($this->in['a'] === 'json') {
+        if ($this->in['x']) {
+            $xhr = $this->out[$this->in['x']] ?? '';
+            if ($xhr) return $xhr;
             header('Content-Type: application/json');
             return json_encode($this->out, JSON_PRETTY_PRINT);
         }
@@ -63,9 +74,6 @@ echo new class
 
     private function main() : string
     {
-        $content = new Pages;
-        if (method_exists($content, $this->in['p']))
-            $this->out['main'] = $content->{$this->in['p']}();
         return '
     <main>' . $this->out['main'] . '
     </main>';
@@ -94,12 +102,9 @@ echo new class
 </html>
 ';
     }
-};
 
-class Pages
-{
-    function home() { return '<h2>Home Page</h2><p>Lorem ipsum home.</p>'; }
-    function about() { return '<h2>About Page</h2><p>Lorem ipsum about.</p>'; }
-    function contact() { return '<h2>Contact Page</h2><p>Lorem ipsum contact.</p>'; }
-}
+    private function home() { return '<h2>Home Page</h2><p>Lorem ipsum home.</p>'; }
+    private function about() { return '<h2>About Page</h2><p>Lorem ipsum about.</p>'; }
+    private function contact() { return '<h2>Contact Page</h2><p>Lorem ipsum contact.</p>'; }
+};
 
