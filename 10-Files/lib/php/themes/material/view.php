@@ -162,7 +162,7 @@ error_log(__METHOD__);
 
         return '
     </div>
-    <script src="//storage.googleapis.com/code.getmdl.io/1.0.1/material.min.js"></script>';
+    <script src="//storage.googleapis.com/code.getmdl.io/1.3.0/material.min.js"></script>';
     }
 
     public function veto_a($href, $label, $class, $extra)

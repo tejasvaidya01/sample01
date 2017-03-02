@@ -166,12 +166,12 @@ td {
         return '
       <table class="table">
         <tr>
-          <td><a href="?p=notes&a=read&i=' . $id . '">' . $title . '</a></td>
+          <td><a href="?o=notes&m=read&i=' . $id . '">' . $title . '</a></td>
           <td style="text-align:right">
             <small>
               by <b>' . $author . '</b> - <i>' . util::now($updated) . '</i> -
-              <a href="?p=notes&a=update&i=' . $id . '" title="Update">E</a>
-              <a href="?p=notes&a=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>
+              <a href="?o=notes&m=update&i=' . $id . '" title="Update">E</a>
+              <a href="?o=notes&m=delete&i=' . $id . '" title="Delete" onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')">X</a>
             </small>
           </td>
         </tr>
@@ -208,8 +208,8 @@ td {
           <div class="col-md-2 col-sm-offset-2 col-md-offset-3 col-lg-offset-4">'.$this->button('Submit', 'submit', 'primary').'
           </div>
         </div>
-        <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
-        <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
+        <input type="hidden" name="o" value="' . $this->g->in['p'] . '">
+        <input type="hidden" name="m" value="' . $this->g->in['a'] . '">
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
     }
@@ -281,8 +281,8 @@ td {
         <div class="col-md-4"></div>
         <div class="col-md-4 col-xs-12 text-right">
           <br>
-          '.$this->a('?p=users&a=update&i='.$id, 'Edit', 'btn btn-primary').'
-          '.$this->a('?p=users&a=delete&i='.$id, 'Delete', 'btn btn-danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"').'
+          '.$this->a('?o=users&m=update&i='.$id, 'Edit', 'btn btn-primary').'
+          '.$this->a('?o=users&m=delete&i='.$id, 'Delete', 'btn btn-danger', ' onClick="javascript: return confirm(\'Are you sure you want to remove '.$id.'?\')"').'
         </div>
         <div class="col-md-4"></div>
       </div>';
@@ -330,21 +330,24 @@ td {
         </div>
         <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
       </form>';
-//        <input type="hidden" name="p" value="' . $this->g->in['p'] . '">
-//        <input type="hidden" name="a" value="' . $this->g->in['a'] . '">
+//        <input type="hidden" name="o" value="' . $this->g->in['p'] . '">
+//        <input type="hidden" name="m" value="' . $this->g->in['a'] . '">
     }
 
     // Auth
 
-    public function auth_signin(string $uid = '') : string
+//    public function auth_signin(string $uid = '') : string
+    public function auth_signin(array $in) : string
     {
 error_log(__METHOD__);
+
+        extract($in);
 
         return '
         <h2><i class="fa fa-sign-in fa-fw"></i> Sign in</h2>
         <div class="col-md-6 col-md-offset-3">
           <form class="form" role="form" action="" method="post">
-            <input type="hidden" name="p" value="auth">
+            <input type="hidden" name="o" value="auth">
             <div class="row">
               <div class="form-group">
                 <div class="input-group">
@@ -373,8 +376,8 @@ error_log(__METHOD__);
             <div class="row">
               <div class="form-group">
                 <div class="text-right">
-                  <a class="btn btn-md btn-default" href="?p=auth&amp;a=forgotpw">Forgot password</a>
-                  <button class="btn btn-md btn-primary" type="submit" name="a" value="signin">Sign in</button>
+                  <a class="btn btn-md btn-default" href="?o=auth&amp;m=forgotpw">Forgot password</a>
+                  <button class="btn btn-md btn-primary" type="submit" name="m" value="signin">Sign in</button>
                 </div>
               </div>
             </div>
@@ -382,15 +385,18 @@ error_log(__METHOD__);
         </div>';
     }
 
-    public function auth_forgotpw(string $uid = '') : string
+//    public function auth_forgotpw(string $uid = '') : string
+    public function auth_forgotpw(array $in) : string
     {
 error_log(__METHOD__);
+
+        extract($in);
 
         return '
         <h2><i class="fa fa-key fa-fw"></i> Reset password</h2>
         <div class="col-md-6 col-md-offset-3">
-          <form class="form" role="form" action="?p=auth&amp;a=forgotpw" method="post">
-            <input type="hidden" name="p" value="auth">
+          <form class="form" role="form" action="?o=auth&amp;m=forgotpw" method="post">
+            <input type="hidden" name="o" value="auth">
             <div class="row">
               <div class="form-group">
                 <div class="input-group">
@@ -402,7 +408,7 @@ error_log(__METHOD__);
             <div class="row">
               <div class="form-group">
                 <div class="text-right">
-                  <a class="btn btn-md btn-default" href="?p=auth&amp;a=signin">&laquo; Back</a>
+                  <a class="btn btn-md btn-default" href="?o=auth&amp;m=signin">&laquo; Back</a>
                   <button class="btn btn-md btn-primary" type="submit">Send</button>
                 </div>
               </div>
@@ -422,7 +428,7 @@ error_log(__METHOD__." id=".$id);
         return '
         <h2><i class="fa fa-key fa-fw"></i> Reset Password</h2>
         <div class="col-md-6 col-md-offset-3">
-          <form class="form" role="form" action="?p=auth&amp;a=resetpw" method="post">
+          <form class="form" role="form" action="?o=auth&amp;m=resetpw" method="post">
             <input type="hidden" name="i" value="'.$id.'">
             <div class="row">
               <p class="text-center"><b>'.$uid.'</b></p>
