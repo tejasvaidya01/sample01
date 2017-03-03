@@ -12,7 +12,7 @@ echo new class
         'doc'   => 'SPE::01',
         'nav1'  => '',
         'head'  => 'Simple',
-        'main'  => 'Error: missing page!',
+        'main'  => '<p>Error: missing page!</p>',
         'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
     ],
     $nav1 = [
@@ -23,13 +23,9 @@ echo new class
 
     public function __construct()
     {
-        foreach ($this->in as $k => $v)
-            $this->in[$k] = isset($_REQUEST[$k])
-                ? htmlentities(trim($_REQUEST[$k])) : $v;
-
+        $this->in['m'] = $_REQUEST['m'] ?? $this->in['m'];
         if (method_exists($this, $this->in['m']))
             $this->out['main'] = $this->{$this->in['m']}();
-
         foreach ($this->out as $k => $v)
             $this->out[$k] = method_exists($this, $k) ? $this->$k() : $v;
     }
