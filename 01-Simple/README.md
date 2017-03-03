@@ -1,4 +1,4 @@
-## simple-php7-examples/01-Simple
+## spe/01-Simple
 
 **2015-10-15** -- _Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)_
 
@@ -19,5 +19,5 @@ part of the framework. It has 3 components...
 
 **TODO: complete documentation.**
 
-[5]: https://github.com/markc/simple-php7-examples/blob/master/01-Simple/index.php#L5
-[7]: https://github.com/markc/simple-php7-examples/blob/master/01-Simple/index.php#L7
+[5]: https://github.com/markc/spe/blob/master/01-Simple/index.php#L5
+[7]: https://github.com/markc/spe/blob/master/01-Simple/index.php#L7

@@ -2,23 +2,14 @@
 // index.php 20150101 - 20170302
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-declare(strict_types = 1);
-
 echo new class
 {
     private
     $in = [
-        'g'     => 0,           // Group (category)
-        'i'     => 0,           // Item or ID
-        'l'     => '',          // Logging [lvl:msg]
         'm'     => 'home',      // Method action
-        'n'     => 1,           // Navigation
-        'o'     => 'home',      // Object module
-        't'     => '',          // current Theme
-        'x'     => '',          // XHR request
     ],
     $out = [
-        'doct'  => 'SPE::01',
+        'doc'   => 'SPE::01',
         'nav1'  => '',
         'head'  => 'Simple',
         'main'  => 'Error: missing page!',
@@ -45,12 +36,6 @@ echo new class
 
     public function __toString() : string
     {
-        if ($this->in['x']) {
-            $xhr = $this->out[$this->in['x']] ?? '';
-            if ($xhr) return $xhr;
-            header('Content-Type: application/json');
-            return json_encode($this->out, JSON_PRETTY_PRINT);
-        }
         return $this->html();
     }
 
@@ -95,7 +80,7 @@ echo new class
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doct . '</title>
+    <title>' . $doc . '</title>
   </head>
   <body>' . $head . $main . $foot . '
   </body>
@@ -107,4 +92,3 @@ echo new class
     private function about() { return '<h2>About Page</h2><p>Lorem ipsum about.</p>'; }
     private function contact() { return '<h2>Contact Page</h2><p>Lorem ipsum contact.</p>'; }
 };
-

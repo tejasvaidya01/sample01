@@ -1,6 +1,6 @@
-# simple-php7-examples
+# SPE - Simple PHP7 Examples
 
-**2015-10-15** -- _Copyright (C) 2015 Mark Constable (AGPL-3.0)_
+_Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
 A very simple PHP7 "framework" that will be expanded to include more small
 project examples building on the first very lean foundation and incorporating
