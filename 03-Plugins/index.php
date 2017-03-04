@@ -1,48 +1,62 @@
 <?php
-// index.php 20150101 - 20170302
+// index.php 20150101 - 20170304
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-declare(strict_types = 1);
-
-echo new class() extends Init
+echo new Init(new class
 {
-    protected
+    public
     $email = 'markc@renta.net',
     $in = [
-        'm'     => 'home',  // Method [home|about|contact]
+        'l'     => '',      // Log (message)
+        'm'     => 'read',  // Method (action)
+        'o'     => 'home',  // Object (content)
+        'x'     => '',      // XHR (request)
     ],
     $out = [
-        'doc'   => 'SPE::02',
+        'doc'   => 'SPE::03',
         'css'   => '',
+        'log'   => '',
         'nav1'  => '',
-        'head'  => 'Styled',
+        'head'  => 'Plugins',
         'main'  => 'Error: missing page!',
         'foot'  => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
     ],
     $nav1 = [
-        ['Home', '?m=home'],
-        ['About', '?m=about'],
-        ['Contact', '?m=contact'],
+        ['Home', '?o=home'],
+        ['About', '?o=about'],
+        ['Contact', '?o=contact'],
     ];
-};
+});
 
 class Init
 {
-    public function __construct()
+    public function __construct($g)
     {
-        foreach ($this->in as $k => $v)
-            $this->in[$k] = isset($_REQUEST[$k])
+        $this->g = $g;
+
+        foreach ($g->in as $k => $v)
+            $this->g->in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k])) : $v;
 
-        if (method_exists($this, $this->in['m']))
-            $this->out['main'] = $this->{$this->in['m']}();
+        if (class_exists($g->in['o'])) {
+            $plugin = new $g->in['o']($g);
+            if (method_exists($plugin, $g->in['m'])) {
+                $g->out['main'] = $plugin->{$g->in['m']}();
+            } else $g->out['main'] = "Error: no plugin method!";
+        } else $g->out['main'] = "Error: no plugin object!";
 
-        foreach ($this->out as $k => $v)
-            $this->out[$k] = method_exists($this, $k) ? $this->$k() : $v;
+        foreach ($g->out as $k => $v)
+            $g->out[$k] = method_exists($this, $k) ? $this->$k() : $v;
     }
 
     public function __toString() : string
     {
+        if ($this->g->in['x']) {
+            $xhr = $this->g->out[$this->g->in['x']] ?? '';
+            if ($xhr) return $xhr;
+            header('Content-Type: application/json');
+            return json_encode($this->g->out, JSON_PRETTY_PRINT);
+        }
         return $this->html();
     }
 
@@ -90,27 +104,39 @@ label, input[type="text"], textarea, pre {
     font-size: 1rem;
     box-sizing : border-box;
 }
-p { margin-top: 0; }
+p, pre, ul { margin-top: 0; }
 a:link, a:visited { color: #0275d8; text-decoration: none; }
 a:hover { text-decoration: underline; }
 a.active { background-color: #2295f8; color: #ffffff; }
 a.active:hover { background-color: #2295f8; }
 .rhs { text-align: right; }
 .center { text-align: center; }
-
+.alert { padding: 0.5em; text-align: center; border-radius: 0.2em; }
+.success { background-color: #dff0d8; border-color: #d0e9c6; color: #3c763d; }
+.danger { background-color: #f2dede; border-color: #ebcccc; color: #a94442; }
 @media (max-width: 46rem) { body { width: 92%; } }
         </style>';
     }
 
+    public function log() : string
+    {
+        if ($this->g->in['l']) {
+            list($lvl, $msg) = explode(':', $this->g->in['l']);
+            return '
+      <p class="alert ' . $lvl . '">' . $msg . '</p>';
+        }
+        return '';
+    }
+
     private function nav1() : string
     {
-        $m = '?m='.$this->in['m'];
+        $m = '?m='.$this->g->in['m'];
         return '
       <nav>' . join('', array_map(function ($n) use ($m) {
             $c = $m === $n[1] ? ' class="active"' : '';
             return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $this->nav1)) . '
+        }, $this->g->nav1)) . '
       </nav>';
     }
 
@@ -118,14 +144,14 @@ a.active:hover { background-color: #2295f8; }
     {
         return '
     <header>
-      <h1>' . $this->out['head'] . '</h1>' . $this->out['nav1'] . '
+      <h1>' . $this->g->out['head'] . '</h1>' . $this->g->out['nav1'] . '
     </header>';
     }
 
     private function main() : string
     {
         return '
-    <main>' . $this->out['main'] . '
+    <main>' . $this->g->out['main'] . '
     </main>';
     }
 
@@ -133,13 +159,13 @@ a.active:hover { background-color: #2295f8; }
     {
         return '
     <footer>
-      <p><em><small>' . $this->out['foot'] . '</small></em></p>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
     </footer>';
     }
 
     private function html() : string
     {
-        extract($this->out, EXTR_SKIP);
+        extract($this->g->out, EXTR_SKIP);
         return '<!DOCTYPE html>
 <html lang="en">
   <head>
@@ -147,15 +173,56 @@ a.active:hover { background-color: #2295f8; }
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>' . $doc . '</title>' . $css . '
   </head>
-  <body>' . $head . $main . $foot . '
+  <body>' . $head . $log . $main . $foot . '
   </body>
 </html>
 ';
     }
+}
 
-    private function home() : string
+class Plugin
+{
+    private
+    $buf = '',
+    $in  = [];
+
+    public function __construct($g)
     {
-        $this->nav1 = array_merge($this->nav1, [
+        $this->g = $g;
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    public function create() : string
+    {
+        return "Plugin::create() not implemented yet!";
+    }
+
+    public function read() : string
+    {
+        return "Plugin::read() not implemented yet!";
+    }
+
+    public function update() : string
+    {
+        return "Plugin::update() not implemented yet!";
+    }
+
+    public function delete() : string
+    {
+        return "Plugin::delete() not implemented yet!";
+    }
+
+}
+
+class Home extends Plugin
+{
+    public function read() : string
+    {
+        $this->g->nav1 = array_merge($this->g->nav1, [
             ['Project Page', 'https://github.com/markc/spe/tree/master/02-Styled'],
             ['Issue Tracker', 'https://github.com/markc/spe/issues'],
         ]);
@@ -166,8 +233,11 @@ This is an ultra simple single-file PHP7 framework and template system example.
 Comments and pull requests are most welcome via the Issue Tracker link above.
       </p>';
     }
+}
 
-    private function about() : string
+class About extends Plugin
+{
+    public function read() : string
     {
         return '
       <h2>About</h2>
@@ -175,10 +245,42 @@ Comments and pull requests are most welcome via the Issue Tracker link above.
 This is an example of a simple PHP7 "framework" to provide the core
 structure for further experimental development with both the framework
 design and some of the new features of PHP7.
-      </p>';
+      </p>
+      <form method="post">
+        <p>
+          <a class="btn success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
+          <a class="btn danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
+          <a class="btn" href="#" onclick="ajax(\'1\')">JSON</a>
+          <a class="btn" href="#" onclick="ajax(\'\')">HTML</a>
+          <a class="btn" href="#" onclick="ajax(\'foot\')">FOOT</a>
+        </p>
+      </form>
+      <pre id="dbg"></pre>
+      <script>
+function ajax(a) {
+  if (window.XMLHttpRequest)  {
+    var x = new XMLHttpRequest();
+    x.open("POST", "", true);
+    x.onreadystatechange = function() {
+      if (x.readyState == 4 && x.status == 200) {
+        document.getElementById("dbg").innerHTML = x.responseText
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/\\\n/g,"\n")
+          .replace(/\\\/g,"");
+    }}
+    x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    x.send("o=about&x="+a);
+    return false;
+  }
+}
+      </script>';
     }
+}
 
-    private function contact() : string
+class Contact extends Plugin
+{
+    public function read() : string
     {
         return '
       <h2>Email Contact Form</h2>
@@ -192,7 +294,7 @@ design and some of the new features of PHP7.
       </form>
       <script>
 function mailform(form) {
-    location.href = "mailto:' . $this->email . '"
+    location.href = "mailto:' . $this->g->email . '"
         + "?subject=" + encodeURIComponent(form.subject.value)
         + "&body=" + encodeURIComponent(form.message.value);
     form.subject.value = "";
