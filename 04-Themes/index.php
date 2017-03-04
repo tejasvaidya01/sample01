@@ -29,7 +29,7 @@ echo new Controller(new class
     $out = [
         'top'   => '',
         'meta'  => '',
-        'doc'   => 'SPE::05',
+        'doc'   => 'SPE::04',
         'css'   => '',
         'msg'   => '',
         'nav1'  => '',
@@ -37,7 +37,7 @@ echo new Controller(new class
         'nav3'  => '',
         'head'  => 'Themes',
         'main'  => 'Missing home page',
-        'foot'  => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
+        'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
         'end'   => '',
     ],
     $nav1 = [
