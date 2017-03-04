@@ -14,34 +14,56 @@ hopefully useful, sub-project with a README.md explaining each example. This
 README will provide an overview and index of all examples and some hints that
 apply to all the sub-project examples.
 
-- [01-Simplest]
+- [01-Simple]
 
-  At 132 LOC this is about the simplest 3 page example of this particular
-  framework I could come up with. It is a self-contained single script with
-  all code encapsulated within classes.
+  At 90 LOC this is about the simplest 3 page example of this particular
+  framework style I could come up with. It is a self-contained single script
+  withall code encapsulated within classes.
 
 - [02-Styled]
 
-  Funcionally similar to the above barebones example but with a reasonable
-  stylesheet (2.4K 130 sloc) and the Roboto font from Google CDN. It also
-  includes a simple AJAX link on the About page that dumps the main global
-  output array using the ultra simple remote API. There is also an example
-  of passing a success/error message back into the same page but it will be
-  replaced with session vars in one of the next examples.
+  Funcionally similar to the above barebones example but with a small amount
+  of inline CSS to provide a minimum of style along with the Roboto font from
+  Google CDN.
 
-- [03-MVC]
+- [03-Plugins]
 
-  Split up the basic functionality of the previous Styled example into the
-  three traditional model, view, controller (MVC) classes.
+  A simple example of providing "plugins" which are basically the model of
+  the traditional MVC coding style. It also includes a simple AJAX link on
+  the About page that dumps the main global output array using the ultra
+  simple remote XHR API. There is also an example of passing a success/error
+  message back into the same page but it will be replaced with session vars
+  in one of the next examples.
 
-- [04-Autoload]
-
-  Add a simple `spl_autoload_register()` function to autoload the split out
-  MVC classes.
-
-- [05-Themes]
+- [04-Themes]
 
   Extend the above example to include basic themeing classes and methods.
+
+- [05-Autoload]
+
+  Add a simple `spl_autoload_register()` function to autoload the split out
+  plugin and theme classes.
+
+- [06-Session]
+
+  TODO:
+
+- [07-PDO]
+
+  TODO:
+
+- [08-Users]
+
+  TODO:
+
+- [05-Auth]
+
+  TODO:
+
+- [10-Files]
+
+  TODO:
+
 
 The associated example README files will act as both code comments and
 general documentation for each project and an easy way to follow along is
@@ -49,7 +71,7 @@ to open up two browsers side by side with the README documentation on the
 left side and drag the reference page line links to the right hand side
 browser which will highlight the code being discussed.
 
-![](https://github.com/markc/simple-php7-examples/blob/master/lib/img/firefox-side-by-side-960x540.jpg)
+![](https://github.com/markc/spe/blob/master/firefox-side-by-side-960x540.jpg)
 
 This function below has proven to be quite useful for examining the code,
 assuming you have access to the servers `error_log` file...
@@ -65,8 +87,8 @@ assuming you have access to the servers `error_log` file...
         error_log($ob);
     }
 
-[01-Simplest]: https://github.com/markc/simple-php7-examples/tree/master/01-Simplest/README.md
-[02-Styled]: https://github.com/markc/simple-php7-examples/tree/master/02-Styled/README.md
-[03-MVC]: https://github.com/markc/simple-php7-examples/tree/master/03-MVC/README.md
-[04-Autoload]: https://github.com/markc/simple-php7-examples/tree/master/04-Autoload/README.md
-[05-themes]: https://github.com/markc/simple-php7-examples/tree/master/05-Themes/README.md
+[01-Simple]:   https://github.com/markc/spe/tree/master/01-Simple/README.md
+[02-Styled]:   https://github.com/markc/spe/tree/master/02-Styled/README.md
+[03-Plugins]:  https://github.com/markc/spe/tree/master/03-Plugins/README.md
+[04-Themes]:   https://github.com/markc/spe/tree/master/04-Themes/README.md
+[05-Autoload]: https://github.com/markc/spe/tree/master/05-Autoload/README.md
