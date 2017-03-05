@@ -435,19 +435,6 @@ body {
   font-weight: 300;
   padding-top: 5rem;
 }
-.w100 { width: 100px; }
-.w200 { width: 200px; }
-.w300 { width: 300px; }
-
-.min50  { min-width:  50px; }
-.min100 { min-width: 100px; }
-.min150 { min-width: 150px; }
-.min200 { min-width: 200px; }
-.min300 { min-width: 300px; }
-.min400 { min-width: 400px; }
-.min500 { min-width: 500px; }
-.min600 { min-width: 600px; }
-
 .nowrap { white-space: nowrap; }
     </style>';
     }
