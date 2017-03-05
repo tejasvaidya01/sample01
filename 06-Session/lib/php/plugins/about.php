@@ -47,4 +47,5 @@ function ajax(a) {
         return $this->t->read(['buf' => $buf]);
     }
 }
+
 ?>

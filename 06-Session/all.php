@@ -2,6 +2,32 @@
 
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
+// lib/php/plugins/home.php 20150101 - 20170305
+
+class Plugins_Home extends Plugin
+{
+    public function read() : string
+    {
+        $ts = util::ses('timestamp', time());
+        util::log("You first visited this page "  . util::now($ts), 'success');
+
+        $buf = '
+      <h2>Home</h2>
+      <p>
+This is an ultra simple single-file PHP7 framework and template system example.
+Comments and pull requests are most welcome via the Issue Tracker link above.
+      </p>
+      <p class="text-center">
+        <a class="btn btn-primary" href="https://github.com/markc/spe">Project Page</a>
+        <a class="btn btn-primary" href="https://github.com/markc/spe/issues">Issue Tracker</a>
+        <a class="btn btn-success" href="?t=none">No Theme</a>
+        <a class="btn btn-success" href="?t=simple">Simple Theme</a>
+        <a class="btn btn-success" href="?t=bootstrap">Bootstrap 4</a>
+      </p>';
+        return $this->t->read(['buf' => $buf]);
+    }
+}
+
 // lib/php/plugins/contact.php 20150101 - 20170305
 
 class Plugins_Contact extends Plugin
@@ -34,6 +60,7 @@ function mailform(form) {
         return $this->t->read(['buf' => $buf, 'js' => $js]);
     }
 }
+
 // lib/php/plugins/about.php 20150101 - 20170305
 
 class Plugins_About extends Plugin
@@ -79,34 +106,11 @@ function ajax(a) {
         return $this->t->read(['buf' => $buf]);
     }
 }
-// lib/php/plugins/home.php 20150101 - 20170305
 
-class Plugins_Home extends Plugin
-{
-    public function read() : string
-    {
-        $ts = util::ses('timestamp', time());
-        util::log("You first visited this page "  . util::now($ts), 'success');
-
-        $buf = '
-      <h2>Home</h2>
-      <p>
-This is an ultra simple single-file PHP7 framework and template system example.
-Comments and pull requests are most welcome via the Issue Tracker link above.
-      </p>
-      <p class="text-center">
-        <a class="btn btn-primary" href="https://github.com/markc/spe">Project Page</a>
-        <a class="btn btn-primary" href="https://github.com/markc/spe/issues">Issue Tracker</a>
-        <a class="btn btn-success" href="?t=none">No Theme</a>
-        <a class="btn btn-success" href="?t=simple">Simple Theme</a>
-        <a class="btn btn-success" href="?t=bootstrap">Bootstrap 4</a>
-      </p>';
-        return $this->t->read(['buf' => $buf]);
-    }
-}
 // lib/php/themes/simple/about.php 20150101 - 20170305
 
 class Themes_Simple_About extends Themes_Simple_Theme {}
+
 // lib/php/themes/simple/contact.php 20150101 - 20170305
 
 class Themes_Simple_Contact extends Themes_Simple_Theme
@@ -116,9 +120,11 @@ class Themes_Simple_Contact extends Themes_Simple_Theme
         return $in['buf'] . $in['js'];
     }
 }
+
 // lib/php/themes/simple/home.php 20150101 - 20170305
 
 class Themes_Simple_Home extends Themes_Simple_Theme {}
+
 // lib/php/themes/simple/theme.php 20150101 - 20170305
 
 class Themes_Simple_Theme extends Theme
@@ -181,54 +187,23 @@ a.active:hover { background-color: #2295f8; }
         </style>';
     }
 }
+
 // lib/php/themes/none/about.php 20150101 - 20170305
 
 class Themes_None_About extends Themes_None_Theme {}
+
 // lib/php/themes/none/contact.php 20150101 - 20170305
 
 class Themes_None_Contact extends Themes_None_Theme {}
+
 // lib/php/themes/none/home.php 20150101 - 20170305
 
 class Themes_None_Home extends Themes_None_Theme {}
+
 // lib/php/themes/none/theme.php 20150101 - 20170305
 
 class Themes_None_Theme extends Theme {}
-// lib/php/themes/bootstrap/about.php 20150101 - 20170305
 
-class Themes_Bootstrap_About extends Themes_Bootstrap_Theme {}
-// lib/php/themes/bootstrap/contact.php 20150101 - 20170305
-
-class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
-{
-    public function read(array $in) : string
-    {
-        return '
-        <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-envelope"></i> Contact us</h2>
-          <form action="' . $this->g->self . '" method="post" onsubmit="return mailform(this)">
-            <input type="hidden" name="o" value="auth">
-            <div class="form-group">
-              <label for="subject">Subject</label>
-              <input type="text" class="form-control" id="subject" placeholder="Your Subject" required>
-            </div>
-            <div class="form-group">
-              <label for="message">Message</label>
-              <textarea class="form-control" id="message" rows="9" placeholder="Your Message" required></textarea>
-            </div>
-            <div class="form-group">
-              <a tabindex="0" role="button" data-toggle="popover" data-trigger="hover" title="Please Note" data-content="Submitting this form will attempt to start your local mail program. If it does not work then you may have to configure your browser to recognize mailto: links."> <i class="fa fa-question-circle fa-fw"></i></a>
-              <div class="btn-group pull-right">
-                <button class="btn btn-primary" type="submit">Send</button>
-              </div>
-            </div>
-          </form>
-        </div>
-        <script> $(function() { $("[data-toggle=popover]").popover(); }); </script>' . $in['js'];
-    }
-}
-// lib/php/themes/bootstrap/home.php 20150101 - 20170305
-
-class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme {}
 // lib/php/themes/bootstrap/theme.php 20150101 - 20170305
 
 class Themes_Bootstrap_Theme extends Theme
@@ -319,145 +294,46 @@ body {
     </main>';
     }
 }
-// lib/php/plugin.php 20150101 - 20170305
 
-class Plugin
+// lib/php/themes/bootstrap/home.php 20150101 - 20170305
+
+class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme {}
+
+// lib/php/themes/bootstrap/contact.php 20150101 - 20170305
+
+class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
 {
-    protected
-    $buf = '',
-    $in  = [];
-
-    public function __construct(Theme $t)
-    {
-        $this->t    = $t;
-        $this->g    = $t->g;
-        $this->buf .= $this->{$t->g->in['m']}();
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
-    }
-
-    public function create() : string
-    {
-        return "<p>Plugin::create() not implemented yet!</p>";
-    }
-
-    public function read() : string
-    {
-        return "<p>Plugin::read() not implemented yet!</p>";
-    }
-
-    public function update() : string
-    {
-        return "<p>Plugin::update() not implemented yet!</p>";
-    }
-
-    public function delete() : string
-    {
-        return "<p>Plugin::delete() not implemented yet!</p>";
-    }
-}
-// lib/php/theme.php 20150101 - 20170305
-
-class Theme
-{
-    private
-    $buf = '',
-    $in  = [];
-
-    public function __construct($g)
-    {
-        $this->g = $g;
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
-    }
-
-    public function log() : string
-    {
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
-    }
-
-    public function nav1() : string
-    {
-        $o = '?o='.$this->g->in['o'];
-        return '
-      <nav>' . join('', array_map(function ($n) use ($o) {
-            $c = $o === $n[1] ? ' class="active"' : '';
-            return '
-        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $this->g->nav1)) . '
-      </nav>';
-    }
-
-    public function head() : string
-    {
-        return '
-    <header>
-      <h1>
-        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
-      </h1>' . $this->g->out['nav1'] . '
-    </header>';
-    }
-
-    public function main() : string
-    {
-        return '
-    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
-    </main>';
-    }
-
-    public function foot() : string
-    {
-        return '
-    <footer class="text-center">
-      <br>
-      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
-    </footer>';
-    }
-
-    public function html() : string
-    {
-        extract($this->g->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $head . $main . $foot . '
-  </body>
-</html>
-';
-    }
-
-    public function create(array $in) : string
-    {
-        return $in['buf'];
-    }
-
     public function read(array $in) : string
     {
-        return $in['buf'];
-    }
-
-    public function update(array $in) : string
-    {
-        return $in['buf'];
-    }
-
-    public function delete(array $in) : string
-    {
-        return $in['buf'];
+        return '
+        <div class="col-md-4 offset-md-4">
+          <h2><i class="fa fa-envelope"></i> Contact us</h2>
+          <form action="' . $this->g->self . '" method="post" onsubmit="return mailform(this)">
+            <input type="hidden" name="o" value="auth">
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" class="form-control" id="subject" placeholder="Your Subject" required>
+            </div>
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea class="form-control" id="message" rows="9" placeholder="Your Message" required></textarea>
+            </div>
+            <div class="form-group">
+              <a tabindex="0" role="button" data-toggle="popover" data-trigger="hover" title="Please Note" data-content="Submitting this form will attempt to start your local mail program. If it does not work then you may have to configure your browser to recognize mailto: links."> <i class="fa fa-question-circle fa-fw"></i></a>
+              <div class="btn-group pull-right">
+                <button class="btn btn-primary" type="submit">Send</button>
+              </div>
+            </div>
+          </form>
+        </div>
+        <script> $(function() { $("[data-toggle=popover]").popover(); }); </script>' . $in['js'];
     }
 }
+
+// lib/php/themes/bootstrap/about.php 20150101 - 20170305
+
+class Themes_Bootstrap_About extends Themes_Bootstrap_Theme {}
+
 // lib/php/util.php 20150225 - 20170306
 
 class Util
@@ -584,6 +460,147 @@ class Init
     }
 }
 
+// lib/php/theme.php 20150101 - 20170305
+
+class Theme
+{
+    private
+    $buf = '',
+    $in  = [];
+
+    public function __construct($g)
+    {
+        $this->g = $g;
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    public function log() : string
+    {
+        list($lvl, $msg) = util::log();
+        return $msg ? '
+      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
+    }
+
+    public function nav1() : string
+    {
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
+    }
+
+    public function head() : string
+    {
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
+    </header>';
+    }
+
+    public function main() : string
+    {
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
+    }
+
+    public function foot() : string
+    {
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
+    }
+
+    public function html() : string
+    {
+        extract($this->g->out, EXTR_SKIP);
+        return '<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>' . $doc . '</title>' . $css . '
+  </head>
+  <body>' . $head . $main . $foot . '
+  </body>
+</html>
+';
+    }
+
+    public function create(array $in) : string
+    {
+        return $in['buf'];
+    }
+
+    public function read(array $in) : string
+    {
+        return $in['buf'];
+    }
+
+    public function update(array $in) : string
+    {
+        return $in['buf'];
+    }
+
+    public function delete(array $in) : string
+    {
+        return $in['buf'];
+    }
+}
+
+// lib/php/plugin.php 20150101 - 20170305
+
+class Plugin
+{
+    protected
+    $buf = '',
+    $in  = [];
+
+    public function __construct(Theme $t)
+    {
+        $this->t    = $t;
+        $this->g    = $t->g;
+        $this->buf .= $this->{$t->g->in['m']}();
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    public function create() : string
+    {
+        return "<p>Plugin::create() not implemented yet!</p>";
+    }
+
+    public function read() : string
+    {
+        return "<p>Plugin::read() not implemented yet!</p>";
+    }
+
+    public function update() : string
+    {
+        return "<p>Plugin::update() not implemented yet!</p>";
+    }
+
+    public function delete() : string
+    {
+        return "<p>Plugin::delete() not implemented yet!</p>";
+    }
+}
+
 // index.php 20150101 - 20170305
 
 const DS  = DIRECTORY_SEPARATOR;
@@ -628,3 +645,4 @@ echo new Init(new class
         ['Bootstrap',   '?t=bootstrap'],
     ];
 });
+

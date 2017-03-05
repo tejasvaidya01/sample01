@@ -32,4 +32,5 @@ error_log(__METHOD__);
         <script> $(function() { $("[data-toggle=popover]").popover(); }); </script>' . $in['js'];
     }
 }
+
 ?>

@@ -34,4 +34,5 @@ function mailform(form) {
         return $this->t->read(['buf' => $buf, 'js' => $js]);
     }
 }
+
 ?>

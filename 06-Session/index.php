@@ -44,4 +44,5 @@ echo new Init(new class
         ['Bootstrap',   '?t=bootstrap'],
     ];
 });
+
 ?>

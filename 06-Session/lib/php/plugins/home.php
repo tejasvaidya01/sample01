@@ -27,4 +27,5 @@ Comments and pull requests are most welcome via the Issue Tracker link above.
         return $this->t->read(['buf' => $buf]);
     }
 }
+
 ?>

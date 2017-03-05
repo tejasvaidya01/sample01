@@ -52,4 +52,5 @@ error_log(__METHOD__);
         return "<p>Plugin::delete() not implemented yet!</p>";
     }
 }
+
 ?>

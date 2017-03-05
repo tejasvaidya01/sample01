@@ -11,4 +11,5 @@ error_log(__METHOD__);
         return $in['buf'] . $in['js'];
     }
 }
+
 ?>
