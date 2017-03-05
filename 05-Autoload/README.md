@@ -1,5 +1,5 @@
-## simple-php7-examples/04-Autoload
+## spe/05-Autoload
 
-**2015-10-15** -- _Copyright (C) 2015 Mark Constable (AGPL-3.0)_
+_Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)_
 
 TODO: write doc
