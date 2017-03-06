@@ -1,74 +1,60 @@
 <?php
-// index.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20170305
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-declare(strict_types = 1);
-
-const DS    = DIRECTORY_SEPARATOR;
-const SYS   = __DIR__;
-const INC   = SYS.DS.'lib'.DS.'php'.DS;
+const DS  = DIRECTORY_SEPARATOR;
+const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 spl_autoload_register(function ($c) {
-    $f = INC.str_replace(['\\', '_'], [DS, DS], strtolower($c)).'.php';
+    $f = INC . str_replace(['\\', '_'], [DS, DS], strtolower($c)) . '.php';
     if (file_exists($f)) include $f;
+    else error_log("!!! $f does not exist");
 });
 
-echo new Controller(new class
+echo new Init(new class
 {
     public
-    $dbh = null,
-    $cfg = [
-        'file'      => 'lib'.DS.'.htconf.php',  // override settings file
-        'email'     => 'markc@renta.net',       // site admin email
-    ],
+    $email      = 'markc@renta.net',
+    $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $self       = '',
     $in = [
-        'a'         => 'read',                  // Action
-        'm'         => '',                      // Message area
-        'p'         => 'home',                  // Page [home|about|contact]
-        't'         => 'simple',                // current Theme
-        'i'         => 0,                       // Item or ID
-        'x'         => '',                      // API [html(default)|json]
+        'i'     => 0,           // Item or ID
+        'l'     => '',          // Log (message)
+        'm'     => 'read',      // Method (action)
+        'o'     => 'home',      // Object (content)
+        't'     => 'bootstrap', // Theme
+        'x'     => '',          // XHR (request)
     ],
     $out = [
-        'top'       => '',
-        'meta'      => '',
-        'doc'       => 'SPE::07',
-        'css'       => '',
-        'msg'       => '',
-        'nav1'      => '',
-        'nav2'      => '',
-        'nav3'      => '',
-        'head'      => 'PDO',
-        'main'      => 'Missing home page',
-        'foot'      => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
-        'end'       => '',
-    ],
-    $ses = [
-        'last'      => '',
-        'lvl'       => '',
-        'msg'       => '',
-        'theme'     => 'simple',
+        'doc'   => 'SPE::07',
+        'css'   => '',
+        'log'   => '',
+        'nav1'  => '',
+        'nav2'  => '',
+        'head'  => 'PDO',
+        'main'  => 'Error: missing page!',
+        'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
     ],
     $db = [
-        'host'      => '127.0.0.1',
-        'name'      => 'notes',
-        'pass'      => '',
-        'path'      => 'lib'.DS.'.ht_notes.sqlite',
-        'port'      => '3306',
-        'sock'      => '', // '/run/mysqld/mysqld.sock',
-        'type'      => 'sqlite',
-        'user'      => 'root',
+        'host'  => '127.0.0.1', // DB site
+        'name'  => 'sysadm',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'path'  => 'lib' . DS . '.ht_news.sqlite', // SQLite DB
+        'port'  => '3306',      // DB port
+        'sock'  => '',          // '/run/mysqld/mysqld.sock',
+        'type'  => 'sqlite',    // mysql | sqlite
+        'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
-        ['Home', '?p=home'],
-        ['About', '?p=about'],
-        ['Contact', '?p=contact'],
-        ['Notes', '?p=notes'],
+        ['About',       '?o=about', 'fa fa-info-circle fa-fw'],
+        ['Contact',     '?o=contact', 'fa fa-envelope fa-fw'],
+        ['News',        '?o=news', 'fa fa-envelope fa-fw'],
     ],
     $nav2 = [
-        ['None', '?t=none'],
-        ['Simple', '?t=simple'],
-        ['Bootstrap', '?t=bootstrap'],
-        ['Material', '?t=material'],
-    ],
-    $nav3 = [];
+        ['None',        '?t=none'],
+        ['Simple',      '?t=simple'],
+        ['Bootstrap',   '?t=bootstrap'],
+    ];
 });
+
+?>
