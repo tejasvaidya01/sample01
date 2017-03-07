@@ -1,7 +1,6 @@
 <?php
-// db.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
-
-declare(strict_types = 1);
+// lib/php/db.php 20150225 - 20170306
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
 {
@@ -10,24 +9,30 @@ class Db extends \PDO
 
     public function __construct(array $dbcfg)
     {
-        extract($dbcfg);
-        $dsn = $type === 'mysql'
-            ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
-            : 'sqlite:' . $path;
-        $pass = file_exists($pass) ? include $pass : $pass;
-        try {
-            parent::__construct($dsn, $user, $pass, [
-                \PDO::ATTR_EMULATE_PREPARES => false,
-                \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-            ]);
-        } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+error_log(__METHOD__);
+
+        if (is_null(self::$dbh)) {
+            extract($dbcfg);
+            $dsn = $type === 'mysql'
+                ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
+                : 'sqlite:' . $path;
+            $pass = file_exists($pass) ? include $pass : $pass;
+            try {
+                parent::__construct($dsn, $user, $pass, [
+                    \PDO::ATTR_EMULATE_PREPARES => false,
+                    \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
+                    \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                ]);
+            } catch(\PDOException $e) {
+                die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
+            }
         }
     }
 
     public static function create(array $ary)
     {
+error_log(__METHOD__);
+
         $fields = $values = '';
         foreach($ary as $k=>$v) {
             $fields .= "
@@ -45,9 +50,10 @@ class Db extends \PDO
         try {
             $stm = self::$dbh->prepare($sql);
             self::bvs($stm, $ary);
-            return $stm->execute();
+            $res = $stm->execute();
+            return self::$dbh->lastInsertId();
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
@@ -58,6 +64,8 @@ class Db extends \PDO
         string $extra = '',
         string $type  = 'all')
     {
+error_log(__METHOD__);
+
         $w = $where ? "
     WHERE $where = :wval" : '';
         $a = $wval ? ['wval' => $wval] : [];
@@ -70,6 +78,8 @@ class Db extends \PDO
 
     public static function update(array $set, array $where)
     {
+error_log(__METHOD__);
+
         $set_str = '';
         foreach($set as $k=>$v) $set_str .= "
         $k = :$k,";
@@ -92,12 +102,14 @@ class Db extends \PDO
             self::bvs($stm, $ary);
             return $stm->execute();
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
     public static function delete(array $where)
     {
+error_log(__METHOD__);
+
         $where_str = '';
         $where_ary = [];
         foreach($where as $k=>$v) {
@@ -114,12 +126,14 @@ class Db extends \PDO
             self::bvs($stm, $where_ary);
             return $stm->execute();
         } catch(\PDOException $e) {
-            die(__FILE__." ".__LINE__."\n".$e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
+error_log(__METHOD__);
+
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
             $stm = self::$dbh->prepare($sql);
@@ -132,12 +146,15 @@ class Db extends \PDO
                 return $res;
             } else return false;
         } catch(\PDOException $e) {
-            die(__FILE__ . " " . __LINE__ . "\n" . $e->getMessage());
+            die(__FILE__ . ' ' . __LINE__ . "<br>\n" . $e->getMessage());
         }
     }
 
-    public static function bvs($stm, array $ary) // bind value statement
+    // bind value statement
+    public static function bvs($stm, array $ary)
     {
+error_log(__METHOD__);
+
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {
                 if (is_numeric($v))     $p = \PDO::PARAM_INT;
@@ -150,3 +167,5 @@ class Db extends \PDO
         }
     }
 }
+
+?>

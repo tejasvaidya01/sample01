@@ -1,104 +1,79 @@
 <?php
-// index.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
+// index.php 20150101 - 20170305
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-declare(strict_types = 1);
-
-const DS    = DIRECTORY_SEPARATOR;
-const SYS   = __DIR__;
-const INC   = SYS.DS.'lib'.DS.'php'.DS;
+const DS  = DIRECTORY_SEPARATOR;
+const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
 
 spl_autoload_register(function ($c) {
-    $f = INC.str_replace(['\\', '_'], [DS, DS], strtolower($c)).'.php';
+    $f = INC . str_replace(['\\', '_'], [DS, DS], strtolower($c)) . '.php';
     if (file_exists($f)) include $f;
+    else error_log("!!! $f does not exist");
 });
 
-echo new Controller(new class
+echo new Init(new class
 {
     public
-    $dbh = null,
-    $cfg = [
-        'file'      => 'lib'.DS.'.ht_conf.php', // override settings file
-        'email'     => 'markc@renta.net',       // site admin email
-    ],
+    $email      = 'admin@goldcoast.org',
+    $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $self       = '',
     $in = [
-        'a'         => '',                      // API [html(default)|json]
-        'g'         => 0,                       // Group (category)
-        'i'         => 0,                       // Item or ID
-        'l'         => '',                      // Logging [lvl:msg]
-        'm'         => 'read',                  // Method action
-        'n'         => 1,                       // Navigation
-        'o'         => 'home',                  // Object module
-        't'         => 'simple',                // current Theme
+        'i'     => 0,           // Item or ID
+        'l'     => '',          // Log (message)
+        'm'     => 'read',      // Method (action)
+        'o'     => 'home',      // Object (content)
+        't'     => 'bootstrap', // Theme
+        'x'     => '',          // XHR (request)
     ],
     $out = [
-        'top'       => '',
-        'meta'      => '',
-        'doc'       => 'SPE::09',
-        'css'       => '',
-        'log'       => '',
-        'nav1'      => '',
-        'nav2'      => '',
-        'nav3'      => '',
-        'head'      => 'Auth',
-        'main'      => 'Missing home page',
-        'foot'      => 'Copyright (C) 2015 Mark Constable (AGPL-3.0)',
-        'end'       => '',
+        'doc'   => 'SPE::09',
+        'css'   => '',
+        'log'   => '',
+        'nav1'  => '',
+        'nav2'  => '',
+        'head'  => 'Auth',
+        'main'  => 'Error: missing page!',
+        'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
     ],
     $db = [
-        'host'      => '127.0.0.1',
-        'name'      => 'spe',
-        'pass'      => 'lib' . DS . '.ht_pw.php',
-        'path'      => 'lib' . DS . '.ht_spe.sqlite',
-        'port'      => '3306',
-        'sock'      => '', // '/run/mysqld/mysqld.sock',
-        'type'      => 'sqlite', // mysql|sqlite
-        'user'      => 'root',
+        'host'  => '127.0.0.1', // DB site
+        'name'  => 'sysadm',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'path'  => 'lib' . DS . '.ht_spe.sqlite', // SQLite DB
+        'port'  => '3306',      // DB port
+        'sock'  => '',          // '/run/mysqld/mysqld.sock',
+        'type'  => 'sqlite',    // mysql | sqlite
+        'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
         'non' => [
-            ['Home', '?o=home'],
-            ['About', '?o=about'],
-            ['Contact', '?o=contact'],
-            ['Notes', '?o=notes'],
-            ['Sign in', '?o=auth&m=signin'],
+            ['About',       '?o=about', 'fa fa-info-circle fa-fw'],
+            ['Contact',     '?o=contact', 'fa fa-envelope fa-fw'],
+            ['News',        '?o=news', 'fa fa-file-text fa-fw'],
+            ['Sign in',     '?o=auth', 'fa fa-sign-in fa-fw'],
         ],
         'usr' => [
-            ['Home', '?o=home'],
-            ['About', '?o=about'],
-            ['Contact', '?o=contact'],
-            ['Notes', '?o=notes'],
-            ['Sign out', '?o=auth&m=signout'],
+            ['News',        '?o=news', 'fa fa-file-text fa-fw'],
+            ['Sign out',    '?o=auth&m=delete', 'fa fa-sign-out fa-fw'],
         ],
         'adm' => [
-            ['Home', '?o=home'],
-            ['About', '?o=about'],
-            ['Contact', '?o=contact'],
-            ['Notes', '?o=notes'],
-            ['Users', '?o=users'],
-            ['Sign out', '?o=auth&m=signout'],
+            ['News',        '?o=news', 'fa fa-file-text fa-fw'],
+            ['Users',       '?o=users', 'fa fa-users fa-fw'],
+            ['Sign out',    '?o=auth&m=delete', 'fa fa-sign-out fa-fw'],
         ],
     ],
     $nav2 = [
-        ['None', '?t=none'],
-        ['Simple', '?t=simple'],
-        ['Bootstrap', '?t=bootstrap'],
-        ['Material', '?t=material'],
+        ['None',        '?t=none'],
+        ['Simple',      '?t=simple'],
+        ['Bootstrap',   '?t=bootstrap'],
     ],
     $acl = [
         0 => 'Anonymous',
-        1 => 'Administrator',
-        2 => 'User',
-        3 => 'Suspended',
+        1 => 'SuperAdmin',
+        2 => 'Administrator',
+        3 => 'User',
+        4 => 'Suspended',
     ];
 });
 
-function dbg($var = null)
-{
-    if (is_object($var))
-        error_log(ReflectionObject::export($var, true));
-    ob_start();
-    print_r($var);
-    $ob = ob_get_contents();
-    ob_end_clean();
-    error_log($ob);
-}
+?>

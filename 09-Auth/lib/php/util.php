@@ -1,12 +1,13 @@
 <?php
-// util.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
-
-declare(strict_types = 1);
+// lib/php/util.php 20150225 - 20170306
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
     public static function log(string $msg = '', string $lvl = 'danger') : array
     {
+error_log(__METHOD__);
+
         if ($msg) {
             if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
             $_SESSION['l'] = $lvl . ':' . $msg;
@@ -19,93 +20,36 @@ class Util
 
     public static function esc(array $in) : array
     {
+error_log(__METHOD__);
+
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
         return $in;
     }
 
-    public static function ses(string $k, $v)
+    public static function ses(string $k, $v) : string
     {
-        return $_SESSION[$k] =
+error_log(__METHOD__." k=$k, v=$v");
+
+        return (string) $_SESSION[$k] =
             (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
                 ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
     }
 
-    public static function cfg($g)
+    public static function cfg($g) : void
     {
-        if (file_exists($g->cfg['file']))
-           foreach(include $g->cfg['file'] as $k => $v)
+error_log(__METHOD__);
+
+        if (file_exists($g->file))
+           foreach(include $g->file as $k => $v)
                $g->$k = array_merge($g->$k, $v);
-    }
-
-    public static function which_usr(array $nav = []) : array
-    {
-        return isset($_SESSION['usr'])
-            ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
-            : $nav['non'];
-    }
-
-    public static function sef($url, $sef = false)
-    {
-      return $sef
-      ? preg_replace('/[\&].=/', '/', preg_replace('/[\?].=/', '', $url))
-      : $url;
-    }
-
-    public static function remember($db)
-    {
-        if (!isset($_SESSION['usr'])) {
-            if ($c = self::cookie_get('remember')) {
-                db::$dbh = new db($db);
-                db::$tbl = 'users';
-                if ($u = db::read('id,acl,uid,cookie', 'cookie', $c, '', 'one')) {
-                    $_SESSION['usr'] = [$u['id'], $u['acl'], $u['uid'], $u['cookie']];
-                    if ($u['acl'] == 1) $_SESSION['adm'] = $u['id'];
-                    self::log($u['uid'].' is remembered and logged back in', 'success');
-                }
-            }
-        }
-    }
-
-    public static function cookie_get(string $name, string $default='') : string
-    {
-        return $_COOKIE[$name] ?? $default;
-    }
-
-    public static function cookie_put(string $name, string $value, int $expiry=604800) : string
-    {
-        return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
-    }
-
-    public static function cookie_del(string $name) : string
-    {
-        return self::cookie_put($name, '', time() - 1);
-    }
-
-    public static function chkpw($pw, $pw2)
-    {
-        if (strlen($pw) > 9) {
-            if (preg_match('/[0-9]+/', $pw)) {
-                if (preg_match('/[A-Z]+/', $pw)) {
-                    if (preg_match('/[a-z]+/', $pw)) {
-                        if ($pw === $pw2) {
-                            return true;
-                        } else util::log('Passwords do not match, please try again');
-                    } else util::log('Password must contains at least one lower case letter');
-                } else util::log('Password must contains at least one captital letter');
-            } else util::log('Password must contains at least one number');
-        } else util::log('Passwords must be at least 10 characters');
-        return false;
-    }
-
-    public static function genpw()
-    {
-        return substr(password_hash((string)time(), PASSWORD_DEFAULT), rand(10, 50), 10);
     }
 
     public static function now($date1, $date2 = null)
     {
+error_log(__METHOD__);
+
         if (!is_numeric($date1)) $date1 = strtotime($date1);
         if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
         $date2 = $date2 ?? time();
@@ -139,4 +83,102 @@ class Util
         }
         return implode(' ', $result) . ' ago';
     }
+
+    // 09-Auth
+
+    public static function which_usr(array $nav = []) : array
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['usr'])
+            ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
+            : $nav['non'];
+    }
+
+    public static function is_adm() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['adm']);
+    }
+
+    public static function is_usr() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['usr']);
+    }
+
+    public static function remember($g)
+    {
+error_log(__METHOD__);
+
+        if (!util::is_usr()) {
+            if ($c = self::cookie_get('remember')) {
+                if (is_null(db::$dbh)) db::$dbh = new db($g->db);
+                db::$tbl = 'users';
+                if ($usr = db::read('id,acl,userid,fname,lname,cookie', 'cookie', $c, '', 'one')) {
+                    extract($usr);
+                    $_SESSION['usr'] = [$id, $acl, $userid, $fname, $lname, $cookie];
+                    if ($acl == 1) $_SESSION['adm'] = $id;
+                    self::log($userid.' is remembered and logged back in', 'success');
+                    self::ses('o', $g->in['o']);
+                    self::ses('m', $g->in['m']);
+                }
+            }
+        } else {
+            self::ses('o', 'auth');
+            self::ses('m', 'read');
+        }
+    }
+
+    public static function cookie_get(string $name, string $default='') : string
+    {
+error_log(__METHOD__);
+
+        return $_COOKIE[$name] ?? $default;
+    }
+
+    public static function cookie_put(string $name, string $value, int $expiry=604800) : string
+    {
+error_log(__METHOD__);
+
+        return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
+    }
+
+    public static function cookie_del(string $name) : string
+    {
+error_log(__METHOD__);
+
+        return self::cookie_put($name, '', time() - 1);
+    }
+
+    public static function chkpw($pw, $pw2)
+    {
+error_log(__METHOD__);
+
+        if (strlen($pw) > 9) {
+            if (preg_match('/[0-9]+/', $pw)) {
+                if (preg_match('/[A-Z]+/', $pw)) {
+                    if (preg_match('/[a-z]+/', $pw)) {
+                        if ($pw === $pw2) {
+                            return true;
+                        } else util::log('Passwords do not match, please try again');
+                    } else util::log('Password must contains at least one lower case letter');
+                } else util::log('Password must contains at least one captital letter');
+            } else util::log('Password must contains at least one number');
+        } else util::log('Passwords must be at least 10 characters');
+        return false;
+    }
+
+    public static function genpw()
+    {
+error_log(__METHOD__);
+
+        return str_replace('.', '_',
+            substr(password_hash((string)time(), PASSWORD_DEFAULT),
+                rand(10, 50), 10));
+    }
 }
+
+?>
