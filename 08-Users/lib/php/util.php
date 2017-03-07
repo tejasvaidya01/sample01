@@ -1,45 +1,55 @@
 <?php
-// util.php 20151015 (C) 2015 Mark Constable <markc@renta.net> (AGPL-3.0)
-
-declare(strict_types = 1);
+// lib/php/util.php 20150225 - 20170306
+// Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Util
 {
-    public static function msg(string $msg = '', string $lvl = 'danger') : array
+    public static function log(string $msg = '', string $lvl = 'danger') : array
     {
-        if ($_SESSION['m']) {
-            if (strpos($_SESSION['m'], ':')) {
-                list($l, $m) = explode(':', $_SESSION['m']);
-            } else {
-                $l = $_SESSION['l']; $_SESSION['l'] = '';
-                $m = $_SESSION['m']; $_SESSION['m'] = '';
-            }
-            return [$l, $m];
-        } elseif ($msg) {
+error_log(__METHOD__);
+
+        if ($msg) {
             if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
-            $_SESSION['m'] = $msg;
-            $_SESSION['l'] = $lvl;
+            $_SESSION['l'] = $lvl . ':' . $msg;
+        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
+            $l = $_SESSION['l']; $_SESSION['l'] = '';
+            return explode(':', $l);
         }
         return ['', ''];
     }
 
-    public static function esc(array $in)
+    public static function esc(array $in) : array
     {
+error_log(__METHOD__);
+
         foreach ($in as $k => $v)
             $in[$k] = isset($_REQUEST[$k])
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
         return $in;
     }
 
-    public static function sef($url, $sef = false)
+    public static function ses(string $k, $v) : string
     {
-      return $sef
-      ? preg_replace('/[\&].=/', '/', preg_replace('/[\?].=/', '', $url))
-      : $url;
+error_log(__METHOD__." k=$k, v=$v");
+
+        return (string) $_SESSION[$k] =
+            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
+                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+    }
+
+    public static function cfg($g) : void
+    {
+error_log(__METHOD__);
+
+        if (file_exists($g->file))
+           foreach(include $g->file as $k => $v)
+               $g->$k = array_merge($g->$k, $v);
     }
 
     public static function now($date1, $date2 = null)
     {
+error_log(__METHOD__);
+
         if (!is_numeric($date1)) $date1 = strtotime($date1);
         if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
         $date2 = $date2 ?? time();
@@ -73,4 +83,7 @@ class Util
         }
         return implode(' ', $result) . ' ago';
     }
+
 }
+
+?>
