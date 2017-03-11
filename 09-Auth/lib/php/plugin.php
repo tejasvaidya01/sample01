@@ -78,7 +78,7 @@ error_log(__METHOD__);
             $this->g->in['i'] = 0;
             return $this->read();
         } elseif ($this->g->in['i']) {
-            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+            return $this->t->update($this->read_one());
         } else return 'Error updating item';
     }
 
