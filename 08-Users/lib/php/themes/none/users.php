@@ -24,7 +24,7 @@ error_log(__METHOD__);
         <tr>
           <td>
             <a href="?o=users&m=read&i=' . $id . '" title="Show user">
-              <strong>' . $userid . '</strong>
+              <strong>' . $login . '</strong>
             </a>
           </td>
           <td>' . $fname . '</td>
@@ -76,7 +76,7 @@ error_log(__METHOD__);
               <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
               <button type="submit" name="m" value="create" class="btn btn-success">Add This Item</button>' : '
               <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
-              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $userid . '?\')">Remove</a>
+              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
               <button type="submit" name="m" value="update" class="btn btn-success">Update</button>';
 
         return '
@@ -90,8 +90,8 @@ error_log(__METHOD__);
             <input type="hidden" name="webpw" value="' . $webpw . '">
 
             <p>
-              <label for="userid">UserID</label><br>
-              <input type="email" id="userid" name="userid" value="' . $userid . '" required>
+              <label for="login">UserID</label><br>
+              <input type="email" id="login" name="login" value="' . $login . '" required>
             </p>
             <p>
               <label for="fname">First Name</label><br>

@@ -25,6 +25,20 @@ error_log('SESSION=' . var_export($_SESSION, true));
         util::ses('l', $g->in['l']);
         $t = util::ses('t', $g->in['t']);
 
+        // temp only
+        if (!isset($_SESSION['usr'])) {
+            $_SESSION['usr'] = [
+                'id'      => 0,
+                'grp'     => 0,
+                'acl'     => 0,
+                'login'   => 'sysadm@example.org',
+                'fname'   => 'Super',
+                'lname'   => 'Admin',
+                'cookie'  => ''
+            ];
+            $_SESSION['adm'] = 0;
+        }
+
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
 
@@ -35,8 +49,11 @@ error_log('SESSION=' . var_export($_SESSION, true));
         if (class_exists($p)) $g->out['main'] = (string) new $p($thm);
         else $g->out['main'] = "Error: no plugin object!";
 
+//        $g->out['end'] = var_export($_SESSION['usr'], true); // debug
+
         foreach ($g->out as $k => $v)
             $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
+            
     }
 
     public function __toString() : string

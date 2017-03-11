@@ -18,16 +18,19 @@ error_log(__METHOD__);
         $buf = '';
         foreach ($in as $row) {
             extract($row);
+            $author_buf = $fname && $lname
+                ? $fname . ' ' . $lname
+                : ($fname && empty($lname) ? $fname : $login);
             $buf .= '
                 <tr>
                   <td class="nowrap">
-                    <a href="?o=news&m=read&i=' . $id . '" title="Show item">
+                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">
                       <strong>' . $title . '</strong>
                     </a>
                   </td>
                   <td class="text-center nowrap bg-primary text-white w200" rowspan="2">
                     <small>
-                      by <b>' . $author . '</b><br>
+                      by <b><a class="text-white" href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
                       <i>' . util::now($updated) . '</i>
                     </small>
                   </td>
@@ -39,7 +42,7 @@ error_log(__METHOD__);
 
         return '
           <h3 class="min600">
-            <a href="?o=news&m=create" title="Add news item">
+            <a href="?o=news&m=create" title="Add new item">
               <i class="fa fa-newspaper-o fa-fw"></i> News
               <small>
                 <i class="fa fa-plus-circle fa-fw"></i>
@@ -54,15 +57,18 @@ error_log(__METHOD__);
           </div>';
     }
 
-    public function read_one(array $ary) : string
+    public function read_one(array $in) : string
     {
 error_log(__METHOD__);
 
-        extract($ary);
-
+        extract($in);
+        $author_buf = $fname && $lname
+            ? $fname . ' ' . $lname
+            : ($fname && empty($lname) ? $fname : $login);
+            
         return '
           <h3 class="w30">
-            <a href="?o=news&m=read&i=0">
+            <a href="?o=news&m=read" title="Go back to list">
               <i class="fa fa-newspaper-o fa-fw"></i> ' . $title . '
             </a>
           </h3>
@@ -73,7 +79,7 @@ error_log(__METHOD__);
                   <td>' . nl2br($content) . '</td>
                   <td class="text-center nowrap w200">
                     <small>
-                      by <b>' . $author . '</b><br>
+                      by <b><a href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
                       <i>' . util::now($updated) . '</i>
                     </small>
                   </td>
@@ -84,7 +90,7 @@ error_log(__METHOD__);
           <div class="row">
             <div class="col-12 text-right">
               <div class="btn-group">
-                <a class="btn btn-secondary" href="?o=news&m=read&i=0">&laquo; Back</a>
+                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
                 <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
               </div>
@@ -104,24 +110,39 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         extract($ary);
-        $itemid = $this->g->in['m'] === 'create' ? 0 : $id;
-        $header = $this->g->in['m'] === 'create' ? 'Add News' : 'Update News';
-        $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn btn-secondary" href="?o=news&m=read&i=0">&laquo; Back</a>
-                <button type="submit" name="i" value="0" class="btn btn-primary">Add This Item</button>' : '
-                <a class="btn btn-secondary" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
+            
+        if ($this->g->in['m'] === 'create') {
+            extract($_SESSION['usr']);
+            $author = $uid = $id;
+            $header = 'Add News';
+            $submit = '
+                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
+                <button type="submit" class="btn btn-primary">Add This Item</button>';                
+        } else {
+            $header = 'Update News';
+            $submit = '
+                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
                 <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
-
+        }
+        
+        $author_label = $fname && $lname
+            ? $fname . ' ' . $lname
+            : ($fname && empty($lname) ? $fname : $login);
+            
+        $author_buf = '
+                  <p class="form-control-static"><b><a href="?o=users&m=update&i=' . $uid . '">' . $author_label . '</a></b></p>';
+            
         return '
           <h3 class="w30">
-            <a href="?o=news&m=read&i=' . $itemid . '">
+            <a href="?o=news&m=read">
               <i class="fa fa-newspaper-o fa-fw"></i> ' . $header . '
             </a>
           </h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
+            <input type="hidden" name="author" value="' . $uid . '">
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
@@ -129,14 +150,13 @@ error_log(__METHOD__);
                   <input type="text" class="form-control" id="title" name="title" value="' . $title . '" required>
                 </div>
                 <div class="form-group">
-                  <label for="author">Author</label>
-                  <input type="text" class="form-control" id="author" name="author" value="' . $author . '" required>
+                  <label for="author">Author</label>' . $author_buf . '
                 </div>
               </div>
               <div class="col-md-8">
                 <div class="form-group">
                   <label for="content">Content</label>
-                  <textarea class="form-control" id="content" name="content" rows="9" required>' . $content . '</textarea>
+                  <textarea class="form-control" id="content" name="content" rows="12" required>' . $content . '</textarea>
                 </div>
               </div>
             </div>

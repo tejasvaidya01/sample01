@@ -8,12 +8,13 @@ class Util
     {
 error_log(__METHOD__);
 
+//error_log("(msg=$msg, lvl=$lvl)");
+
         if ($msg) {
-            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
             $_SESSION['l'] = $lvl . ':' . $msg;
         } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
             $l = $_SESSION['l']; $_SESSION['l'] = '';
-            return explode(':', $l);
+            return explode(':', $l, 2);
         }
         return ['', ''];
     }
@@ -82,6 +83,29 @@ error_log(__METHOD__);
             }
         }
         return implode(' ', $result) . ' ago';
+    }
+
+    public static function is_adm() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['adm']);
+    }
+
+    public static function is_usr(int $id = null) : bool
+    {
+error_log(__METHOD__);
+
+        return (is_null($id))
+            ? isset($_SESSION['usr'])
+            : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
+    }
+
+    public static function is_acl(int $acl) : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
 
 }

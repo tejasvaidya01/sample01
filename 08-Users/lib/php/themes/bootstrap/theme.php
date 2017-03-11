@@ -40,7 +40,10 @@ error_log(__METHOD__);
 
         list($lvl, $msg) = util::log();
         return $msg ? '
-      <div class="alert alert-' . $lvl . '">' . $msg . '
+      <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>' . $msg . '
       </div>' : '';
     }
 
@@ -50,13 +53,21 @@ error_log(__METHOD__);
 
         return '
     <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a class="navbar-brand" href="' . $this->g->self . '"><b>' . $this->g->out['head'] . '</b></a>
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
-        </ul>
+      <div class="container">
+        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
+          <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
+        </a>
+        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
+            </li>
+          </ul>
+        </div>
       </div>
     </nav>';
     }
@@ -75,6 +86,27 @@ error_log(__METHOD__);
             return '
           <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
         }, $a));
+    }
+
+    public function nav2() : string
+    {
+error_log(__METHOD__);
+
+        return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
+    }
+
+    public function nav3() : string
+    {
+error_log(__METHOD__);
+
+        if (util::is_usr()) {
+            $usr[] = ['Change Profile', '?o=users&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-user fa-fw'];
+
+            if (util::is_adm() && !util::is_acl(0)) $usr[] = 
+                ['Switch to sysadm', '?o=users&m=switch_user&i=0', 'fa fa-user fa-fw'];
+
+            return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fa fa-user fa-fw']);
+        } else return '';
     }
 
     public function nav_dropdown(array $a = []) : string

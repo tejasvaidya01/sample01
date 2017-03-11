@@ -51,7 +51,7 @@ error_log(__METHOD__);
         $c = $this->in['remember'];
 
         if ($u) {
-            if ($usr = db::read('id,userid,acl,fname,lname,webpw,cookie', 'userid', $u, '', 'one')) {
+            if ($usr = db::read('id,userid,acl,grp,fname,lname,webpw,cookie', 'userid', $u, '', 'one')) {
                 extract($usr);
                 if ($acl) {
 //                    if ($p === $usr['webpw']) { // for testing a clear text password
@@ -62,7 +62,8 @@ error_log(__METHOD__);
                             util::cookie_put('remember', $uniq, 60*60*24*7);
                             $tmp = $uniq;
                         } else $tmp = '';
-                        $_SESSION['usr'] = [$id, $acl, $u, $fname, $lname, $tmp];
+                        $_SESSION['usr'] = [$id, $acl, $u, $fname, $lname, $tmp]; // add $grp
+                        $_SESSION['usr2'] = $usr;
                         util::log($userid.' is now logged in', 'success');
                         if ((int) $acl === 1) $_SESSION['adm'] = $id;
                         $_SESSION['m'] = 'read';

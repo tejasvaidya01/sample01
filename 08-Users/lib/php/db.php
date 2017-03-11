@@ -68,7 +68,9 @@ error_log(__METHOD__);
 
         $w = $where ? "
     WHERE $where = :wval" : '';
-        $a = $wval ? ['wval' => $wval] : [];
+
+        $a = ($wval || $wval == '0') ? ['wval' => $wval] : [];
+
         $sql = "
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
@@ -133,6 +135,7 @@ error_log(__METHOD__);
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
 error_log(__METHOD__);
+error_log("sql = $sql");
 
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
@@ -154,6 +157,7 @@ error_log(__METHOD__);
     public static function bvs($stm, array $ary)
     {
 error_log(__METHOD__);
+error_log("ary = ".var_export($ary,true));
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {
@@ -162,7 +166,7 @@ error_log(__METHOD__);
                 elseif (is_null($v))    $p = \PDO::PARAM_NULL;
                 elseif (is_string($v))  $p = \PDO::PARAM_STR;
                 else $p = false;
-                if ($p !== false) $stm->bindValue(":$k", $v, $p);
+               if ($p !== false) $stm->bindValue(":$k", $v, $p);
             }
         }
     }

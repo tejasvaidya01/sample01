@@ -77,6 +77,15 @@ error_log(__METHOD__);
     </footer>';
     }
 
+    public function end() : string
+    {
+error_log(__METHOD__);
+
+        return '
+    <pre>' . $this->g->out['end'] . '
+    </pre>';
+    }
+
     public function html() : string
     {
 error_log(__METHOD__);
@@ -89,10 +98,35 @@ error_log(__METHOD__);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>' . $doc . '</title>' . $css . '
   </head>
-  <body>' . $head . $main . $foot . '
+  <body>' . $head . $main . $foot . $end . '
   </body>
 </html>
 ';
+    }
+
+    public static function dropdown(
+        array $ary,
+        string $name,
+        string $sel = '',
+        string $label = '',
+        string $class = '',
+        string $extra = '') : string
+    {
+error_log(__METHOD__);
+
+        $opt = $label ? '
+          <option value="">' . ucfirst($label) . '</option>' : '';
+        $buf = '';
+        $c = $class ? ' class="' . $class . '"' : '';
+        foreach($ary as $k => $v) {
+            $t = str_replace('?t=', '', $v[1]);
+            $s = $sel === $t ? ' selected' : '';
+            $buf .= '
+          <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+        }
+        return '
+        <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
+        </select>';
     }
 
     public function create(array $in) : string

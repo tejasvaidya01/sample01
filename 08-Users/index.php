@@ -18,7 +18,8 @@ echo new Init(new class
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
     $self       = '',
     $in = [
-        'i'     => 0,           // Item or ID
+        'i'     => null,        // Item or ID
+        'g'     => null,        // Group/Category
         'l'     => '',          // Log (message)
         'm'     => 'read',      // Method (action)
         'o'     => 'home',      // Object (content)
@@ -31,9 +32,11 @@ echo new Init(new class
         'log'   => '',
         'nav1'  => '',
         'nav2'  => '',
+        'nav3'  => '',
         'head'  => 'Users',
         'main'  => 'Error: missing page!',
         'foot'  => 'Copyright (C) 2015-2017 Mark Constable (AGPL-3.0)',
+        'end'   => '',
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
@@ -57,11 +60,11 @@ echo new Init(new class
         ['Bootstrap',   '?t=bootstrap'],
     ],
     $acl = [
-        0 => 'Anonymous',
-        1 => 'SuperAdmin',
-        2 => 'Administrator',
-        3 => 'User',
-        4 => 'Suspended',
+        0 => 'SuperAdmin',
+        1 => 'Administrator',
+        2 => 'User',
+        3 => 'Suspended',
+        9 => 'Anonymous',
     ];
 });
 
