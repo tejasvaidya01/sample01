@@ -135,7 +135,6 @@ error_log(__METHOD__);
     public static function qry(string $sql, array $ary = [], string $type = 'all')
     {
 error_log(__METHOD__);
-error_log("sql = $sql");
 
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
@@ -157,7 +156,6 @@ error_log("sql = $sql");
     public static function bvs($stm, array $ary)
     {
 error_log(__METHOD__);
-error_log("ary = ".var_export($ary,true));
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {

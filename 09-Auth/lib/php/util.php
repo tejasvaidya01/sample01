@@ -9,11 +9,10 @@ class Util
 error_log(__METHOD__);
 
         if ($msg) {
-            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
             $_SESSION['l'] = $lvl . ':' . $msg;
         } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
             $l = $_SESSION['l']; $_SESSION['l'] = '';
-            return explode(':', $l);
+            return explode(':', $l, 2);
         }
         return ['', ''];
     }
@@ -95,43 +94,6 @@ error_log(__METHOD__);
             : $nav['non'];
     }
 
-    public static function is_adm() : bool
-    {
-error_log(__METHOD__);
-
-        return isset($_SESSION['adm']);
-    }
-
-    public static function is_usr() : bool
-    {
-error_log(__METHOD__);
-
-        return isset($_SESSION['usr']);
-    }
-
-    public static function remember($g)
-    {
-error_log(__METHOD__);
-
-        if (!util::is_usr()) {
-            if ($c = self::cookie_get('remember')) {
-                if (is_null(db::$dbh)) db::$dbh = new db($g->db);
-                db::$tbl = 'users';
-                if ($usr = db::read('id,acl,userid,fname,lname,cookie', 'cookie', $c, '', 'one')) {
-                    extract($usr);
-                    $_SESSION['usr'] = [$id, $acl, $userid, $fname, $lname, $cookie];
-                    if ($acl == 1) $_SESSION['adm'] = $id;
-                    self::log($userid.' is remembered and logged back in', 'success');
-                    self::ses('o', $g->in['o']);
-                    self::ses('m', $g->in['m']);
-                }
-            }
-        } else {
-            self::ses('o', 'auth');
-            self::ses('m', 'read');
-        }
-    }
-
     public static function cookie_get(string $name, string $default='') : string
     {
 error_log(__METHOD__);
@@ -178,6 +140,54 @@ error_log(__METHOD__);
         return str_replace('.', '_',
             substr(password_hash((string)time(), PASSWORD_DEFAULT),
                 rand(10, 50), 10));
+    }
+    
+    public static function is_adm() : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['adm']);
+    }
+
+    public static function is_usr(int $id = null) : bool
+    {
+error_log(__METHOD__);
+
+        return (is_null($id))
+            ? isset($_SESSION['usr'])
+            : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
+    }
+
+    public static function is_acl(int $acl) : bool
+    {
+error_log(__METHOD__);
+
+        return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
+    }
+    
+    public static function remember($g)
+    {
+error_log(__METHOD__);
+
+        if (!self::is_usr()) {
+            if ($c = self::cookie_get('remember')) {
+                if (is_null(db::$dbh)) db::$dbh = new db($g->db);
+                db::$tbl = 'users';
+                if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
+//error_log(var_export($usr,true));
+                    extract($usr);
+                    $_SESSION['usr'] = $usr;
+//error_log(var_export($_SESSION,true));
+                    if ($acl == 0) $_SESSION['adm'] = $id;
+                    self::log($login . ' is remembered and logged back in', 'success');
+                    self::ses('o', $g->in['o']);
+                    self::ses('m', $g->in['m']);
+                }
+            }
+//        } else {
+//            self::ses('o', 'auth');
+//            self::ses('m', 'read');
+        }
     }
 }
 

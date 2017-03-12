@@ -23,14 +23,15 @@ error_log(__METHOD__);
             $buf .= '
         <tr>
           <td>
-            <a href="?o=users&m=read&i=' . $id . '" title="Show user">
-              <strong>' . $userid . '</strong>
+            <a href="?o=users&m=read&i=' . $id . '" title="Show user: ' . $id . '">
+              <strong>' . $login . '</strong>
             </a>
           </td>
           <td>' . $fname . '</td>
           <td>' . $lname . '</td>
           <td>' . $altemail . '</td>
           <td>' . $this->g->acl[$acl] . '</td>
+          <td>' . $grp . '</td>
         </tr>';
         }
 
@@ -53,6 +54,7 @@ error_log(__METHOD__);
                   <th>Last Name</th>
                   <th>Alt Email</th>
                   <th>ACL</th>
+                  <th>Grp</th>
                 </tr>
               </thead>
               <tbody>' . $buf . '
@@ -66,66 +68,6 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return $this->editor($in);
-/*
-        extract($in);
-
-        return '
-          <h3 class="w30">
-            <a href="?o=users&m=read&i=0">
-              <i class="fa fa-users fa-fw"></i> ' . $userid . '
-            </a>
-            <small>&nbsp;ID: ' . $id . '</small>
-          </h3>
-          <form method="post" action="' . $this->g->self . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <div class="row">
-              <div class="col-md-4">
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>UserID:</b></label>
-                  <p class="form-control-static col-sm-8"><a href="mailto:' . $userid . '">' . $userid . '</a></p>
-                </div>
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>Full Name:</b></label>
-                  <p class="form-control-static col-sm-8">' . $fname . ' ' . $lname . '</p>
-                </div>
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>ACL:</b></label>
-                  <p class="form-control-static col-sm-8">' . $this->g->acl[$acl] . '</p>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>Alt Email:</b></label>
-                  <p class="form-control-static col-sm-8"><a href="mailto:' . $altemail . '">' . $altemail . '</a></p>
-                </div>
-
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>Updated:</b></label>
-                  <p class="form-control-static col-sm-8">' . $updated . '</p>
-                </div>
-                <div class="row">
-                  <label class="col-sm-4 col-form-label"><b>Created:</b></label>
-                  <p class="form-control-static col-sm-8">' . $created . '</p>
-                </div>
-              </div>
-              <div class="col-md-4">
-              <div class="row">
-                <textarea rows="4" class="form-control" placeholder="Admin notes" disabled>' . nl2br($anote) . '</textarea>
-              </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12 text-right">
-                <div class="btn-group">
-                  <a class="btn btn-secondary" href="?o=users&m=read&i=0">&laquo; Back</a>
-                  <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $userid . '?\')">Remove</a>
-                  <a class="btn btn-primary" href="?o=users&m=update&i=' . $id . '">Update</a>
-                </div>
-              </div>
-            </div>
-          </form>';
-*/
     }
 
     public function update(array $in) : string
@@ -140,37 +82,50 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 error_log(var_export($in,true));
 
-
         extract($in);
+        $ary1 = $ary2 = [];
+        foreach($this->g->acl as $k => $v) $ary1[] = [$v, $k];
 
-//        $itemid = $this->g->in['m'] === 'create' ? 0 : $id;
+        $res = db::qry("
+ SELECT login,id FROM `users`
+  WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
+
+        foreach($res as $k => $v) $ary2[] = [$v['login'], $v['id']];
+
+        $acl = null ?? '2';
+        $grp = null ?? '';
+        
+        $aclbuf = $this->dropdown($ary1, 'acl', $acl, '', 'custom-select');
+        $grpbuf = $this->dropdown($ary2, 'grp', $grp, '', 'custom-select');
+
         $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
         $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn btn-outline-primary" href="?o=users&m=read&i=0">&laquo; Back</a>
+                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
                 <button type="submit" name="m" value="create" class="btn btn-primary">Add This Item</button>' : '
-                <a class="btn btn-outline-primary" href="?o=users&m=read&i=0">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $userid . '?\')">Remove</a>
+                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
                 <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
+
+        $switch_buf = '';
+        if ($this->g->in['m'] !== 'create')
+            if (util::is_adm() && (util::is_acl(0) or util::is_acl(1))) $switch_buf = '
+                  <a class="btn btn-outline-primary pull-left" href="?o=users&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>';
 
         return '
           <h3 class="w30">
-            <a href="?o=users&m=read&i=0">
+            <a href="?o=users&m=read">
               <i class="fa fa-users fa-fw"></i> ' . $header . '
             </a>
           </h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-
-            <input type="hidden" name="acl" value="' . $acl . '">
+            <input type="hidden" name="i" value="' . $id . '">
             <input type="hidden" name="webpw" value="' . $webpw . '">
-
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
-                  <label for="userid">UserID</label>
-                  <input type="email" class="form-control" id="userid" name="userid" value="' . $userid . '" required>
+                  <label for="login">UserID</label>
+                  <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
                 </div>
                 <div class="form-group">
                   <label for="fname">First Name</label>
@@ -187,6 +142,13 @@ error_log(var_export($in,true));
                   <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                 </div>
                 <div class="form-group">
+                  <label for="acl">ACL</label><br>' . $aclbuf . '
+                </div>
+                <div class="form-group">
+                  <label for="grp">Group</label><br>' . $grpbuf . '
+                </div>
+<!--
+                <div class="form-group">
                   <label for="password1">Password</label>
                   <input type="password" class="form-control" name="passwd1" id="passwd1" value="">
                 </div>
@@ -194,6 +156,7 @@ error_log(var_export($in,true));
                   <label for="password2">Password Repeat</label>
                   <input type="password" class="form-control" name="passwd2" id="passwd2" value="">
                 </div>
+-->
               </div>
               <div class="col-md-4">
                 <div class="form-group">
@@ -203,7 +166,7 @@ error_log(var_export($in,true));
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">
+              <div class="col-md-12">' . $switch_buf . '
                 <div class="btn-group pull-right">' . $submit . '
                 </div>
               </div>

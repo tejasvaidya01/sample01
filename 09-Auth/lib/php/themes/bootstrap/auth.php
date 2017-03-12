@@ -19,7 +19,7 @@ error_log(__METHOD__);
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" name="userid" id="userid" class="form-control" placeholder="Your Login Email Address" value="' . $userid . '" autofocus required>
+                <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="' . $login . '" autofocus required>
               </div>
             </div>
             <div class="form-group">
@@ -49,7 +49,7 @@ error_log(__METHOD__);
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-                <input type="email" name="userid" id="userid" class="form-control" placeholder="Your Email Address" value="'.$userid.'" required autofocus>
+                <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="' . $login . '" required autofocus>
               </div>
             </div>
             <div class="form-group">
@@ -77,6 +77,7 @@ error_log(__METHOD__);
     public function update(array $in) : string
     {
 error_log(__METHOD__);
+error_log(var_export($in,true));
 
         extract($in);
 
@@ -86,8 +87,8 @@ error_log(__METHOD__);
           <form action="' . $this->g->self . '" method="post">
             <input type="hidden" name="o" value="auth">
             <input type="hidden" name="id" value="' . $id . '">
-            <input type="hidden" name="userid" value="' . $userid . '">
-            <p class="text-center"><b>For ' . $userid . '</b></p>
+            <input type="hidden" name="login" value="' . $login . '">
+            <p class="text-center"><b>For ' . $login . '</b></p>
             <div class="form-group">
               <div class="input-group">
                 <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>

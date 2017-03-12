@@ -43,7 +43,6 @@ error_log(__METHOD__);
             return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
         }, $a));
-// ?            if (is_array($n[1])) return $this->dropdown($n);
     }
 
     public function nav2() : string
@@ -95,6 +94,15 @@ error_log(__METHOD__);
     </footer>';
     }
 
+    public function end() : string
+    {
+error_log(__METHOD__);
+
+        return '
+    <pre>' . $this->g->out['end'] . '
+    </pre>';
+    }
+
     public function html() : string
     {
 error_log(__METHOD__);
@@ -107,7 +115,7 @@ error_log(__METHOD__);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>' . $doc . '</title>' . $css . '
   </head>
-  <body>' . $head . $main . $foot . '
+  <body>' . $head . $main . $foot . $end . '
   </body>
 </html>
 ';

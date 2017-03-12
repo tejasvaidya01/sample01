@@ -47,7 +47,6 @@ error_log(__METHOD__);
     protected function read() : string
     {
 error_log(__METHOD__);
-//error_log(var_export($this->g->in, true));
 
         return is_null($this->g->in['i'])
             ? $this->t->read($this->read_all())

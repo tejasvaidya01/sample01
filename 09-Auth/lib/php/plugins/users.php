@@ -7,13 +7,14 @@ class Plugins_Users extends Plugin
     protected
     $tbl = 'users',
     $in = [
-        'userid'    => '',
-        'acl'       => 0,
+        'id'        => null,
+        'grp'       => null,
+        'acl'       => null,
+        'login'     => '',
         'fname'     => '',
         'lname'     => '',
         'altemail'  => '',
         'webpw'     => '',
-        'otp'       => '',
         'anote'     => '',
     ];
     
@@ -21,20 +22,11 @@ class Plugins_Users extends Plugin
     {
 error_log(__METHOD__);
 
-            $_SESSION['switch_to'] = 0;
-            $_SESSION['switch_from'] = 0;
-
         if (util::is_acl(0)) { // superadmin
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
             return db::read('*', '', '', 'ORDER BY `updated` DESC');
         } elseif (util::is_acl(1)) { // normal admin
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
             return db::read('*', 'grp', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
         } else {
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
             return db::read('*', 'id', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
         }
     }

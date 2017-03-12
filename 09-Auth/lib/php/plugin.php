@@ -40,6 +40,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
+            $this->g->in['i'] = $lid;
             return $this->read();
         } else return $this->t->create($this->in);
     }
@@ -48,9 +49,9 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return $this->g->in['i']
-            ? $this->t->read_one($this->read_one())
-            : $this->t->read($this->read_all());
+        return is_null($this->g->in['i'])
+            ? $this->t->read($this->read_all())
+            : $this->t->read_one($this->read_one());
     }
 
     protected function read_one() : array
@@ -75,9 +76,9 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            $this->g->in['i'] = 0;
+            $this->g->in['i'] = null;
             return $this->read();
-        } elseif ($this->g->in['i']) {
+        } elseif (!is_null($this->g->in['i'])) {
             return $this->t->update($this->read_one());
         } else return 'Error updating item';
     }
@@ -89,7 +90,7 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            $this->g->in['i'] = 0;
+            $this->g->in['i'] = null;
             return $this->read();
         } else return 'Error deleting item';
     }

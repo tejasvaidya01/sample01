@@ -40,7 +40,10 @@ error_log(__METHOD__);
 
         list($lvl, $msg) = util::log();
         return $msg ? '
-      <div class="alert alert-' . $lvl . '">' . $msg . '
+      <div class="alert alert-' . $lvl . ' alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>' . $msg . '
       </div>' : '';
     }
 
@@ -60,7 +63,9 @@ error_log(__METHOD__);
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
           <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
           </ul>
-          <ul class="navbar-nav">'  . $this->g->out['nav2'] . '
+          <ul class="navbar-nav">
+            <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
+            </li>
           </ul>
         </div>
       </div>
@@ -79,9 +84,7 @@ error_log(__METHOD__);
             $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
             $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
             return '
-          <li class="nav-item' . $c . '">
-            <a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a>
-          </li>';
+          <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
         }, $a));
     }
 
@@ -90,6 +93,21 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return $this->nav_dropdown(['Theme', $this->g->nav2, 'fa fa-th fa-fw']);
+    }
+
+    public function nav3() : string
+    {
+error_log(__METHOD__);
+
+        if (util::is_usr()) {
+            $usr[] = ['Change Profile', '?o=users&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-user fa-fw'];
+            $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-key fa-fw'];
+            $usr[] = ['Sign out', '?o=auth&m=delete', 'fa fa-sign-out fa-fw'];
+            if (util::is_adm() && !util::is_acl(0)) $usr[] = 
+                ['Switch to sysadm', '?o=users&m=switch_user&i=0', 'fa fa-user fa-fw'];
+
+            return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fa fa-user fa-fw']);
+        } else return '';
     }
 
     public function nav_dropdown(array $a = []) : string

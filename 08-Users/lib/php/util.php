@@ -107,7 +107,6 @@ error_log(__METHOD__);
 
         return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
-
 }
 
 ?>

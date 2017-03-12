@@ -33,7 +33,6 @@ error_log('SESSION=' . var_export($_SESSION, true));
 
         $p  = 'plugins_' . $g->in['o'];
         if (class_exists($p)) {
-            if (is_null(db::$dbh)) db::$dbh = new db($g->db);
             util::remember($g);
             $g->out['main'] = (string) new $p($thm);
         } else $g->out['main'] = "Error: no plugin object!";

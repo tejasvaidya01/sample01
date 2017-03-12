@@ -68,7 +68,11 @@ error_log(__METHOD__);
 
         $w = $where ? "
     WHERE $where = :wval" : '';
-        $a = $wval ? ['wval' => $wval] : [];
+
+        $a = ($wval || $wval == '0') ? ['wval' => $wval] : [];
+        
+error_log("wval = $wval");
+
         $sql = "
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
@@ -134,6 +138,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+error_log("sql = $sql");
+
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
             $stm = self::$dbh->prepare($sql);
@@ -154,6 +160,8 @@ error_log(__METHOD__);
     public static function bvs($stm, array $ary)
     {
 error_log(__METHOD__);
+
+error_log("ary = ".var_export($ary,true));
 
         if (is_object($stm) && ($stm instanceof \PDOStatement)) {
             foreach($ary as $k => $v) {

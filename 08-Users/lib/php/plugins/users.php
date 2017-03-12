@@ -7,7 +7,6 @@ class Plugins_Users extends Plugin
     protected
     $tbl = 'users',
     $in = [
-//        'id'        => null,
         'grp'       => null,
         'acl'       => null,
         'login'     => '',
