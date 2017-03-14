@@ -27,7 +27,7 @@ error_log(__METHOD__);
         if ($_POST) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
-                    if ($usr['acl'] == 9) {
+                    if ($usr['acl'] != 9) {
                         $newpass = util::genpw();
                         if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->email)) {
                             db::update([
