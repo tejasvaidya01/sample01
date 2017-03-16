@@ -9,7 +9,7 @@ class Plugins_Home extends Plugin
 error_log(__METHOD__);
 
         if (empty($_SESSION['l'])) {
-            $ts = util::ses('timestamp', time());
+            $ts = util::ses('timestamp', (string) time());
             util::log("You first visited this page "  . util::now($ts), 'success');
         }
 

@@ -80,7 +80,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $curr  = (int) util::ses('p', $this->g->in['p']);
+        $curr  = (int) util::ses('p', (string) $this->g->in['p']);
         $perp  = $this->g->perp;
         $start = ($curr - 1) * $perp;
         $total = db::read('count(id)', '', '', '', 'col');
