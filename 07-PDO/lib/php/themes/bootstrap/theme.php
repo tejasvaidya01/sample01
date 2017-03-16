@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/theme.php 20150101 - 20170305
+// lib/php/themes/bootstrap/theme.php 20150101 - 20170316
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Theme extends Theme
@@ -52,7 +52,9 @@ error_log(__METHOD__);
       <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="' . $this->g->self . '"><b>' . $this->g->out['head'] . '</b></a>
+      <a class="navbar-brand" href="' . $this->g->self . '">
+        <b><i class="fa fa-home fa-fw"></i> ' . $this->g->out['head'] . '</b>
+      </a>
       <div class="collapse navbar-collapse" id="navbarsExampleDefault">
         <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
         </ul>

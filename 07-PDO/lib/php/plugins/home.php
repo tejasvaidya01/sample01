@@ -4,7 +4,7 @@
 
 class Plugins_Home extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
 error_log(__METHOD__);
 
@@ -26,7 +26,7 @@ Comments and pull requests are most welcome via the Issue Tracker link above.
         <a class="btn btn-success" href="?t=simple">Simple Theme</a>
         <a class="btn btn-success" href="?t=bootstrap">Bootstrap 4</a>
       </p>';
-        return $this->t->read(['buf' => $buf]);
+        return $this->t->list(['buf' => $buf]);
     }
 }
 

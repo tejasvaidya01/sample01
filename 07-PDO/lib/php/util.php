@@ -28,9 +28,9 @@ error_log(__METHOD__);
         return $in;
     }
 
-    public static function ses(string $k, $v) : string
+    public static function ses(string $k, string $v) : string
     {
-error_log(__METHOD__."k=$k, v=$v");
+error_log(__METHOD__."(k=$k, v=$v)");
 
         return (string) $_SESSION[$k] =
             (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))

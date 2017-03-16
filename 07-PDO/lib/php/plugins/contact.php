@@ -4,7 +4,7 @@
 
 class Plugins_Contact extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
 error_log(__METHOD__);
 
@@ -31,7 +31,7 @@ function mailform(form) {
     return false;
 }
       </script>';
-        return $this->t->read(['buf' => $buf, 'js' => $js]);
+        return $this->t->list(['buf' => $buf, 'js' => $js]);
     }
 }
 

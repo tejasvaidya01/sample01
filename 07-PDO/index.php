@@ -16,12 +16,14 @@ echo new Init(new class
     public
     $email      = 'markc@renta.net',
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $perp       = 5, // items Per Page
     $self       = '',
     $in = [
-        'i'     => 0,           // Item or ID
+        'i'     => null,        // Item or ID
         'l'     => '',          // Log (message)
-        'm'     => 'read',      // Method (action)
+        'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
+        'p'     => 1,           // Page (current)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
     ],

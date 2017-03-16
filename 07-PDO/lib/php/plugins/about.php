@@ -4,7 +4,7 @@
 
 class Plugins_About extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
 error_log(__METHOD__);
 
@@ -44,7 +44,7 @@ function ajax(a) {
   }
 }
       </script>';
-        return $this->t->read(['buf' => $buf]);
+        return $this->t->list(['buf' => $buf]);
     }
 }
 

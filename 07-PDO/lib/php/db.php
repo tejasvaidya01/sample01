@@ -1,5 +1,5 @@
 <?php
-// lib/php/db.php 20150225 - 20170306
+// lib/php/db.php 20150225 - 20170316
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
@@ -68,7 +68,9 @@ error_log(__METHOD__);
 
         $w = $where ? "
     WHERE $where = :wval" : '';
-        $a = $wval ? ['wval' => $wval] : [];
+
+        $a = ($wval || $wval == '0') ? ['wval' => $wval] : [];
+
         $sql = "
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";

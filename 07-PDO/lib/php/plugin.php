@@ -1,5 +1,5 @@
 <?php
-// lib/php/plugin.php 20150101 - 20170305
+// lib/php/plugin.php 20150101 - 20170316
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugin
@@ -40,7 +40,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            return $this->read();
+            return $this->list();
         } else return $this->t->create($this->in);
     }
 
@@ -48,23 +48,7 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        return $this->g->in['i']
-            ? $this->t->read_one($this->read_one())
-            : $this->t->read($this->read_all());
-    }
-
-    protected function read_one() : array
-    {
-error_log(__METHOD__);
-
-        return db::read('*', 'id', $this->g->in['i'], '', 'one');
-    }
-
-    protected function read_all() : array
-    {
-error_log(__METHOD__);
-
-        return db::read('*', '', '', 'ORDER BY `updated` DESC');
+        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
     }
 
     protected function update() : string
@@ -75,8 +59,7 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            $this->g->in['i'] = 0;
-            return $this->read();
+            return $this->list();
         } elseif ($this->g->in['i']) {
             return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
         } else return 'Error updating item';
@@ -89,9 +72,27 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            $this->g->in['i'] = 0;
-            return $this->read();
+            return $this->list();
         } else return 'Error deleting item';
+    }
+
+    protected function list() : string
+    {
+error_log(__METHOD__);
+
+        $curr  = (int) util::ses('p', $this->g->in['p']);
+        $perp  = $this->g->perp;
+        $start = ($curr - 1) * $perp;
+        $total = db::read('count(id)', '', '', '', 'col');
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return $this->t->list(array_merge(
+            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $start . ',' . $perp),
+            ['pages' => ['prev' => $prev, 'curr' => $curr, 'next' => $next, 'last' => $last]]
+        ));
     }
 }
 

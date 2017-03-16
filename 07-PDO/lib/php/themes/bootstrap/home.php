@@ -4,7 +4,7 @@
 
 class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
 error_log(__METHOD__);
 
