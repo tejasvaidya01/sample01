@@ -565,204 +565,6 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/news.php 20170316
-
-class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
-{
-    public function create(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function read(array $ary) : string
-    {
-        extract($ary);
-
-        return '
-          <h3 class="min600">
-            <a href="?o=news&m=list&p=' . $_SESSION['p'] . '">
-              <i class="fa fa-file-text fa-fw"></i> ' . $title . '
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table min600">
-              <tbody>
-                <tr>
-                  <td>' . nl2br($content) . '</td>
-                  <td class="text-center nowrap w200">
-                    <small>
-                      by <b>' . $author . '</b><br>
-                      <i>' . util::now($updated) . '</i>
-                    </small>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="row">
-            <div class="col-12 text-right">
-              <div class="btn-group">
-                <a class="btn btn-secondary" href="?o=news&m=list&p=' . $_SESSION['p'] . '">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
-              </div>
-            </div>
-          </div>';
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function list(array $in) : string
-    {
-        $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pages']; unset($in['pages']);
-
-        if ($pgr['last'] > 1) {
-            $pgr_top ='
-          <div class="col-md-6">' . $this->pager($pgr) . '
-          </div>';
-            $pgr_end = '
-          <div class="row">
-            <div class="col-12">' . $this->pager($pgr) . '
-            </div>
-          </div>';
-        }
-
-        foreach ($in as $row) {
-            extract($row);
-            $buf .= '
-                <tr>
-                  <td class="nowrap">
-                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">
-                      <strong>' . $title . '</strong>
-                    </a>
-                  </td>
-                  <td class="text-center nowrap bg-primary text-white w200" rowspan="2">
-                    <small>
-                      by <b>' . $author . '</b><br>
-                      <i>' . util::now($updated) . '</i>
-                    </small>
-                  </td>
-                </tr>
-                <tr>
-                  <td><p>' . nl2br($content) . '</p></td>
-                </tr>';
-        }
-
-        return '
-        <div class="row">
-          <div class="col-md-6">
-            <h2 class="min600">
-              <a href="?o=news&m=create" title="Add news item">
-                <i class="fa fa-file-text fa-fw"></i> News
-                <small><i class="fa fa-plus-circle fa-fw"></i></small>
-              </a>
-            </h2>
-          </div>' . $pgr_top . '
-        </div>
-        <div class="table-responsive">
-          <table class="table table-bordered min600">
-            <tbody>' . $buf . '
-            </tbody>
-          </table>
-        </div>' . $pgr_end;
-    }
-
-    private function editor(array $ary) : string
-    {
-        extract($ary);
-
-        if ($this->g->in['m'] === 'create') {
-            $header = 'Add News';
-            $submit = '
-                  <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
-                  <button type="submit" name="i" value="0" class="btn btn-primary">Add This Item</button>';
-
-        } else {
-            $header = 'Update News';
-            $submit = '
-                  <a class="btn btn-secondary" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
-                  <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                  <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
-        }
-
-        return '
-          <h2 class="min600">
-            <a href="?o=news&m=list">
-              <i class="fa fa-file-text fa-fw"></i> ' . $header . '
-            </a>
-          </h2>
-          <form method="post" action="' . $this->g->self . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <div class="row">
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="title">Title</label>
-                  <input type="text" class="form-control" id="title" name="title" value="' . $title . '" required>
-                </div>
-                <div class="form-group">
-                  <label for="author">Author</label>
-                  <input type="text" class="form-control" id="author" name="author" value="' . $author . '" required>
-                </div>
-              </div>
-              <div class="col-md-8">
-                <div class="form-group">
-                  <label for="content">Content</label>
-                  <textarea class="form-control" id="content" name="content" rows="9" required>' . $content . '</textarea>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-12 text-right">
-                <div class="btn-group">' . $submit . '
-                </div>
-              </div>
-            </div>
-          </form>';
-    }
-
-    private function pager(array $ary) : string
-    {
-        extract($ary);
-
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
-        $buf = '';
-
-        for($i = 1; $i <= $last; $i++) {
-            $a = $i === $curr ? ' active' : '';
-            $buf .= '
-              <li class="page-item' . $a . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
-              </li>';
-        }
-
-        $prev_dis = $curr === 1 ? ' disabled' : '';
-        $next_dis = $curr === $last ? ' disabled' : '';
-
-        return '
-          <nav aria-label="Page navigation">
-            <ul class="pagination pull-right">
-              <li class="page-item' . $prev_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-              </li>' . $buf . '
-              <li class="page-item' . $next_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-              </li>
-            </ul>
-          </nav>';
-    }
-}
 // lib/php/themes/bootstrap/theme.php 20150101 - 20170316
 
 class Themes_Bootstrap_Theme extends Theme
@@ -860,8 +662,208 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
       </div>
     </main>';
     }
+
+    protected function pager(array $ary) : string
+    {
+        extract($ary);
+
+        $o = util::ses('o', (string) $this->g->in['o']);
+        $m = 'list';
+
+        $buf = '';
+
+        for($i = 1; $i <= $last; $i++) {
+            $a = $i === $curr ? ' active' : '';
+            $buf .= '
+              <li class="page-item' . $a . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
+              </li>';
+        }
+
+        $prev_dis = $curr === 1 ? ' disabled' : '';
+        $next_dis = $curr === $last ? ' disabled' : '';
+
+        return '
+          <nav aria-label="Page navigation">
+            <ul class="pagination pull-right">
+              <li class="page-item' . $prev_dis . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+              </li>' . $buf . '
+              <li class="page-item' . $next_dis . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+            </ul>
+          </nav>';
+    }
 }
 
+// lib/php/themes/bootstrap/news.php 20170316
+
+class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
+{
+    public function create(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function read(array $in) : string
+    {
+        extract($in);
+
+        return '
+          <h3 class="min600">
+            <a href="?o=news&m=list&p=' . $_SESSION['p'] . '">
+              <i class="fa fa-file-text fa-fw"></i> ' . $title . '
+            </a>
+          </h3>
+          <div class="table-responsive">
+            <table class="table min600">
+              <tbody>
+                <tr>
+                  <td>' . nl2br($content) . '</td>
+                  <td class="text-center nowrap w200">
+                    <small>
+                      by <b>' . $author . '</b><br>
+                      <i>' . util::now($updated) . '</i>
+                    </small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row">
+            <div class="col-12 text-right">
+              <div class="btn-group">
+                <a class="btn btn-secondary" href="?o=news&m=list&p=' . $_SESSION['p'] . '">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
+              </div>
+            </div>
+          </div>';
+    }
+
+    public function update(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+        $buf = $pgr_top = $pgr_end = '';
+        $pgr = $in['pager']; unset($in['pager']);
+
+        if ($pgr['last'] > 1) {
+            $pgr_top ='
+          <div class="col-md-6">' . $this->pager($pgr) . '
+          </div>';
+            $pgr_end = '
+          <div class="row">
+            <div class="col-12">' . $this->pager($pgr) . '
+            </div>
+          </div>';
+        }
+
+        foreach ($in as $row) {
+            extract($row);
+            $buf .= '
+                <tr>
+                  <td class="nowrap">
+                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">
+                      <strong>' . $title . '</strong>
+                    </a>
+                  </td>
+                  <td class="text-center nowrap bg-primary text-white w200" rowspan="2">
+                    <small>
+                      by <b>' . $author . '</b><br>
+                      <i>' . util::now($updated) . '</i>
+                    </small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><p>' . nl2br($content) . '</p></td>
+                </tr>';
+        }
+
+        return '
+        <div class="row">
+          <div class="col-md-6">
+            <h2 class="min600">
+              <a href="?o=news&m=create" title="Add news item">
+                <i class="fa fa-file-text fa-fw"></i> News
+                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h2>
+          </div>' . $pgr_top . '
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered min600">
+            <tbody>' . $buf . '
+            </tbody>
+          </table>
+        </div>' . $pgr_end;
+    }
+
+    private function editor(array $in) : string
+    {
+        extract($in);
+
+        if ($this->g->in['m'] === 'create') {
+            $header = 'Add News';
+            $submit = '
+                  <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
+                  <button type="submit" name="i" value="0" class="btn btn-primary">Add This Item</button>';
+
+        } else {
+            $header = 'Update News';
+            $submit = '
+                  <a class="btn btn-secondary" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
+                  <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                  <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
+        }
+
+        return '
+          <h2 class="min600">
+            <a href="?o=news&m=list">
+              <i class="fa fa-file-text fa-fw"></i> ' . $header . '
+            </a>
+          </h2>
+          <form method="post" action="' . $this->g->self . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="title">Title</label>
+                  <input type="text" class="form-control" id="title" name="title" value="' . $title . '" required>
+                </div>
+                <div class="form-group">
+                  <label for="author">Author</label>
+                  <input type="text" class="form-control" id="author" name="author" value="' . $author . '" required>
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label for="content">Content</label>
+                  <textarea class="form-control" id="content" name="content" rows="9" required>' . $content . '</textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 text-right">
+                <div class="btn-group">' . $submit . '
+                </div>
+              </div>
+            </div>
+          </form>';
+    }
+
+}
 // lib/php/theme.php 20150101 - 20170305
 
 class Theme
@@ -974,6 +976,100 @@ class Theme
     private function editor(array $in) : string
     {
         return 'Theme::editor() not implemented';
+    }
+}
+
+// lib/php/util.php 20150225 - 20170306
+
+class Util
+{
+    public static function log(string $msg = '', string $lvl = 'danger') : array
+    {
+        if ($msg) {
+            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
+            $_SESSION['l'] = $lvl . ':' . $msg;
+        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
+            $l = $_SESSION['l']; $_SESSION['l'] = '';
+            return explode(':', $l);
+        }
+        return ['', ''];
+    }
+
+    public static function esc(array $in) : array
+    {
+        foreach ($in as $k => $v)
+            $in[$k] = isset($_REQUEST[$k])
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
+        return $in;
+    }
+
+    public static function ses(string $k, string $v) : string
+    {
+        return (string) $_SESSION[$k] =
+            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
+                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+    }
+
+    public static function cfg($g) : void
+    {
+        if (file_exists($g->file))
+           foreach(include $g->file as $k => $v)
+               $g->$k = array_merge($g->$k, $v);
+    }
+
+    public static function now($date1, $date2 = null)
+    {
+        if (!is_numeric($date1)) $date1 = strtotime($date1);
+        if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
+        $date2 = $date2 ?? time();
+        $diff = abs($date1 - $date2);
+        if ($diff < 10) return ' just now';
+
+        $blocks = [
+            ['k' => 'year', 'v' => 31536000],
+            ['k' => 'month','v' => 2678400],
+            ['k' => 'week', 'v' => 604800],
+            ['k' => 'day',  'v' => 86400],
+            ['k' => 'hour', 'v' => 3600],
+            ['k' => 'min',  'v' => 60],
+            ['k' => 'sec',  'v' => 1],
+        ];
+        $levels = 2;
+        $current_level = 1;
+        $result = [];
+
+        foreach ($blocks as $block) {
+            if ($current_level > $levels) {
+                break;
+            }
+            if ($diff / $block['v'] >= 1) {
+                $amount = floor($diff / $block['v']);
+                $plural = ($amount > 1) ? 's' : '';
+                $result[] = $amount . ' ' . $block['k'] . $plural;
+                $diff -= $amount * $block['v'];
+                ++$current_level;
+            }
+        }
+        return implode(' ', $result) . ' ago';
+    }
+
+    public static function pager(int $curr, int $perp, int $total) : array
+    {
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
     }
 }
 
@@ -1178,82 +1274,6 @@ class Init
     }
 }
 
-// lib/php/util.php 20150225 - 20170306
-
-class Util
-{
-    public static function log(string $msg = '', string $lvl = 'danger') : array
-    {
-        if ($msg) {
-            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
-            $_SESSION['l'] = $lvl . ':' . $msg;
-        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
-            $l = $_SESSION['l']; $_SESSION['l'] = '';
-            return explode(':', $l);
-        }
-        return ['', ''];
-    }
-
-    public static function esc(array $in) : array
-    {
-        foreach ($in as $k => $v)
-            $in[$k] = isset($_REQUEST[$k])
-                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
-        return $in;
-    }
-
-    public static function ses(string $k, string $v) : string
-    {
-        return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
-    }
-
-    public static function cfg($g) : void
-    {
-        if (file_exists($g->file))
-           foreach(include $g->file as $k => $v)
-               $g->$k = array_merge($g->$k, $v);
-    }
-
-    public static function now($date1, $date2 = null)
-    {
-        if (!is_numeric($date1)) $date1 = strtotime($date1);
-        if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
-        $date2 = $date2 ?? time();
-        $diff = abs($date1 - $date2);
-        if ($diff < 10) return ' just now';
-
-        $blocks = [
-            ['k' => 'year', 'v' => 31536000],
-            ['k' => 'month','v' => 2678400],
-            ['k' => 'week', 'v' => 604800],
-            ['k' => 'day',  'v' => 86400],
-            ['k' => 'hour', 'v' => 3600],
-            ['k' => 'min',  'v' => 60],
-            ['k' => 'sec',  'v' => 1],
-        ];
-        $levels = 2;
-        $current_level = 1;
-        $result = [];
-
-        foreach ($blocks as $block) {
-            if ($current_level > $levels) {
-                break;
-            }
-            if ($diff / $block['v'] >= 1) {
-                $amount = floor($diff / $block['v']);
-                $plural = ($amount > 1) ? 's' : '';
-                $result[] = $amount . ' ' . $block['k'] . $plural;
-                $diff -= $amount * $block['v'];
-                ++$current_level;
-            }
-        }
-        return implode(' ', $result) . ' ago';
-    }
-
-}
-
 // lib/php/plugin.php 20150101 - 20170316
 
 class Plugin
@@ -1288,6 +1308,7 @@ class Plugin
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
+            util::ses('p', '1');
             return $this->list();
         } else return $this->t->create($this->in);
     }
@@ -1303,6 +1324,7 @@ class Plugin
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+            util::ses('p', '1');
             return $this->list();
         } elseif ($this->g->in['i']) {
             return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
@@ -1320,18 +1342,15 @@ class Plugin
 
     protected function list() : string
     {
-        $curr  = (int) util::ses('p', (string) $this->g->in['p']);
-        $perp  = $this->g->perp;
-        $start = ($curr - 1) * $perp;
-        $total = db::read('count(id)', '', '', '', 'col');
-        $last  = intval(ceil($total / $perp));
-        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
-        $prev  = $curr < 2 ? 1 : $curr - 1;
-        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+        $pagr = util::pager(
+            (int) util::ses('p', (string) $this->g->in['p']),
+            (int) $this->g->perp,
+            (int) db::read('count(id)', '', '', '', 'col')
+        );
 
         return $this->t->list(array_merge(
-            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $start . ',' . $perp),
-            ['pages' => ['prev' => $prev, 'curr' => $curr, 'next' => $next, 'last' => $last]]
+            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pagr['start'] . ',' . $pagr['perp']),
+            ['pager' => $pagr]
         ));
     }
 }

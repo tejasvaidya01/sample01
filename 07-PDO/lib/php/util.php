@@ -28,13 +28,17 @@ error_log(__METHOD__);
         return $in;
     }
 
-    public static function ses(string $k, string $v) : string
+    public static function ses(string $k, string $v = null) : string
     {
-error_log(__METHOD__."(k=$k, v=$v)");
+error_log(__METHOD__."(k=$k, v=$v");
+//if ($k == 'p') return $_SESSION[$k] = '4';
 
+//        if (is_null($v) && isset($_SESSION[$k]))
+//            return (string) $_SESSION[$k];
+//        else
         return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+                (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] != $_SESSION[$k]))
+                    ? $_REQUEST[$k] : ($v ?? $_SESSION[$k]);
     }
 
     public static function cfg($g) : void
@@ -84,6 +88,26 @@ error_log(__METHOD__);
         return implode(' ', $result) . ' ago';
     }
 
+    public static function pager(int $curr, int $perp, int $total) : array
+    {
+error_log(__METHOD__);
+
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
+    }
 }
 
 ?>

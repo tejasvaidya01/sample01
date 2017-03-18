@@ -11,11 +11,11 @@ error_log(__METHOD__);
         return $this->editor($in);
     }
 
-    public function read(array $ary) : string
+    public function read(array $in) : string
     {
 error_log(__METHOD__);
 
-        extract($ary);
+        extract($in);
 
         return '
           <h3 class="min600">
@@ -61,7 +61,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pages']; unset($in['pages']);
+        $pgr = $in['pager']; unset($in['pager']);
 
         if ($pgr['last'] > 1) {
             $pgr_top ='
@@ -114,11 +114,11 @@ error_log(__METHOD__);
         </div>' . $pgr_end;
     }
 
-    private function editor(array $ary) : string
+    private function editor(array $in) : string
     {
 error_log(__METHOD__);
 
-        extract($ary);
+        extract($in);
 
         if ($this->g->in['m'] === 'create') {
             $header = 'Add News';
@@ -170,44 +170,5 @@ error_log(__METHOD__);
           </form>';
     }
 
-    private function pager(array $ary) : string
-    {
-error_log(__METHOD__);
-
-        extract($ary);
-
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
-        $buf = '';
-
-        for($i = 1; $i <= $last; $i++) {
-            $a = $i === $curr ? ' active' : '';
-            $buf .= '
-              <li class="page-item' . $a . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
-              </li>';
-        }
-
-        $prev_dis = $curr === 1 ? ' disabled' : '';
-        $next_dis = $curr === $last ? ' disabled' : '';
-
-        return '
-          <nav aria-label="Page navigation">
-            <ul class="pagination pull-right">
-              <li class="page-item' . $prev_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-              </li>' . $buf . '
-              <li class="page-item' . $next_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-              </li>
-            </ul>
-          </nav>';
-    }
 }
 ?>
