@@ -862,6 +862,116 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
     }
 }
 
+// lib/php/theme.php 20150101 - 20170305
+
+class Theme
+{
+    private
+    $buf = '',
+    $in  = [];
+
+    public function __construct($g)
+    {
+        $this->g = $g;
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    public function log() : string
+    {
+        list($lvl, $msg) = util::log();
+        return $msg ? '
+      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
+    }
+
+    public function nav1() : string
+    {
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
+    }
+
+    public function head() : string
+    {
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
+    </header>';
+    }
+
+    public function main() : string
+    {
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
+    }
+
+    public function foot() : string
+    {
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
+    }
+
+    public function html() : string
+    {
+        extract($this->g->out, EXTR_SKIP);
+        return '<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>' . $doc . '</title>' . $css . '
+  </head>
+  <body>' . $head . $main . $foot . '
+  </body>
+</html>
+';
+    }
+
+    public function create(array $in) : string
+    {
+        return 'Theme::create() not implemented';
+    }
+
+    public function read(array $in) : string
+    {
+        return 'Theme::read() not implemented';
+    }
+
+    public function update(array $in) : string
+    {
+        return 'Theme::update() not implemented';
+    }
+
+    public function delete(array $in) : string
+    {
+        return 'Theme::delete() not implemented';
+    }
+
+    public function list(array $in) : string
+    {
+        return 'Theme::list() not implemented';
+    }
+
+    private function editor(array $in) : string
+    {
+        return 'Theme::editor() not implemented';
+    }
+}
+
 // lib/php/db.php 20150225 - 20170316
 
 class Db extends \PDO
@@ -876,7 +986,7 @@ class Db extends \PDO
             $dsn = $type === 'mysql'
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
-            $pass = file_exists($pass) ? include $pass : $pass;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,
@@ -1018,198 +1128,6 @@ class Db extends \PDO
     }
 }
 
-// lib/php/theme.php 20150101 - 20170305
-
-class Theme
-{
-    private
-    $buf = '',
-    $in  = [];
-
-    public function __construct($g)
-    {
-        $this->g = $g;
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
-    }
-
-    public function log() : string
-    {
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
-    }
-
-    public function nav1() : string
-    {
-        $o = '?o='.$this->g->in['o'];
-        return '
-      <nav>' . join('', array_map(function ($n) use ($o) {
-            $c = $o === $n[1] ? ' class="active"' : '';
-            return '
-        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $this->g->nav1)) . '
-      </nav>';
-    }
-
-    public function head() : string
-    {
-        return '
-    <header>
-      <h1>
-        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
-      </h1>' . $this->g->out['nav1'] . '
-    </header>';
-    }
-
-    public function main() : string
-    {
-        return '
-    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
-    </main>';
-    }
-
-    public function foot() : string
-    {
-        return '
-    <footer class="text-center">
-      <br>
-      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
-    </footer>';
-    }
-
-    public function html() : string
-    {
-        extract($this->g->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $head . $main . $foot . '
-  </body>
-</html>
-';
-    }
-
-    public function create(array $in) : string
-    {
-        return 'Theme::create() not implemented';
-    }
-
-    public function read(array $in) : string
-    {
-        return 'Theme::read() not implemented';
-    }
-
-    public function update(array $in) : string
-    {
-        return 'Theme::update() not implemented';
-    }
-
-    public function delete(array $in) : string
-    {
-        return 'Theme::delete() not implemented';
-    }
-
-    public function list(array $in) : string
-    {
-        return 'Theme::list() not implemented';
-    }
-
-    private function editor(array $in) : string
-    {
-        return 'Theme::editor() not implemented';
-    }
-}
-
-// lib/php/plugin.php 20150101 - 20170316
-
-class Plugin
-{
-    protected
-    $buf = '',
-    $tbl = '',
-    $in  = [];
-
-    public function __construct(Theme $t)
-    {
-        $this->t  = $t;
-        $this->g  = $t->g;
-        $this->in = util::esc($this->in);
-        if ($this->tbl) {
-            if (is_null(db::$dbh))
-                db::$dbh = new db($t->g->db);
-            db::$tbl = $this->tbl;
-        }
-        $this->buf .= $this->{$t->g->in['m']}();
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
-    }
-
-    protected function create() : string
-    {
-        if ($_POST) {
-            $this->in['updated'] = date('Y-m-d H:i:s');
-            $this->in['created'] = date('Y-m-d H:i:s');
-            $lid = db::create($this->in);
-            util::log('Item number ' . $lid . ' created', 'success');
-            util::ses('p', '1');
-            return $this->list();
-        } else return $this->t->create($this->in);
-    }
-
-    protected function read() : string
-    {
-        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
-    }
-
-    protected function update() : string
-    {
-        if ($_POST) {
-            $this->in['updated'] = date('Y-m-d H:i:s');
-            db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            util::ses('p', '1');
-            return $this->list();
-        } elseif ($this->g->in['i']) {
-            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
-        } else return 'Error updating item';
-    }
-
-    protected function delete() : string
-    {
-        if ($this->g->in['i']) {
-            $res = db::delete([['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            util::ses('p', '1');
-            return $this->list();
-        } else return 'Error deleting item';
-    }
-
-    protected function list() : string
-    {
-        $pagr = util::pager(
-            (int) util::ses('p'),
-            (int) $this->g->perp,
-            (int) db::read('count(id)', '', '', '', 'col')
-        );
-
-        return $this->t->list(array_merge(
-            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pagr['start'] . ',' . $pagr['perp']),
-            ['pager' => $pagr]
-        ));
-    }
-}
-
 // lib/php/init.php 20150101 - 20170305
 
 class Init
@@ -1223,9 +1141,9 @@ class Init
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-        util::ses('l');
-        $t = util::ses('t');
-        $t = $t ? $t : util::ses('t', $g->in['t']);
+        util::ses('l', 'success:abc', 'danger:xyz');
+        $t = util::ses('t', '', $g->in['t']);
+//        $t = $t ? $t : util::ses('t', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
 
@@ -1278,14 +1196,15 @@ class Util
         return $in;
     }
 
-    public static function ses(string $k, string $v = null) : string
+    public static function ses(string $k, string $v = '', string $x = null) : string
     {
-        return $_SESSION[$k] = (!is_null($v)) ? $v
-            : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
-                || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || isset($_REQUEST[$k]))) ? $x :
+                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                    || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
                     && ($_REQUEST[$k] != $_SESSION[$k])))
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
-                : ($_SESSION[$k] ?? ''));
+                : ($_SESSION[$k] ?? $v));
     }
 
     public static function cfg($g) : void
@@ -1351,7 +1270,89 @@ class Util
     }
 }
 
-// index.php 20150101 - 20170305
+// lib/php/plugin.php 20150101 - 20170316
+
+class Plugin
+{
+    protected
+    $buf = '',
+    $tbl = '',
+    $in  = [];
+
+    public function __construct(Theme $t)
+    {
+        $this->t  = $t;
+        $this->g  = $t->g;
+        $this->in = util::esc($this->in);
+        if ($this->tbl) {
+            if (is_null(db::$dbh))
+                db::$dbh = new db($t->g->db);
+            db::$tbl = $this->tbl;
+        }
+        $this->buf .= $this->{$t->g->in['m']}();
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    protected function create() : string
+    {
+        if ($_POST) {
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            $this->in['created'] = date('Y-m-d H:i:s');
+            $lid = db::create($this->in);
+            util::log('Item number ' . $lid . ' created', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } else return $this->t->create($this->in);
+    }
+
+    protected function read() : string
+    {
+        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+    }
+
+    protected function update() : string
+    {
+        if ($_POST) {
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            db::update($this->in, [['id', '=', $this->g->in['i']]]);
+            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } elseif ($this->g->in['i']) {
+            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+        } else return 'Error updating item';
+    }
+
+    protected function delete() : string
+    {
+        if ($this->g->in['i']) {
+            $res = db::delete([['id', '=', $this->g->in['i']]]);
+            util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } else return 'Error deleting item';
+    }
+
+    protected function list() : string
+    {
+        $pager = util::pager(
+            (int) util::ses('p'),
+            (int) $this->g->perp,
+            (int) db::read('count(id)', '', '', '', 'col')
+        );
+
+        return $this->t->list(array_merge(
+            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+            ['pager' => $pager]
+        ));
+    }
+}
+
+// index.php 20150101 - 20170317
 
 const DS  = DIRECTORY_SEPARATOR;
 const INC = __DIR__ . DS . 'lib' . DS . 'php' . DS;
@@ -1370,12 +1371,12 @@ echo new Init(new class
     $perp       = 5, // items Per Page
     $self       = '',
     $in = [
-        'i'     => null,        // Item or ID
+        'i'     => null,        // Item/ID
         'l'     => '',          // Log (message)
         'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
         'p'     => 1,           // Page (current)
-        't'     => 'bootstrap', // Theme
+        't'     => 'bootstrap', // Theme (current)
         'x'     => '',          // XHR (request)
     ],
     $out = [
@@ -1390,12 +1391,12 @@ echo new Init(new class
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'name'  => 'spe_07',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_news.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [

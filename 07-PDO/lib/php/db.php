@@ -16,7 +16,7 @@ error_log(__METHOD__);
             $dsn = $type === 'mysql'
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
-            $pass = file_exists($pass) ? include $pass : $pass;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,

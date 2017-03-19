@@ -28,16 +28,17 @@ error_log(__METHOD__);
         return $in;
     }
 
-    public static function ses(string $k, string $v = null) : string
+    public static function ses(string $k, string $v = '', string $x = null) : string
     {
-error_log(__METHOD__."($k, $v)");
+error_log(__METHOD__."($k, $v, $x)");
 
-        return $_SESSION[$k] = (!is_null($v)) ? $v
-            : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
-                || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || isset($_REQUEST[$k]))) ? $x :
+                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                    || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
                     && ($_REQUEST[$k] != $_SESSION[$k])))
                 ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
-                : ($_SESSION[$k] ?? ''));
+                : ($_SESSION[$k] ?? $v));
     }
 
     public static function cfg($g) : void

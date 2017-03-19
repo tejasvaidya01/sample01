@@ -40,7 +40,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-            util::ses('p', '1');
+            util::ses('p', '', '1');
             return $this->list();
         } else return $this->t->create($this->in);
     }
@@ -60,7 +60,7 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            util::ses('p', '1');
+            util::ses('p', '', '1');
             return $this->list();
         } elseif ($this->g->in['i']) {
             return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
@@ -74,7 +74,7 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            util::ses('p', '1');
+            util::ses('p', '', '1');
             return $this->list();
         } else return 'Error deleting item';
     }
@@ -83,15 +83,15 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $pagr = util::pager(
+        $pager = util::pager(
             (int) util::ses('p'),
             (int) $this->g->perp,
             (int) db::read('count(id)', '', '', '', 'col')
         );
 
         return $this->t->list(array_merge(
-            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pagr['start'] . ',' . $pagr['perp']),
-            ['pager' => $pagr]
+            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+            ['pager' => $pager]
         ));
     }
 }

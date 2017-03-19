@@ -1,5 +1,5 @@
 <?php
-// index.php 20150101 - 20170305
+// index.php 20150101 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 const DS  = DIRECTORY_SEPARATOR;
@@ -19,12 +19,12 @@ echo new Init(new class
     $perp       = 5, // items Per Page
     $self       = '',
     $in = [
-        'i'     => null,        // Item or ID
+        'i'     => null,        // Item/ID
         'l'     => '',          // Log (message)
         'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
         'p'     => 1,           // Page (current)
-        't'     => 'bootstrap', // Theme
+        't'     => 'bootstrap', // Theme (current)
         'x'     => '',          // XHR (request)
     ],
     $out = [
@@ -39,12 +39,12 @@ echo new Init(new class
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'name'  => 'spe_07',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_news.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
