@@ -89,7 +89,7 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pages']; unset($in['pages']);
+        $pgr = $in['pager']; unset($in['pager']);
 
         if ($pgr['last'] > 1)
             $pgr_top = $pgr_end = '
@@ -133,18 +133,17 @@ error_log(__METHOD__);
         extract($ary);
 
         $b = '';
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
+        $o = util::ses('o');
 
         for($i = 1; $i <= $last; $i++) {
             $c = $i === $curr ? ' class="active"' : '';
             $b .= '
-            <a' . $c . ' href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>';
+            <a' . $c . ' href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>';
         }
 
         return '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '">&laquo;</a>' . $b . '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '">&raquo;</a>';
+            <a href="?o=' . $o . '&m=list&p=' . $prev . '">&laquo;</a>' . $b . '
+            <a href="?o=' . $o . '&m=list&p=' . $next . '">&raquo;</a>';
     }
 }
 

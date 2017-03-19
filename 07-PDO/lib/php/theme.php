@@ -109,20 +109,6 @@ error_log(__METHOD__);
         return 'Theme::read() not implemented';
     }
 
-    public function read_one(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::read_one() not implemented';
-    }
-
-    public function read_all(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::read_all() not implemented';
-    }
-
     public function update(array $in) : string
     {
 error_log(__METHOD__);
@@ -135,6 +121,13 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         return 'Theme::delete() not implemented';
+    }
+
+    public function list(array $in) : string
+    {
+error_log(__METHOD__);
+
+        return 'Theme::list() not implemented';
     }
 
     private function editor(array $in) : string

@@ -100,10 +100,9 @@ class Plugins_Home extends Plugin
 {
     public function list() : string
     {
-        if (empty($_SESSION['l'])) {
-            $ts = util::ses('timestamp', (string) time());
-            util::log("You first visited this page "  . util::now($ts), 'success');
-        }
+        if (!isset($_SESSION['ts']))
+            $_SESSION['ts'] = (string) time();
+        util::log("You first visited this page "  . util::now($_SESSION['ts']), 'success');
 
         $buf = '
       <h2>Home</h2>
@@ -298,7 +297,7 @@ class Themes_Simple_News extends Themes_Simple_Theme {
     public function list(array $in) : string
     {
         $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pages']; unset($in['pages']);
+        $pgr = $in['pager']; unset($in['pager']);
 
         if ($pgr['last'] > 1)
             $pgr_top = $pgr_end = '
@@ -340,18 +339,17 @@ class Themes_Simple_News extends Themes_Simple_Theme {
         extract($ary);
 
         $b = '';
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
+        $o = util::ses('o');
 
         for($i = 1; $i <= $last; $i++) {
             $c = $i === $curr ? ' class="active"' : '';
             $b .= '
-            <a' . $c . ' href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>';
+            <a' . $c . ' href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>';
         }
 
         return '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '">&laquo;</a>' . $b . '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '">&raquo;</a>';
+            <a href="?o=' . $o . '&m=list&p=' . $prev . '">&laquo;</a>' . $b . '
+            <a href="?o=' . $o . '&m=list&p=' . $next . '">&raquo;</a>';
     }
 }
 
@@ -458,7 +456,7 @@ class Themes_None_News extends Themes_None_Theme
     public function list(array $in) : string
     {
         $buf = $pgr_top = $pgr_end = '';
-        $pgr = $in['pages']; unset($in['pages']);
+        $pgr = $in['pager']; unset($in['pager']);
 
         if ($pgr['last'] > 1)
             $pgr_top = $pgr_end = '
@@ -499,18 +497,17 @@ class Themes_None_News extends Themes_None_Theme
         extract($ary);
 
         $b = '';
-        $o = $this->g->in['o'];
-        $m = $this->g->in['m'];
+        $o = util::ses('o');
 
         for($i = 1; $i <= $last; $i++) {
             $c = $i === $curr ? ' class="active"' : '';
             $b .= '
-            <a' . $c . ' href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>';
+            <a' . $c . ' href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>';
         }
 
         return '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '">&laquo;</a>' . $b . '
-            <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '">&raquo;</a>';
+            <a href="?o=' . $o . '&m=list&p=' . $prev . '">&laquo;</a>' . $b . '
+            <a href="?o=' . $o . '&m=list&p=' . $next . '">&raquo;</a>';
     }
 }
 
@@ -562,144 +559,6 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
           </form>
         </div>
         <script> $(function() { $("[data-toggle=popover]").popover(); }); </script>' . $in['js'];
-    }
-}
-
-// lib/php/themes/bootstrap/theme.php 20150101 - 20170316
-
-class Themes_Bootstrap_Theme extends Theme
-{
-    public function css() : string
-    {
-        return '
-    <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300italic" rel="stylesheet" type="text/css">
-    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" rel="stylesheet" crossorigin="anonymous">
-    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-    <script src="//code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
-    <style>
-* { transition: 0.2s linear; }
-body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; padding-top: 5rem; }
-.w100 { width: 100px; }
-.w200 { width: 200px; }
-.w300 { width: 300px; }
-.min50  { min-width:  50px; }
-.min100 { min-width: 100px; }
-.min150 { min-width: 150px; }
-.min200 { min-width: 200px; }
-.min300 { min-width: 300px; }
-.min400 { min-width: 400px; }
-.min500 { min-width: 500px; }
-.min600 { min-width: 600px; }
-.nowrap { white-space: nowrap; }
-    </style>';
-    }
-
-    public function log() : string
-    {
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-      <div class="alert alert-' . $lvl . '">' . $msg . '
-      </div>' : '';
-    }
-
-    public function head() : string
-    {
-        return '
-    <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <a class="navbar-brand" href="' . $this->g->self . '">
-        <b><i class="fa fa-home fa-fw"></i> ' . $this->g->out['head'] . '</b>
-      </a>
-      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
-        </ul>
-      </div>
-    </nav>';
-    }
-
-    public function nav1(array $a = []) : string
-    {
-        $a = isset($a[0]) ? $a : $this->g->nav1;
-        $o = '?o=' . $this->g->in['o'];
-        $t = '?t=' . $this->g->in['t'];
-        return join('', array_map(function ($n) use ($o, $t) {
-            if (is_array($n[1])) return $this->nav_dropdown($n);
-            $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
-            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
-            return '
-          <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
-        }, $a));
-    }
-
-    public function nav_dropdown(array $a = []) : string
-    {
-        $o = '?o=' . $this->g->in['o'];
-        $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
-        return '
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
-            <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
-            $c = $o === $n[1] ? ' active' : '';
-            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
-            return '
-              <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
-        }, $a[1])).'
-            </div>
-          </li>';
-    }
-
-    public function main() : string
-    {
-        return '
-    <main class="container">
-      <div class="row">
-        <div class="col-12">' . $this->g->out['log'] . $this->g->out['main'] . '
-        </div>
-      </div>
-    </main>';
-    }
-
-    protected function pager(array $ary) : string
-    {
-        extract($ary);
-
-        $o = util::ses('o', (string) $this->g->in['o']);
-        $m = 'list';
-
-        $buf = '';
-
-        for($i = 1; $i <= $last; $i++) {
-            $a = $i === $curr ? ' active' : '';
-            $buf .= '
-              <li class="page-item' . $a . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
-              </li>';
-        }
-
-        $prev_dis = $curr === 1 ? ' disabled' : '';
-        $next_dis = $curr === $last ? ' disabled' : '';
-
-        return '
-          <nav aria-label="Page navigation">
-            <ul class="pagination pull-right">
-              <li class="page-item' . $prev_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
-                  <span aria-hidden="true">&laquo;</span>
-                  <span class="sr-only">Previous</span>
-                </a>
-              </li>' . $buf . '
-              <li class="page-item' . $next_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
-                  <span aria-hidden="true">&raquo;</span>
-                  <span class="sr-only">Next</span>
-                </a>
-              </li>
-            </ul>
-          </nav>';
     }
 }
 
@@ -864,212 +723,142 @@ class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
     }
 
 }
-// lib/php/theme.php 20150101 - 20170305
+// lib/php/themes/bootstrap/theme.php 20150101 - 20170316
 
-class Theme
+class Themes_Bootstrap_Theme extends Theme
 {
-    private
-    $buf = '',
-    $in  = [];
-
-    public function __construct($g)
+    public function css() : string
     {
-        $this->g = $g;
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
+        return '
+    <link href="//fonts.googleapis.com/css?family=Roboto:100,300,400,500,300italic" rel="stylesheet" type="text/css">
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" rel="stylesheet" crossorigin="anonymous">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <script src="//code.jquery.com/jquery-3.1.1.min.js" crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <style>
+* { transition: 0.2s linear; }
+body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; padding-top: 5rem; }
+.w100 { width: 100px; }
+.w200 { width: 200px; }
+.w300 { width: 300px; }
+.min50  { min-width:  50px; }
+.min100 { min-width: 100px; }
+.min150 { min-width: 150px; }
+.min200 { min-width: 200px; }
+.min300 { min-width: 300px; }
+.min400 { min-width: 400px; }
+.min500 { min-width: 500px; }
+.min600 { min-width: 600px; }
+.nowrap { white-space: nowrap; }
+    </style>';
     }
 
     public function log() : string
     {
         list($lvl, $msg) = util::log();
         return $msg ? '
-      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
-    }
-
-    public function nav1() : string
-    {
-        $o = '?o='.$this->g->in['o'];
-        return '
-      <nav>' . join('', array_map(function ($n) use ($o) {
-            $c = $o === $n[1] ? ' class="active"' : '';
-            return '
-        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $this->g->nav1)) . '
-      </nav>';
+      <div class="alert alert-' . $lvl . '">' . $msg . '
+      </div>' : '';
     }
 
     public function head() : string
     {
         return '
-    <header>
-      <h1>
-        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
-      </h1>' . $this->g->out['nav1'] . '
-    </header>';
+    <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="' . $this->g->self . '">
+        <b><i class="fa fa-home fa-fw"></i> ' . $this->g->out['head'] . '</b>
+      </a>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+        </ul>
+      </div>
+    </nav>';
+    }
+
+    public function nav1(array $a = []) : string
+    {
+        $a = isset($a[0]) ? $a : $this->g->nav1;
+        $o = '?o=' . $this->g->in['o'];
+        $t = '?t=' . $this->g->in['t'];
+        return join('', array_map(function ($n) use ($o, $t) {
+            if (is_array($n[1])) return $this->nav_dropdown($n);
+            $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
+            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
+            return '
+          <li class="nav-item' . $c . '"><a class="nav-link" href="' . $n[1] . '">' . $i . $n[0] . '</a></li>';
+        }, $a));
+    }
+
+    public function nav_dropdown(array $a = []) : string
+    {
+        $o = '?o=' . $this->g->in['o'];
+        $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
+        return '
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' active' : '';
+            $i = isset($n[2]) ? '<i class="' . $n[2] . '"></i> ' : '';
+            return '
+              <a class="dropdown-item" href="' . $n[1] . '">' . $i . $n[0] . '</a>';
+        }, $a[1])).'
+            </div>
+          </li>';
     }
 
     public function main() : string
     {
         return '
-    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    <main class="container">
+      <div class="row">
+        <div class="col-12">' . $this->g->out['log'] . $this->g->out['main'] . '
+        </div>
+      </div>
     </main>';
     }
 
-    public function foot() : string
+    protected function pager(array $ary) : string
     {
+        extract($ary);
+
+//        $o = util::ses('o', (string) $this->g->in['o']);
+        $o = util::ses('o');
+        $m = 'list';
+
+        $buf = '';
+
+        for($i = 1; $i <= $last; $i++) {
+            $a = $i === $curr ? ' active' : '';
+            $buf .= '
+              <li class="page-item' . $a . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
+              </li>';
+        }
+
+        $prev_dis = $curr === 1 ? ' disabled' : '';
+        $next_dis = $curr === $last ? ' disabled' : '';
+
         return '
-    <footer class="text-center">
-      <br>
-      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
-    </footer>';
-    }
-
-    public function html() : string
-    {
-        extract($this->g->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $head . $main . $foot . '
-  </body>
-</html>
-';
-    }
-
-    public function create(array $in) : string
-    {
-        return 'Theme::create() not implemented';
-    }
-
-    public function read(array $in) : string
-    {
-        return 'Theme::read() not implemented';
-    }
-
-    public function read_one(array $in) : string
-    {
-        return 'Theme::read_one() not implemented';
-    }
-
-    public function read_all(array $in) : string
-    {
-        return 'Theme::read_all() not implemented';
-    }
-
-    public function update(array $in) : string
-    {
-        return 'Theme::update() not implemented';
-    }
-
-    public function delete(array $in) : string
-    {
-        return 'Theme::delete() not implemented';
-    }
-
-    private function editor(array $in) : string
-    {
-        return 'Theme::editor() not implemented';
-    }
-}
-
-// lib/php/util.php 20150225 - 20170306
-
-class Util
-{
-    public static function log(string $msg = '', string $lvl = 'danger') : array
-    {
-        if ($msg) {
-            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
-            $_SESSION['l'] = $lvl . ':' . $msg;
-        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
-            $l = $_SESSION['l']; $_SESSION['l'] = '';
-            return explode(':', $l);
-        }
-        return ['', ''];
-    }
-
-    public static function esc(array $in) : array
-    {
-        foreach ($in as $k => $v)
-            $in[$k] = isset($_REQUEST[$k])
-                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
-        return $in;
-    }
-
-    public static function ses(string $k, string $v) : string
-    {
-        return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
-    }
-
-    public static function cfg($g) : void
-    {
-        if (file_exists($g->file))
-           foreach(include $g->file as $k => $v)
-               $g->$k = array_merge($g->$k, $v);
-    }
-
-    public static function now($date1, $date2 = null)
-    {
-        if (!is_numeric($date1)) $date1 = strtotime($date1);
-        if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
-        $date2 = $date2 ?? time();
-        $diff = abs($date1 - $date2);
-        if ($diff < 10) return ' just now';
-
-        $blocks = [
-            ['k' => 'year', 'v' => 31536000],
-            ['k' => 'month','v' => 2678400],
-            ['k' => 'week', 'v' => 604800],
-            ['k' => 'day',  'v' => 86400],
-            ['k' => 'hour', 'v' => 3600],
-            ['k' => 'min',  'v' => 60],
-            ['k' => 'sec',  'v' => 1],
-        ];
-        $levels = 2;
-        $current_level = 1;
-        $result = [];
-
-        foreach ($blocks as $block) {
-            if ($current_level > $levels) {
-                break;
-            }
-            if ($diff / $block['v'] >= 1) {
-                $amount = floor($diff / $block['v']);
-                $plural = ($amount > 1) ? 's' : '';
-                $result[] = $amount . ' ' . $block['k'] . $plural;
-                $diff -= $amount * $block['v'];
-                ++$current_level;
-            }
-        }
-        return implode(' ', $result) . ' ago';
-    }
-
-    public static function pager(int $curr, int $perp, int $total) : array
-    {
-        $start = ($curr - 1) * $perp;
-        $last  = intval(ceil($total / $perp));
-        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
-        $prev  = $curr < 2 ? 1 : $curr - 1;
-        $next  = $curr > ($last - 1) ? $last : $curr + 1;
-
-        return [
-            'start' => $start,
-            'prev'  => $prev,
-            'curr'  => $curr,
-            'next'  => $next,
-            'last'  => $last,
-            'perp'  => $perp,
-            'total' => $total
-        ];
+          <nav aria-label="Page navigation">
+            <ul class="pagination pull-right">
+              <li class="page-item' . $prev_dis . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+              </li>' . $buf . '
+              <li class="page-item' . $next_dis . '">
+                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+            </ul>
+          </nav>';
     }
 }
 
@@ -1229,48 +1018,113 @@ class Db extends \PDO
     }
 }
 
-// lib/php/init.php 20150101 - 20170305
+// lib/php/theme.php 20150101 - 20170305
 
-class Init
+class Theme
 {
-    private $t = null;
+    private
+    $buf = '',
+    $in  = [];
 
     public function __construct($g)
     {
-        session_start();
-        //$_SESSION = []; // to reset session for testing
-        util::cfg($g);
-        $g->in = util::esc($g->in);
-        $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-
-        util::ses('l', $g->in['l']);
-        $t = util::ses('t', $g->in['t']);
-
-        $t1 = 'themes_' . $t . '_' . $g->in['o'];
-        $t2 = 'themes_' . $t . '_theme';
-
-        $this->t = $thm = class_exists($t1) ? new $t1($g)
-            : (class_exists($t2) ? new $t2($g) : new Theme($g));
-
-        $p  = 'plugins_' . $g->in['o'];
-        if (class_exists($p)) $g->out['main'] = (string) new $p($thm);
-        else $g->out['main'] = "Error: no plugin object!";
-
-        foreach ($g->out as $k => $v)
-            $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
+        $this->g = $g;
     }
 
     public function __toString() : string
     {
-        $g = $this->t->g;
+        return $this->buf;
+    }
 
-        if ($g->in['x']) {
-            $xhr = $g->out[$g->in['x']] ?? '';
-            if ($xhr) return $xhr;
-            header('Content-Type: application/json');
-            return json_encode($g->out, JSON_PRETTY_PRINT);
-        }
-        return $this->t->html();
+    public function log() : string
+    {
+        list($lvl, $msg) = util::log();
+        return $msg ? '
+      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
+    }
+
+    public function nav1() : string
+    {
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
+    }
+
+    public function head() : string
+    {
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
+    </header>';
+    }
+
+    public function main() : string
+    {
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
+    }
+
+    public function foot() : string
+    {
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
+    }
+
+    public function html() : string
+    {
+        extract($this->g->out, EXTR_SKIP);
+        return '<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>' . $doc . '</title>' . $css . '
+  </head>
+  <body>' . $head . $main . $foot . '
+  </body>
+</html>
+';
+    }
+
+    public function create(array $in) : string
+    {
+        return 'Theme::create() not implemented';
+    }
+
+    public function read(array $in) : string
+    {
+        return 'Theme::read() not implemented';
+    }
+
+    public function update(array $in) : string
+    {
+        return 'Theme::update() not implemented';
+    }
+
+    public function delete(array $in) : string
+    {
+        return 'Theme::delete() not implemented';
+    }
+
+    public function list(array $in) : string
+    {
+        return 'Theme::list() not implemented';
+    }
+
+    private function editor(array $in) : string
+    {
+        return 'Theme::editor() not implemented';
     }
 }
 
@@ -1285,13 +1139,13 @@ class Plugin
 
     public function __construct(Theme $t)
     {
-        $this->t    = $t;
-        $this->g    = $t->g;
+        $this->t  = $t;
+        $this->g  = $t->g;
         $this->in = util::esc($this->in);
         if ($this->tbl) {
             if (is_null(db::$dbh))
                 db::$dbh = new db($t->g->db);
-            db::$tbl  = $this->tbl;
+            db::$tbl = $this->tbl;
         }
         $this->buf .= $this->{$t->g->in['m']}();
     }
@@ -1336,6 +1190,7 @@ class Plugin
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+            util::ses('p', '1');
             return $this->list();
         } else return 'Error deleting item';
     }
@@ -1343,7 +1198,7 @@ class Plugin
     protected function list() : string
     {
         $pagr = util::pager(
-            (int) util::ses('p', (string) $this->g->in['p']),
+            (int) util::ses('p'),
             (int) $this->g->perp,
             (int) db::read('count(id)', '', '', '', 'col')
         );
@@ -1352,6 +1207,147 @@ class Plugin
             db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pagr['start'] . ',' . $pagr['perp']),
             ['pager' => $pagr]
         ));
+    }
+}
+
+// lib/php/init.php 20150101 - 20170305
+
+class Init
+{
+    private $t = null;
+
+    public function __construct($g)
+    {
+        session_start();
+        //$_SESSION = []; // to reset session for testing
+        util::cfg($g);
+        $g->in = util::esc($g->in);
+        $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+        util::ses('l');
+        $t = util::ses('t');
+        $t = $t ? $t : util::ses('t', $g->in['t']);
+        $t1 = 'themes_' . $t . '_' . $g->in['o'];
+        $t2 = 'themes_' . $t . '_theme';
+
+        $this->t = $thm = class_exists($t1) ? new $t1($g)
+            : (class_exists($t2) ? new $t2($g) : new Theme($g));
+
+        $p  = 'plugins_' . $g->in['o'];
+        if (class_exists($p)) $g->out['main'] = (string) new $p($thm);
+        else $g->out['main'] = "Error: no plugin object!";
+
+        foreach ($g->out as $k => $v)
+            $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
+    }
+
+    public function __toString() : string
+    {
+        $g = $this->t->g;
+
+        if ($g->in['x']) {
+            $xhr = $g->out[$g->in['x']] ?? '';
+            if ($xhr) return $xhr;
+            header('Content-Type: application/json');
+            return json_encode($g->out, JSON_PRETTY_PRINT);
+        }
+        return $this->t->html();
+    }
+}
+
+// lib/php/util.php 20150225 - 20170306
+
+class Util
+{
+    public static function log(string $msg = '', string $lvl = 'danger') : array
+    {
+        if ($msg) {
+            if (strpos($msg, ':')) list($lvl, $msg) = explode(':', $msg);
+            $_SESSION['l'] = $lvl . ':' . $msg;
+        } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
+            $l = $_SESSION['l']; $_SESSION['l'] = '';
+            return explode(':', $l);
+        }
+        return ['', ''];
+    }
+
+    public static function esc(array $in) : array
+    {
+        foreach ($in as $k => $v)
+            $in[$k] = isset($_REQUEST[$k])
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8') : $v;
+        return $in;
+    }
+
+    public static function ses(string $k, string $v = null) : string
+    {
+        return $_SESSION[$k] = (!is_null($v)) ? $v
+            : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                : ($_SESSION[$k] ?? ''));
+    }
+
+    public static function cfg($g) : void
+    {
+        if (file_exists($g->file))
+           foreach(include $g->file as $k => $v)
+               $g->$k = array_merge($g->$k, $v);
+    }
+
+    public static function now($date1, $date2 = null)
+    {
+        if (!is_numeric($date1)) $date1 = strtotime($date1);
+        if ($date2 and !is_numeric($date2)) $date2 = strtotime($date2);
+        $date2 = $date2 ?? time();
+        $diff = abs($date1 - $date2);
+        if ($diff < 10) return ' just now';
+
+        $blocks = [
+            ['k' => 'year', 'v' => 31536000],
+            ['k' => 'month','v' => 2678400],
+            ['k' => 'week', 'v' => 604800],
+            ['k' => 'day',  'v' => 86400],
+            ['k' => 'hour', 'v' => 3600],
+            ['k' => 'min',  'v' => 60],
+            ['k' => 'sec',  'v' => 1],
+        ];
+        $levels = 2;
+        $current_level = 1;
+        $result = [];
+
+        foreach ($blocks as $block) {
+            if ($current_level > $levels) {
+                break;
+            }
+            if ($diff / $block['v'] >= 1) {
+                $amount = floor($diff / $block['v']);
+                $plural = ($amount > 1) ? 's' : '';
+                $result[] = $amount . ' ' . $block['k'] . $plural;
+                $diff -= $amount * $block['v'];
+                ++$current_level;
+            }
+        }
+        return implode(' ', $result) . ' ago';
+    }
+
+    public static function pager(int $curr, int $perp, int $total) : array
+    {
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
     }
 }
 

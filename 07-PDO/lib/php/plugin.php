@@ -13,13 +13,13 @@ class Plugin
     {
 error_log(__METHOD__);
 
-        $this->t    = $t;
-        $this->g    = $t->g;
+        $this->t  = $t;
+        $this->g  = $t->g;
         $this->in = util::esc($this->in);
         if ($this->tbl) {
             if (is_null(db::$dbh))
                 db::$dbh = new db($t->g->db);
-            db::$tbl  = $this->tbl;
+            db::$tbl = $this->tbl;
         }
         $this->buf .= $this->{$t->g->in['m']}();
     }
@@ -40,7 +40,7 @@ error_log(__METHOD__);
             $this->in['created'] = date('Y-m-d H:i:s');
             $lid = db::create($this->in);
             util::log('Item number ' . $lid . ' created', 'success');
-//            util::ses('p', '1');
+            util::ses('p', '1');
             return $this->list();
         } else return $this->t->create($this->in);
     }
@@ -60,8 +60,7 @@ error_log(__METHOD__);
             $this->in['updated'] = date('Y-m-d H:i:s');
             db::update($this->in, [['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            //util::ses('p', '1');
-//            $this->g->in['p'] = 1;
+            util::ses('p', '1');
             return $this->list();
         } elseif ($this->g->in['i']) {
             return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
@@ -75,6 +74,7 @@ error_log(__METHOD__);
         if ($this->g->in['i']) {
             $res = db::delete([['id', '=', $this->g->in['i']]]);
             util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+            util::ses('p', '1');
             return $this->list();
         } else return 'Error deleting item';
     }
@@ -82,15 +82,6 @@ error_log(__METHOD__);
     protected function list() : string
     {
 error_log(__METHOD__);
-error_log('REQUEST='.var_export($_REQUEST,true));
-error_log('SESSION='.var_export($_SESSION,true));
-
-//error_log('a ses p='.util::ses('p'));
-util::ses('p', '1');
-error_log('SESSION[p] = '.$_SESSION['p']);
-//error_log('b ses p='.util::ses('p'));
-
-//            (int) util::ses('p', (string) $this->g->in['p']),
 
         $pagr = util::pager(
             (int) util::ses('p'),

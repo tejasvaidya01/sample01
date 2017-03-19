@@ -116,7 +116,8 @@ error_log(__METHOD__);
 
         extract($ary);
 
-        $o = util::ses('o', (string) $this->g->in['o']);
+//        $o = util::ses('o', (string) $this->g->in['o']);
+        $o = util::ses('o');
         $m = 'list';
 
         $buf = '';

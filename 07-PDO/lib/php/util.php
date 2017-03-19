@@ -30,15 +30,14 @@ error_log(__METHOD__);
 
     public static function ses(string $k, string $v = null) : string
     {
-error_log(__METHOD__."(k=$k, v=$v");
-//if ($k == 'p') return $_SESSION[$k] = '4';
+error_log(__METHOD__."($k, $v)");
 
-//        if (is_null($v) && isset($_SESSION[$k]))
-//            return (string) $_SESSION[$k];
-//        else
-        return (string) $_SESSION[$k] =
-                (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] != $_SESSION[$k]))
-                    ? $_REQUEST[$k] : ($v ?? $_SESSION[$k]);
+        return $_SESSION[$k] = (!is_null($v)) ? $v
+            : (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                : ($_SESSION[$k] ?? ''));
     }
 
     public static function cfg($g) : void
