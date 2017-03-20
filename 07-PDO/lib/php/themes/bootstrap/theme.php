@@ -116,34 +116,25 @@ error_log(__METHOD__);
 
         extract($ary);
 
-//        $o = util::ses('o', (string) $this->g->in['o']);
+        $b = '';
         $o = util::ses('o');
-        $m = 'list';
 
-        $buf = '';
-
-        for($i = 1; $i <= $last; $i++) {
-            $a = $i === $curr ? ' active' : '';
-            $buf .= '
-              <li class="page-item' . $a . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $i . '">' . $i . '</a>
+        for($i = 1; $i <= $last; $i++) $b .= '
+              <li class="page-item' . ($i === $curr ? ' active' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>
               </li>';
-        }
-
-        $prev_dis = $curr === 1 ? ' disabled' : '';
-        $next_dis = $curr === $last ? ' disabled' : '';
 
         return '
           <nav aria-label="Page navigation">
             <ul class="pagination pull-right">
-              <li class="page-item' . $prev_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $prev . '" aria-label="Previous">
+              <li class="page-item' . ($curr === 1 ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $prev . '" aria-label="Previous">
                   <span aria-hidden="true">&laquo;</span>
                   <span class="sr-only">Previous</span>
                 </a>
-              </li>' . $buf . '
-              <li class="page-item' . $next_dis . '">
-                <a class="page-link" href="?o=' . $o . '&m=' . $m . '&p=' . $next . '" aria-label="Next">
+              </li>' . $b . '
+              <li class="page-item' . ($curr === $last ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $next . '" aria-label="Next">
                   <span aria-hidden="true">&raquo;</span>
                   <span class="sr-only">Next</span>
                 </a>

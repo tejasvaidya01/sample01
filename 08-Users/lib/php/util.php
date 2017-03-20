@@ -8,8 +8,6 @@ class Util
     {
 error_log(__METHOD__);
 
-//error_log("(msg=$msg, lvl=$lvl)");
-
         if ($msg) {
             $_SESSION['l'] = $lvl . ':' . $msg;
         } elseif (isset($_SESSION['l']) and $_SESSION['l']) {
@@ -29,13 +27,17 @@ error_log(__METHOD__);
         return $in;
     }
 
-    public static function ses(string $k, $v) : string
+    public static function ses(string $k, string $v = '', string $x = null) : string
     {
-error_log(__METHOD__." k=$k, v=$v");
+error_log(__METHOD__."($k, $v, $x)");
 
-        return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x :
+                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                    || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                : ($_SESSION[$k] ?? $v));
     }
 
     public static function cfg($g) : void
@@ -83,6 +85,27 @@ error_log(__METHOD__);
             }
         }
         return implode(' ', $result) . ' ago';
+    }
+
+    public static function pager(int $curr, int $perp, int $total) : array
+    {
+error_log(__METHOD__);
+
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
     }
 
     public static function is_adm() : bool

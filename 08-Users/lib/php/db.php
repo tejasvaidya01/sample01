@@ -1,5 +1,5 @@
 <?php
-// lib/php/db.php 20150225 - 20170306
+// lib/php/db.php 20150225 - 20170316
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Db extends \PDO
@@ -16,7 +16,7 @@ error_log(__METHOD__);
             $dsn = $type === 'mysql'
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
-            $pass = file_exists($pass) ? include $pass : $pass;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,
@@ -136,6 +136,8 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+error_log("sql = $sql");
+
         try {
             if ($type !== 'all') $sql .= ' LIMIT 1';
             $stm = self::$dbh->prepare($sql);
@@ -164,7 +166,7 @@ error_log(__METHOD__);
                 elseif (is_null($v))    $p = \PDO::PARAM_NULL;
                 elseif (is_string($v))  $p = \PDO::PARAM_STR;
                 else $p = false;
-               if ($p !== false) $stm->bindValue(":$k", $v, $p);
+                if ($p !== false) $stm->bindValue(":$k", $v, $p);
             }
         }
     }

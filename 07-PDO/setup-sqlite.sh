@@ -6,7 +6,7 @@ DB="lib/.ht_news.sqlite"
 
 if [[ ! -f $DB ]]; then
     DIR=$(dirname $DB)
-    mkdir -p $DIR
+    [[ ! -d $DIR ]] && mkdir -p $DIR
     cat << 'EOS' | sqlite3 $DB
 CREATE TABLE IF NOT EXISTS `news` (
   `id` integer PRIMARY KEY AUTOINCREMENT,
@@ -34,4 +34,6 @@ EOS
     chmod 750 $DIR
     chmod 600 $DB
     echo "Installed SQLite 'news' database to $DB"
+else
+    echo `SQLite database at $DB already exists`
 fi

@@ -125,7 +125,6 @@ error_log(__METHOD__);
             $submit = '
                   <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
                   <button type="submit" name="i" value="0" class="btn btn-primary">Add This Item</button>';
-
         } else {
             $header = 'Update News';
             $submit = '
@@ -169,6 +168,6 @@ error_log(__METHOD__);
             </div>
           </form>';
     }
-
 }
+
 ?>

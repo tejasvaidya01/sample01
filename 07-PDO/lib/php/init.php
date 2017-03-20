@@ -21,9 +21,8 @@ error_log('SESSION=' . var_export($_SESSION, true));
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-        util::ses('l', 'success:abc', 'danger:xyz');
+        util::ses('l');
         $t = util::ses('t', '', $g->in['t']);
-//        $t = $t ? $t : util::ses('t', $g->in['t']);
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
         $t2 = 'themes_' . $t . '_theme';
 

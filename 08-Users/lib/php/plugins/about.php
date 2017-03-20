@@ -1,10 +1,10 @@
 <?php
-// lib/php/plugins/about.php 20150101 - 20170305
+// lib/php/plugins/about.php 20150101 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Plugins_About extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
 error_log(__METHOD__);
 
@@ -44,7 +44,7 @@ function ajax(a) {
   }
 }
       </script>';
-        return $this->t->read(['buf' => $buf]);
+        return $this->t->list(['buf' => $buf]);
     }
 }
 

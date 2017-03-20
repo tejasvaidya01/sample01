@@ -15,6 +15,20 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
+        return $this->editor($in);
+    }
+
+    public function update(array $in) : string
+    {
+error_log(__METHOD__);
+
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+error_log(__METHOD__);
+
         $buf = '';
         $num = count($in);
 
@@ -51,20 +65,6 @@ error_log(__METHOD__);
           </table>';
     }
 
-    public function read_one(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
-    }
-
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
-    }
-
     private function editor(array $in) : string
     {
 error_log(__METHOD__);
@@ -73,14 +73,14 @@ error_log(__METHOD__);
 
         $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
         $submit = $this->g->in['m'] === 'create' ? '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
               <button type="submit" name="m" value="create" class="btn btn-success">Add This Item</button>' : '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
               <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
               <button type="submit" name="m" value="update" class="btn btn-success">Update</button>';
 
         return '
-          <h2><a href="?o=users&m=read&i=0"><b>&laquo; ' . $header . '</b></a></h3>
+          <h2><a href="?o=users&m=list"><b>&laquo; ' . $header . '</b></a></h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
@@ -88,7 +88,6 @@ error_log(__METHOD__);
 
             <input type="hidden" name="acl" value="' . $acl . '">
             <input type="hidden" name="webpw" value="' . $webpw . '">
-
             <p>
               <label for="login">UserID</label><br>
               <input type="email" id="login" name="login" value="' . $login . '" required>

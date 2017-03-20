@@ -7,8 +7,9 @@ class Plugins_Users extends Plugin
     protected
     $tbl = 'users',
     $in = [
-        'grp'       => null,
-        'acl'       => null,
+        'id'        => null,
+        'grp'       => 1,
+        'acl'       => 2,
         'login'     => '',
         'fname'     => '',
         'lname'     => '',
@@ -17,26 +18,31 @@ class Plugins_Users extends Plugin
         'anote'     => '',
     ];
 
-    protected function read_all() : array
+    protected function list() : string
     {
 error_log(__METHOD__);
 
-            $_SESSION['switch_to'] = 0;
-            $_SESSION['switch_from'] = 0;
-
         if (util::is_acl(0)) { // superadmin
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
-            return db::read('*', '', '', 'ORDER BY `updated` DESC');
+            $where = '';
+            $wval = '';
         } elseif (util::is_acl(1)) { // normal admin
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
-            return db::read('*', 'grp', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
+            $where = 'grp';
+            $wval = $_SESSION['usr']['id'];
         } else {
-            $_SESSION['switch_to'] = $_SESSION['usr']['id'];
-            $_SESSION['switch_from'] = 0;
-            return db::read('*', 'id', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
-        }
+            $where = 'id';
+            $wval = $_SESSION['usr']['id'];
+         }
+
+        $pager = util::pager(
+            (int) util::ses('p'),
+            (int) $this->g->perp,
+            (int) db::read('count(id)', $where, $wval, '', 'col')
+        );
+
+        return $this->t->list(array_merge(
+            db::read('*', $where, $wval, 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+            ['pager' => $pager]
+        ));
     }
 
     protected function switch_user()
@@ -47,8 +53,7 @@ error_log(__METHOD__);
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
             util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
         } else util::log('Not authorized to switch users');
-        $this->g->in['i'] = null;
-        return $this->read();
+        return $this->list();
     }
 }
 

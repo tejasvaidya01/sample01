@@ -16,12 +16,13 @@ echo new Init(new class
     public
     $email      = 'markc@renta.net',
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $perp       = 5,
     $self       = '',
     $in = [
         'i'     => null,        // Item or ID
         'g'     => null,        // Group/Category
         'l'     => '',          // Log (message)
-        'm'     => 'read',      // Method (action)
+        'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
@@ -41,7 +42,7 @@ echo new Init(new class
     $db = [
         'host'  => '127.0.0.1', // DB site
         'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_spe.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',

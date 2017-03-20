@@ -21,22 +21,21 @@ error_log('SESSION=' . var_export($_SESSION, true));
         util::cfg($g);
         $g->in = util::esc($g->in);
         $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-
-        util::ses('l', $g->in['l']);
-        $t = util::ses('t', $g->in['t']);
+        util::ses('l');
+        $t = util::ses('t', '', $g->in['t']);
 
         // temp only
         if (!isset($_SESSION['usr'])) {
             $_SESSION['usr'] = [
-                'id'      => 0,
-                'grp'     => 0,
+                'id'      => 1,
+                'grp'     => 1,
                 'acl'     => 0,
                 'login'   => 'sysadm@example.org',
-                'fname'   => 'Super',
-                'lname'   => 'Admin',
+                'fname'   => 'Sys',
+                'lname'   => 'Adm',
                 'cookie'  => ''
             ];
-            $_SESSION['adm'] = 0;
+            $_SESSION['adm'] = 1;
         }
 
         $t1 = 'themes_' . $t . '_' . $g->in['o'];
@@ -53,7 +52,6 @@ error_log('SESSION=' . var_export($_SESSION, true));
 
         foreach ($g->out as $k => $v)
             $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
-            
     }
 
     public function __toString() : string

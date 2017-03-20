@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/users.php 20170225
+// lib/php/themes/bootstrap/users.php 20170225 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Users extends Themes_Bootstrap_Theme
@@ -15,8 +15,34 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $buf = '';
+        return $this->editor($in);
+    }
+
+    public function update(array $in) : string
+    {
+error_log(__METHOD__);
+
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+error_log(__METHOD__);
+
+        $buf = $pgr_top = $pgr_end = '';
+        $pgr = $in['pager']; unset($in['pager']);
         $num = count($in);
+
+        if ($pgr['last'] > 1) {
+            $pgr_top ='
+          <div class="col-md-6">' . $this->pager($pgr) . '
+          </div>';
+            $pgr_end = '
+          <div class="row">
+            <div class="col-12">' . $this->pager($pgr) . '
+            </div>
+          </div>';
+        }
 
         foreach ($in as $a) {
             extract($a);
@@ -36,45 +62,32 @@ error_log(__METHOD__);
         }
 
         return '
-          <h3 class="min60">
-            <a href="?o=users&m=create" title="Add new user">
-              <i class="fa fa-users fa-fw"></i> Users
-              <small>
-                <i class="fa fa-plus-circle fa-fw"></i>
-                <span class="badge badge-pill badge-default pull-right">' . $num . '</span>
-              </small>
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table table-sm min600">
-              <thead class="nowrap">
-                <tr class="bg-primary text-white">
-                  <th>User ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Alt Email</th>
-                  <th>ACL</th>
-                  <th>Grp</th>
-                </tr>
-              </thead>
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
-          </div>';
-    }
-
-    public function read_one(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
-    }
-
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="min60">
+              <a href="?o=users&m=create" title="Add new user">
+                <i class="fa fa-users fa-fw"></i> Users
+                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h3>
+          </div>' . $pgr_top . '
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm min600">
+            <thead class="nowrap">
+              <tr class="bg-primary text-white">
+                <th>User ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Alt Email</th>
+                <th>ACL</th>
+                <th>Grp</th>
+              </tr>
+            </thead>
+            <tbody>' . $buf . '
+            </tbody>
+          </table>
+        </div>' . $pgr_end;
     }
 
     private function editor(array $in) : string
@@ -83,40 +96,45 @@ error_log(__METHOD__);
 error_log(var_export($in, true));
 
         extract($in);
-        $ary1 = $ary2 = [];
-        foreach($this->g->acl as $k => $v) $ary1[] = [$v, $k];
+
+        if ($this->g->in['m'] === 'create') {
+            $header = 'Add User';
+            $switch = '';
+            $submit = '
+                <a class="btn btn-outline-primary" href="?o=users&m=list">&laquo; Back</a>
+                <button type="submit" name="m" value="create" class="btn btn-primary">Add This Item</button>';
+        } else {
+            $header = 'Update User';
+error_log("is_usr($id) = ".var_export(!util::is_usr($id),true));
+            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
+                  <a class="btn btn-outline-primary pull-left" href="?o=users&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
+            $submit = '
+                <a class="btn btn-outline-primary" href="?o=users&m=list">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
+                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
+        }
+
+        $acl_ary = $grp_ary = [];
+
+        foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
+        $acl_buf = $this->dropdown($acl_ary, 'acl', $acl, '', 'custom-select');
 
         $res = db::qry("
  SELECT login,id FROM `users`
   WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
 
-        foreach($res as $k => $v) $ary2[] = [$v['login'], $v['id']];
-
-        $aclbuf = $this->dropdown($ary1, 'acl', $acl, '', 'custom-select');
-        $grpbuf = $this->dropdown($ary2, 'grp', $grp, '', 'custom-select');
-        $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
-        $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
-                <button type="submit" name="m" value="create" class="btn btn-primary">Add This Item</button>' : '
-                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
-                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
-
-        $switch_buf = '';
-        if (util::is_adm() && (util::is_acl(0) or util::is_acl(1))) $switch_buf = '
-                  <a class="btn btn-outline-primary pull-left" href="?o=users&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>';
+        foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
+        $grp_buf = $this->dropdown($grp_ary, 'grp', $grp, '', 'custom-select');
 
         return '
-          <h3 class="w30">
-            <a href="?o=users&m=read">
+          <h3 class="min600">
+            <a href="?o=users&m=list">
               <i class="fa fa-users fa-fw"></i> ' . $header . '
             </a>
           </h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-<!--            <input type="hidden" name="i" value="' . $this->g->in['i'] . '"> -->
-            <input type="hidden" name="webpw" value="' . $webpw . '">
+            <input type="hidden" name="i" value="' . $id . '">
             <div class="row">
               <div class="col-md-4">
                 <div class="form-group">
@@ -138,21 +156,11 @@ error_log(var_export($in, true));
                   <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
                 </div>
                 <div class="form-group">
-                  <label for="acl">ACL</label><br>' . $aclbuf . '
+                  <label for="acl">ACL</label><br>' . $acl_buf . '
                 </div>
                 <div class="form-group">
-                  <label for="grp">Group</label><br>' . $grpbuf . '
+                  <label for="grp">Group</label><br>' . $grp_buf . '
                 </div>
-<!--
-                <div class="form-group">
-                  <label for="password1">Password</label>
-                  <input type="password" class="form-control" name="passwd1" id="passwd1" value="">
-                </div>
-                <div class="form-group">
-                  <label for="password2">Password Repeat</label>
-                  <input type="password" class="form-control" name="passwd2" id="passwd2" value="">
-                </div>
--->
               </div>
               <div class="col-md-4">
                 <div class="form-group">
@@ -162,7 +170,7 @@ error_log(var_export($in, true));
               </div>
             </div>
             <div class="row">
-              <div class="col-md-12">' . $switch_buf . '
+              <div class="col-md-12">' . $switch . '
                 <div class="btn-group pull-right">' . $submit . '
                 </div>
               </div>
