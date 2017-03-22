@@ -50,7 +50,7 @@ label, input[type="text"], input[type="email"], input[type="password"], textarea
     font-size: 1rem;
     box-sizing : border-box;
 }
-form { margin: 0 auto; width: 30rem; }
+form { margin: 0 auto; width: 36rem; }
 p, pre, ul { margin-top: 0; }
 a:link, a:visited { color: #0275d8; text-decoration: none; }
 a:hover { text-decoration: underline; }

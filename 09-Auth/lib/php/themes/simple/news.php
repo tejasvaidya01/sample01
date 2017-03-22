@@ -11,7 +11,43 @@ error_log(__METHOD__);
         return $this->editor($in);
     }
 
-    public function read(array $in) : string
+    public function read(array $ary) : string
+    {
+error_log(__METHOD__);
+
+        extract($ary);
+
+        return '
+          <h2><b><a href="?o=news&m=list">&laquo; ' . $title . '</a></b></h2>
+          <table>
+            <tbody>
+              <tr>
+                <td>' . nl2br($content) . '</td>
+                <td class="text-center nowrap tblbg w150">
+                  <small>
+                    by <b>' . $author . '</b><br>
+                    <i>' . util::now($updated) . '</i>
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <p class="text-right">
+            <a class="btn" href="?o=news&m=list">&laquo; Back</a>
+            <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+            <a class="btn btn-success" href="?o=news&m=update&i=' . $id . '">Update</a>
+          </p>';
+    }
+
+    public function update(array $in) : string
+    {
+error_log(__METHOD__);
+
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
     {
 error_log(__METHOD__);
 
@@ -21,7 +57,7 @@ error_log(__METHOD__);
             $buf .= '
               <tr>
                 <td class="nowrap tblbg">
-                  <a href="?o=news&m=read&i=' . $id . '" title="Show item">
+                  <a href="?o=news&m=list" title="Show item">
                     <strong>' . $title . '</strong>
                   </a>
                 </td>
@@ -45,58 +81,21 @@ error_log(__METHOD__);
           </table>';
     }
 
-    public function read_one(array $ary) : string
-    {
-error_log(__METHOD__);
-
-        extract($ary);
-
-        return '
-          <h2><b><a href="?o=news&m=read&i=0">&laquo; ' . $title . '</a></b></h2>
-          <table>
-            <tbody>
-              <tr>
-                <td>' . nl2br($content) . '</td>
-                <td class="text-center nowrap tblbg w150">
-                  <small>
-                    by <b>' . $author . '</b><br>
-                    <i>' . util::now($updated) . '</i>
-                  </small>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-          <p class="text-right">
-            <a class="btn" href="?o=news&m=read&i=0">&laquo; Back</a>
-            <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-            <a class="btn btn-success" href="?o=news&m=update&i=' . $id . '">Update</a>
-          </p>';
-    }
-
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
-    }
-
     private function editor(array $ary) : string
     {
 error_log(__METHOD__);
 
         extract($ary);
-        $itemid = $this->g->in['m'] === 'create' ? 0 : $id;
         $header = $this->g->in['m'] === 'create' ? 'Add News' : 'Update News';
         $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn" href="?o=news&m=read&i=0">&laquo; Back</a>
+                <a class="btn" href="?o=news&m=list">&laquo; Back</a>
                 <button class="btn btn-success" type="submit" name="i" value="0">Add This Item</button>' : '
-                <a class="btn" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
+                <a class="btn" href="?o=news&m=list">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
                 <button class="btn btn-success" type="submit" name="i" value="' . $id . '">Update</button>';
 
         return '
-          <h2><a href="?o=news&m=read&i=' . $itemid . '"><b>&laquo; ' . $header . '</b></a></h2>
+          <h2><a href="?o=news&m=list"><b>&laquo; ' . $header . '</b></a></h2>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
@@ -117,7 +116,6 @@ error_log(__METHOD__);
             </p>
           </form>';
     }
-
 }
 
 ?>

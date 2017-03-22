@@ -2,11 +2,57 @@
 
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
-// lib/php/plugins/contact.php 20150101 - 20170305
+// lib/php/plugins/about.php 20150101 - 20170317
+
+class Plugins_About extends Plugin
+{
+    public function list() : string
+    {
+        $buf = '
+      <h2>About</h2>
+      <p>
+This is an example of a simple PHP7 "framework" to provide the core
+structure for further experimental development with both the framework
+design and some of the new features of PHP7.
+      </p>
+      <form method="post">
+        <p class="text-center">
+          <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
+          <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
+          <a class="btn btn-secondary" href="#" onclick="ajax(\'1\')">JSON</a>
+          <a class="btn btn-secondary" href="#" onclick="ajax(\'\')">HTML</a>
+          <a class="btn btn-secondary" href="#" onclick="ajax(\'foot\')">FOOT</a>
+        </p>
+      </form>
+      <pre id="dbg"></pre>
+      <script>
+function ajax(a) {
+  if (window.XMLHttpRequest)  {
+    var x = new XMLHttpRequest();
+    x.open("POST", "", true);
+    x.onreadystatechange = function() {
+      if (x.readyState == 4 && x.status == 200) {
+        document.getElementById("dbg").innerHTML = x.responseText
+          .replace(/</g,"&lt;")
+          .replace(/>/g,"&gt;")
+          .replace(/\\\n/g,"\n")
+          .replace(/\\\/g,"");
+    }}
+    x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    x.send("o=about&x="+a);
+    return false;
+  }
+}
+      </script>';
+        return $this->t->list(['buf' => $buf]);
+    }
+}
+
+// lib/php/plugins/contact.php 20150101 - 20170317
 
 class Plugins_Contact extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
         $buf = '
       <h2>Email Contact Form</h2>
@@ -31,20 +77,18 @@ function mailform(form) {
     return false;
 }
       </script>';
-        return $this->t->read(['buf' => $buf, 'js' => $js]);
+        return $this->t->list(['buf' => $buf, 'js' => $js]);
     }
 }
 
-// lib/php/plugins/home.php 20150101 - 20170305
+// lib/php/plugins/home.php 20150101 - 20170317
 
 class Plugins_Home extends Plugin
 {
-    public function read() : string
+    public function list() : string
     {
-//        if (empty($_SESSION['l'])) {
-//            $ts = util::ses('timestamp', time());
-//            util::log("You first visited this page "  . util::now($ts), 'success');
-//        }
+//        if (!isset($_SESSION['ts'])) $_SESSION['ts'] = (string) time();
+//        util::log("You first visited this page "  . util::now($_SESSION['ts']), 'success');
 
         $buf = '
       <h2>Home</h2>
@@ -55,94 +99,11 @@ Comments and pull requests are most welcome via the Issue Tracker link above.
       <p class="text-center">
         <a class="btn btn-primary" href="https://github.com/markc/spe">Project Page</a>
         <a class="btn btn-primary" href="https://github.com/markc/spe/issues">Issue Tracker</a>
+        <a class="btn btn-success" href="?t=none">No Theme</a>
+        <a class="btn btn-success" href="?t=simple">Simple Theme</a>
+        <a class="btn btn-success" href="?t=bootstrap">Bootstrap 4</a>
       </p>';
-        return $this->t->read(['buf' => $buf]);
-    }
-}
-
-//        <a class="btn btn-success" href="?t=none">No Theme</a>
-//        <a class="btn btn-success" href="?t=simple">Simple Theme</a>
-//        <a class="btn btn-success" href="?t=bootstrap">Bootstrap 4</a>
-
-// lib/php/plugins/about.php 20150101 - 20170305
-
-class Plugins_About extends Plugin
-{
-    public function read() : string
-    {
-        $buf = '
-      <h2>About</h2>
-      <p>
-This is an example of a simple PHP7 "framework" to provide the core
-structure for further experimental development with both the framework
-design and some of the new features of PHP7.
-      </p>
-      <p class="text-center">
-        <a class="btn btn-success" href="?o=about&l=success:Howdy, all is okay.">Success Message</a>
-        <a class="btn btn-danger" href="?o=about&l=danger:Houston, we have a problem.">Danger Message</a>
-      </p>
-      <p class="text-center">
-        <a class="btn btn-secondary" href="" onclick="ajax(\'1\');return false;">JSON</a>
-        <a class="btn btn-secondary" href="" onclick="ajax(\'\');return false;">HTML</a>
-        <a class="btn btn-secondary" href="" onclick="ajax(\'foot\');return false;">FOOT</a>
-      </p>
-      <pre id="dbg"></pre>
-      <script>
-function ajax(a) {
-  if (window.XMLHttpRequest)  {
-    var x = new XMLHttpRequest();
-    x.open("POST", "", true);
-    x.onreadystatechange = function() {
-      if (x.readyState == 4 && x.status == 200) {
-        document.getElementById("dbg").innerHTML = x.responseText
-          .replace(/</g,"&lt;")
-          .replace(/>/g,"&gt;")
-          .replace(/\\\n/g,"\n")
-          .replace(/\\\/g,"");
-    }}
-    x.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-    x.send("o=about&x="+a);
-  }
-}
-      </script>';
-        return $this->t->read(['buf' => $buf]);
-    }
-}
-
-// lib/php/plugins/news.php 20150101 - 20170306
-
-class Plugins_News extends Plugin
-{
-    protected
-    $tbl = 'news',
-    $in = [
-        'title'     => '',
-        'author'    => '',
-        'content'   => '',
-    ];
-    
-    protected function read_one() : array
-    {
-        $sql = "
- SELECT n.*, u.id as uid, u.login, u.fname, u.lname
-   FROM news n
-        JOIN users u
-            ON n.author=u.id
-  WHERE n.id=:nid";
-    
-        return db::qry($sql, ['nid' => $this->g->in['i']], 'one');
-    }
-
-    protected function read_all() : array
-    {
-        $sql = "
- SELECT n.*, u.id as uid, u.login, u.fname, u.lname
-   FROM news n
-        JOIN users u
-            ON n.author=u.id
-  ORDER BY n.updated DESC";
-
-        return db::qry($sql, []);
+        return $this->t->list(['buf' => $buf]);
     }
 }
 
@@ -153,9 +114,8 @@ class Plugins_Users extends Plugin
     protected
     $tbl = 'users',
     $in = [
-        'id'        => null,
-        'grp'       => null,
-        'acl'       => null,
+        'grp'       => 1,
+        'acl'       => 2,
         'login'     => '',
         'fname'     => '',
         'lname'     => '',
@@ -163,16 +123,30 @@ class Plugins_Users extends Plugin
         'webpw'     => '',
         'anote'     => '',
     ];
-    
-    protected function read_all() : array
+
+    protected function list() : string
     {
         if (util::is_acl(0)) { // superadmin
-            return db::read('*', '', '', 'ORDER BY `updated` DESC');
+            $where = '';
+            $wval = '';
         } elseif (util::is_acl(1)) { // normal admin
-            return db::read('*', 'grp', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
+            $where = 'grp';
+            $wval = $_SESSION['usr']['id'];
         } else {
-            return db::read('*', 'id', $_SESSION['usr']['id'], 'ORDER BY `updated` DESC');
-        }
+            $where = 'id';
+            $wval = $_SESSION['usr']['id'];
+         }
+
+        $pager = util::pager(
+            (int) util::ses('p'),
+            (int) $this->g->perp,
+            (int) db::read('count(id)', $where, $wval, '', 'col')
+        );
+
+        return $this->t->list(array_merge(
+            db::read('*', $where, $wval, 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+            ['pager' => $pager]
+        ));
     }
 
     protected function switch_user()
@@ -181,8 +155,7 @@ class Plugins_Users extends Plugin
             $_SESSION['usr'] = db::read('id,acl,grp,login,fname,lname,webpw,cookie', 'id', $this->g->in['i'], '', 'one');
             util::log('Switch to user: ' . $_SESSION['usr']['login'], 'success');
         } else util::log('Not authorized to switch users');
-        $this->g->in['i'] = null;
-        return $this->read();
+        return $this->list();
     }
 }
 
@@ -211,7 +184,7 @@ class Plugins_Auth extends Plugin
         if ($_POST) {
             if (filter_var($u, FILTER_VALIDATE_EMAIL)) {
                 if ($usr = db::read('id,acl', 'login', $u, '', 'one')) {
-                    if ($usr['acl'] == 9) {
+                    if ($usr['acl'] != 9) {
                         $newpass = util::genpw();
                         if ($this->mail_forgotpw($u, $newpass, 'From: ' . $this->g->email)) {
                             db::update([
@@ -220,7 +193,7 @@ class Plugins_Auth extends Plugin
                             ], [['id', '=', $usr['id']]]);
                             util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
                         } else util::log('Problem sending message to ' . $u, 'danger');
-                        return $this->t->read(['login' => $u]);
+                        return $this->t->list(['login' => $u]);
                     } else util::log('Account is disabled, contact your System Administrator');
                 } else util::log('User does not exist');
             } else util::log('You must provide a valid email address');
@@ -228,7 +201,7 @@ class Plugins_Auth extends Plugin
         return $this->t->create(['login' => $u]);
     }
 
-    public function read() : string
+    public function list() : string
     {
         $u = $this->in['login'];
         $p = $this->in['webpw'];
@@ -236,25 +209,27 @@ class Plugins_Auth extends Plugin
 
         if ($u) {
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
+                extract($usr);
                 if ($acl !== 9) {
-                    if ($p === $usr['webpw']) { // for testing a clear text password
-//                    if (password_verify(html_entity_decode($p), $webpw)) {
+//                    if ($p === $usr['webpw']) { // for testing a clear text password
+                    if (password_verify(html_entity_decode($p), $webpw)) {
                         $uniq = md5(uniqid());
                         if ($c) {
                             db::update(['cookie' => $uniq], [['login', '=', $u]]);
-                            util::cookie_put('remember', $uniq, 60*60*24*7);
+                            util::put_cookie('remember', $uniq, 60*60*24*7);
                             $tmp = $uniq;
                         } else $tmp = '';
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
                         if ((int) $acl === 0) $_SESSION['adm'] = $id;
-                        $_SESSION['m'] = 'read';
+                        $_SESSION['m'] = 'list';
+                        header('Location: ' . $_SERVER['PHP_SELF']);
                         exit();
                     } else util::log('Incorrect password');
                 } else util::log('Account is disabled, contact your System Administrator');
             } else util::log('Username does not exist');
         }
-        return $this->t->read(['login' => $u]);
+        return $this->t->list(['login' => $u]);
     }
 
     public function update() : string
@@ -279,7 +254,7 @@ class Plugins_Auth extends Plugin
                                 if (util::is_usr()) {
                                     header('Location: ' . $_SERVER['PHP_SELF']);
                                     exit();
-                                } else return $this->t->read(['login' => $usr['login']]);
+                                } else return $this->t->list(['login' => $usr['login']]);
                             } else util::log('Problem updating database');
                         } else util::log($usr['login'] . ' is not allowed access');
                     } else util::log('Your one time password key has expired');
@@ -292,10 +267,10 @@ class Plugins_Auth extends Plugin
     public function delete() : string
     {
         $u = $_SESSION['usr']['login'];
-        if (isset($_SESSION['adm']) and $_SESSION['usr'][0] === $_SESSION['adm'])
+        if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
             unset($_SESSION['adm']);
         unset($_SESSION['usr']);
-        util::cookie_del('remember');
+        util::del_cookie('remember');
         util::log($u . ' is now logged out', 'success');
         header('Location: ' . $this->g->self);
         exit();
@@ -310,7 +285,7 @@ class Plugins_Auth extends Plugin
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
                 extract($usr);
                 if ($otpttl && (($otpttl + 3600) > time())) {
-                    if ($acl) {
+                    if ($acl != 3) { // suspended
                         return $this->t->update(['id' => $id, 'login' => $login]);
                     } else util::log($login . ' is not allowed access');
                 } else util::log('Your one time password key has expired');
@@ -340,33 +315,322 @@ If you did not request this action then please ignore this message.
     }
 }
 
-// lib/php/themes/simple/contact.php 20150101 - 20170305
+// lib/php/plugins/news.php 20150101 - 20170317
+
+class Plugins_News extends Plugin
+{
+    protected
+    $tbl = 'news',
+    $in = [
+        'title'     => '',
+        'author'    => 1,
+        'content'   => '',
+    ];
+
+    protected function read() : string
+    {
+        $sql = "
+ SELECT n.*, u.id as uid, u.login, u.fname, u.lname
+   FROM news n
+        JOIN users u
+            ON n.author=u.id
+  WHERE n.id=:nid";
+
+        return $this->t->read(db::qry($sql, ['nid' => $this->g->in['i']], 'one'));
+    }
+
+    protected function update() : string
+    {
+        $sql = "
+ SELECT n.*, u.id as uid, u.login, u.fname, u.lname
+   FROM news n
+        JOIN users u
+            ON n.author=u.id
+  WHERE n.id=:nid";
+
+        return $this->t->update(db::qry($sql, ['nid' => $this->g->in['i']], 'one'));
+    }
+
+    protected function delete() : string
+    {
+        if (!util::is_adm()) {
+            $author = db::read('author', 'id', $this->g->in['i'], '', 'col');
+            if ($_SESSION['usr']['id'] !== $author) {
+                util::log('You do not have permissions to delete this post');
+                return $this->list();
+            }
+        }
+
+        return parent::delete();
+    }
+
+    protected function list() : string
+    {
+        $pager = util::pager(
+            (int) util::ses('p'),
+            (int) $this->g->perp,
+            (int) db::qry("SELECT count(*) FROM news n JOIN users u ON n.author=u.id", [], 'col')
+        );
+
+        $sql = "
+ SELECT n.*, u.id as uid, u.login, u.fname, u.lname
+   FROM news n
+        JOIN users u
+            ON n.author=u.id
+  ORDER BY n.updated DESC LIMIT " . $pager['start'] . "," . $pager['perp'];
+
+        return $this->t->list(array_merge(db::qry($sql), ['pager' => $pager]));
+    }
+}
+
+// lib/php/themes/simple/about.php 20150101 - 20170317
+
+class Themes_Simple_About extends Themes_Simple_Theme
+{
+    public function list(array $in) : string
+    {
+        return $in['buf'];
+    }
+}
+
+// lib/php/themes/simple/contact.php 20150101 - 20170317
 
 class Themes_Simple_Contact extends Themes_Simple_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return $in['buf'] . $in['js'];
     }
 }
 
-// lib/php/themes/simple/about.php 20150101 - 20170305
+// lib/php/themes/simple/home.php 20150101 - 20170317
 
-class Themes_Simple_About extends Themes_Simple_Theme
+class Themes_Simple_Home extends Themes_Simple_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return $in['buf'];
     }
 }
 
-// lib/php/themes/simple/home.php 20150101 - 20170305
+// lib/php/themes/simple/news.php 20150101 - 20170305
 
-class Themes_Simple_Home extends Themes_Simple_Theme
-{
+class Themes_Simple_News extends Themes_Simple_Theme {
+
+    public function create(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function read(array $ary) : string
+    {
+        extract($ary);
+
+        return '
+          <h2><b><a href="?o=news&m=list">&laquo; ' . $title . '</a></b></h2>
+          <table>
+            <tbody>
+              <tr>
+                <td>' . nl2br($content) . '</td>
+                <td class="text-center nowrap tblbg w150">
+                  <small>
+                    by <b>' . $author . '</b><br>
+                    <i>' . util::now($updated) . '</i>
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <p class="text-right">
+            <a class="btn" href="?o=news&m=list">&laquo; Back</a>
+            <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+            <a class="btn btn-success" href="?o=news&m=update&i=' . $id . '">Update</a>
+          </p>';
+    }
+
+    public function update(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+        $buf = '';
+        foreach ($in as $row) {
+            extract($row);
+            $buf .= '
+              <tr>
+                <td class="nowrap tblbg">
+                  <a href="?o=news&m=list" title="Show item">
+                    <strong>' . $title . '</strong>
+                  </a>
+                </td>
+                <td class="text-center nowrap tblbg top w150" rowspan="2">
+                  <small>
+                    by <b>' . $author . '</b><br>
+                    <i>' . util::now($updated) . '</i>
+                  </small>
+                </td>
+              </tr>
+              <tr>
+                <td><p>' . nl2br($content) . '</p></td>
+              </tr>';
+        }
+
+        return '
+          <h2><b><a href="?o=news&m=create" title="Add news item">News (+)</a></b></h2>
+          <table>
+            <tbody>' . $buf . '
+            </tbody>
+          </table>';
+    }
+
+    private function editor(array $ary) : string
+    {
+        extract($ary);
+        $header = $this->g->in['m'] === 'create' ? 'Add News' : 'Update News';
+        $submit = $this->g->in['m'] === 'create' ? '
+                <a class="btn" href="?o=news&m=list">&laquo; Back</a>
+                <button class="btn btn-success" type="submit" name="i" value="0">Add This Item</button>' : '
+                <a class="btn" href="?o=news&m=list">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                <button class="btn btn-success" type="submit" name="i" value="' . $id . '">Update</button>';
+
+        return '
+          <h2><a href="?o=news&m=list"><b>&laquo; ' . $header . '</b></a></h2>
+          <form method="post" action="' . $this->g->self . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
+            <p>
+              <label for="title">Title</label><br>
+              <input type="text" id="title" name="title" value="' . $title . '" required>
+            </p>
+            <p>
+              <label for="author">Author</label><br>
+              <input type="text" id="author" name="author" value="' . $author . '" required>
+            </p>
+            <p>
+              <label for="content">Content</label><br>
+              <textarea id="content" name="content" rows="9" required>' . $content . '</textarea>
+            </p>
+            <br>
+            <p class="text-right">' . $submit . '
+            </p>
+          </form>';
+    }
+}
+
+// lib/php/themes/simple/users.php 20150101 - 20170306
+
+class Themes_Simple_Users extends Themes_Simple_Theme {
+
+    public function create(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
     public function read(array $in) : string
     {
-        return $in['buf'];
+        return $this->editor($in);
+    }
+
+    public function update(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+        $buf = '';
+        $num = count($in);
+
+        foreach ($in as $a) {
+            extract($a);
+            $buf .= '
+        <tr>
+          <td>
+            <a href="?o=users&m=read&i=' . $id . '" title="Show user">
+              <strong>' . $login . '</strong>
+            </a>
+          </td>
+          <td>' . $fname . '</td>
+          <td>' . $lname . '</td>
+          <td>' . $altemail . '</td>
+          <td>' . $this->g->acl[$acl] . '</td>
+        </tr>';
+        }
+
+        return '
+          <h2><a href="?o=users&m=create" title="Add new user"><b>Users (+)</b></a></h3>
+          <table>
+            <thead class="nowrap">
+              <tr class="bg-primary text-white">
+                <th>User ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Alt Email</th>
+                <th>ACL</th>
+              </tr>
+            </thead>
+            <tbody>' . $buf . '
+            </tbody>
+          </table>';
+    }
+
+    private function editor(array $in) : string
+    {
+        extract($in);
+
+        $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
+        $submit = $this->g->in['m'] === 'create' ? '
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
+              <button type="submit" name="m" value="create" class="btn btn-success">Add This Item</button>' : '
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
+              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
+              <button type="submit" name="m" value="update" class="btn btn-success">Update</button>';
+
+        return '
+          <h2><a href="?o=users&m=list"><b>&laquo; ' . $header . '</b></a></h3>
+          <form method="post" action="' . $this->g->self . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
+            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
+
+            <input type="hidden" name="acl" value="' . $acl . '">
+            <input type="hidden" name="webpw" value="' . $webpw . '">
+            <p>
+              <label for="login">UserID</label><br>
+              <input type="email" id="login" name="login" value="' . $login . '" required>
+            </p>
+            <p>
+              <label for="fname">First Name</label><br>
+              <input type="text" id="fname" name="fname" value="' . $fname . '" required>
+            </p>
+            <p>
+              <label for="lname">Last Name</label><br>
+              <input type="text" id="lname" name="lname" value="' . $lname . '" required>
+            </p>
+            <p>
+              <label for="altemail">Alt Email</label><br>
+              <input type="text" id="altemail" name="altemail" value="' . $altemail . '">
+            </p>
+            <p>
+              <label for="password1">Password</label><br>
+              <input type="password" name="passwd1" id="passwd1" value="">
+            </p>
+            <p>
+              <label for="password2">Password Repeat</label><br>
+              <input type="password" name="passwd2" id="passwd2" value="">
+            </p>
+            <p>
+              <label for="anote">Admin Notes</label><br>
+              <textarea rows="9" id="anote" name="anote">' . nl2br($anote) . '</textarea>
+            </p>
+            <br>
+            <p class="text-right">' . $submit . '
+            </p>
+          </form>';
     }
 }
 
@@ -418,7 +682,7 @@ label, input[type="text"], input[type="email"], input[type="password"], textarea
     font-size: 1rem;
     box-sizing : border-box;
 }
-form { margin: 0 auto; width: 30rem; }
+form { margin: 0 auto; width: 36rem; }
 p, pre, ul { margin-top: 0; }
 a:link, a:visited { color: #0275d8; text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -439,230 +703,6 @@ table td { padding: 0.25em 1em; }
 @media (max-width: 46rem) { body { width: 92%; } }
         </style>';
     }
-}
-
-// lib/php/themes/simple/users.php 20150101 - 20170306
-
-class Themes_Simple_Users extends Themes_Simple_Theme {
-
-    public function create(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function read(array $in) : string
-    {
-        $buf = '';
-        $num = count($in);
-
-        foreach ($in as $a) {
-            extract($a);
-            $buf .= '
-        <tr>
-          <td>
-            <a href="?o=users&m=read&i=' . $id . '" title="Show user">
-              <strong>' . $userid . '</strong>
-            </a>
-          </td>
-          <td>' . $fname . '</td>
-          <td>' . $lname . '</td>
-          <td>' . $altemail . '</td>
-          <td>' . $this->g->acl[$acl] . '</td>
-        </tr>';
-        }
-
-        return '
-          <h2><a href="?o=users&m=create" title="Add new user"><b>Users (+)</b></a></h3>
-          <table>
-            <thead class="nowrap">
-              <tr class="bg-primary text-white">
-                <th>User ID</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Alt Email</th>
-                <th>ACL</th>
-              </tr>
-            </thead>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>';
-    }
-
-    public function read_one(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    private function editor(array $in) : string
-    {
-        extract($in);
-
-        $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
-        $submit = $this->g->in['m'] === 'create' ? '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
-              <button type="submit" name="m" value="create" class="btn btn-success">Add This Item</button>' : '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
-              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $userid . '?\')">Remove</a>
-              <button type="submit" name="m" value="update" class="btn btn-success">Update</button>';
-
-        return '
-          <h2><a href="?o=users&m=read&i=0"><b>&laquo; ' . $header . '</b></a></h3>
-          <form method="post" action="' . $this->g->self . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <input type="hidden" name="i" value="' . $this->g->in['i'] . '">
-
-            <input type="hidden" name="acl" value="' . $acl . '">
-            <input type="hidden" name="webpw" value="' . $webpw . '">
-
-            <p>
-              <label for="userid">UserID</label><br>
-              <input type="email" id="userid" name="userid" value="' . $userid . '" required>
-            </p>
-            <p>
-              <label for="fname">First Name</label><br>
-              <input type="text" id="fname" name="fname" value="' . $fname . '" required>
-            </p>
-            <p>
-              <label for="lname">Last Name</label><br>
-              <input type="text" id="lname" name="lname" value="' . $lname . '" required>
-            </p>
-            <p>
-              <label for="altemail">Alt Email</label><br>
-              <input type="text" id="altemail" name="altemail" value="' . $altemail . '">
-            </p>
-            <p>
-              <label for="password1">Password</label><br>
-              <input type="password" name="passwd1" id="passwd1" value="">
-            </p>
-            <p>
-              <label for="password2">Password Repeat</label><br>
-              <input type="password" name="passwd2" id="passwd2" value="">
-            </p>
-            <p>
-              <label for="anote">Admin Notes</label><br>
-              <textarea rows="9" id="anote" name="anote">' . nl2br($anote) . '</textarea>
-            </p>
-            <br>
-            <p class="text-right">' . $submit . '
-            </p>
-          </form>';
-    }
-}
-
-// lib/php/themes/simple/news.php 20150101 - 20170305
-
-class Themes_Simple_News extends Themes_Simple_Theme {
-
-    public function create(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function read(array $in) : string
-    {
-        $buf = '';
-        foreach ($in as $row) {
-            extract($row);
-            $buf .= '
-              <tr>
-                <td class="nowrap tblbg">
-                  <a href="?o=news&m=read&i=' . $id . '" title="Show item">
-                    <strong>' . $title . '</strong>
-                  </a>
-                </td>
-                <td class="text-center nowrap tblbg top w150" rowspan="2">
-                  <small>
-                    by <b>' . $author . '</b><br>
-                    <i>' . util::now($updated) . '</i>
-                  </small>
-                </td>
-              </tr>
-              <tr>
-                <td><p>' . nl2br($content) . '</p></td>
-              </tr>';
-        }
-
-        return '
-          <h2><b><a href="?o=news&m=create" title="Add news item">News (+)</a></b></h2>
-          <table>
-            <tbody>' . $buf . '
-            </tbody>
-          </table>';
-    }
-
-    public function read_one(array $ary) : string
-    {
-        extract($ary);
-
-        return '
-          <h2><b><a href="?o=news&m=read&i=0">&laquo; ' . $title . '</a></b></h2>
-          <table>
-            <tbody>
-              <tr>
-                <td>' . nl2br($content) . '</td>
-                <td class="text-center nowrap tblbg w150">
-                  <small>
-                    by <b>' . $author . '</b><br>
-                    <i>' . util::now($updated) . '</i>
-                  </small>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <br>
-          <p class="text-right">
-            <a class="btn" href="?o=news&m=read&i=0">&laquo; Back</a>
-            <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-            <a class="btn btn-success" href="?o=news&m=update&i=' . $id . '">Update</a>
-          </p>';
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    private function editor(array $ary) : string
-    {
-        extract($ary);
-        $itemid = $this->g->in['m'] === 'create' ? 0 : $id;
-        $header = $this->g->in['m'] === 'create' ? 'Add News' : 'Update News';
-        $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn" href="?o=news&m=read&i=0">&laquo; Back</a>
-                <button class="btn btn-success" type="submit" name="i" value="0">Add This Item</button>' : '
-                <a class="btn" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                <button class="btn btn-success" type="submit" name="i" value="' . $id . '">Update</button>';
-
-        return '
-          <h2><a href="?o=news&m=read&i=' . $itemid . '"><b>&laquo; ' . $header . '</b></a></h2>
-          <form method="post" action="' . $this->g->self . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <p>
-              <label for="title">Title</label><br>
-              <input type="text" id="title" name="title" value="' . $title . '" required>
-            </p>
-            <p>
-              <label for="author">Author</label><br>
-              <input type="text" id="author" name="author" value="' . $author . '" required>
-            </p>
-            <p>
-              <label for="content">Content</label><br>
-              <textarea id="content" name="content" rows="9" required>' . $content . '</textarea>
-            </p>
-            <br>
-            <p class="text-right">' . $submit . '
-            </p>
-          </form>';
-    }
-
 }
 
 // lib/php/themes/simple/auth.php 20150101 - 20170307
@@ -745,41 +785,41 @@ class Themes_Simple_Auth extends Themes_Simple_Theme
     }
 }
 
-// lib/php/themes/none/theme.php 20150101 - 20170305
+// lib/php/themes/none/theme.php 20150101 - 20170317
 
 class Themes_None_Theme extends Theme {}
 
-// lib/php/themes/none/about.php 20150101 - 20170305
+// lib/php/themes/none/about.php 20150101 - 20170317
 
 class Themes_None_About extends Themes_None_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return $in['buf'];
     }
 }
 
-// lib/php/themes/none/contact.php 20150101 - 20170305
+// lib/php/themes/none/contact.php 20150101 - 20170317
 
 class Themes_None_Contact extends Themes_None_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return $in['buf'];
     }
 }
 
-// lib/php/themes/none/home.php 20150101 - 20170305
+// lib/php/themes/none/home.php 20150101 - 20170317
 
 class Themes_None_Home extends Themes_None_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return $in['buf'];
     }
 }
 
-// lib/php/themes/none/users.php 20150101 - 20170306
+// lib/php/themes/none/users.php 20150101 - 20170317
 
 class Themes_None_Users extends Themes_None_Theme {
 
@@ -790,6 +830,16 @@ class Themes_None_Users extends Themes_None_Theme {
 
     public function read(array $in) : string
     {
+        return $this->editor($in);
+    }
+
+    public function update(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
         $buf = '';
         $num = count($in);
 
@@ -798,8 +848,8 @@ class Themes_None_Users extends Themes_None_Theme {
             $buf .= '
         <tr>
           <td>
-            <a href="?o=users&m=read&i=' . $id . '" title="Show user">
-              <strong>' . $userid . '</strong>
+            <a href="?o=users&m=list" title="Show user">
+              <strong>' . $login . '</strong>
             </a>
           </td>
           <td>' . $fname . '</td>
@@ -826,30 +876,20 @@ class Themes_None_Users extends Themes_None_Theme {
           </table>';
     }
 
-    public function read_one(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
     private function editor(array $in) : string
     {
         extract($in);
 
         $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
         $submit = $this->g->in['m'] === 'create' ? '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
               <button type="submit" name="m" value="create" class="btn btn-success">Add This Item</button>' : '
-              <a class="btn" href="?o=users&m=read&i=0">&laquo; Back</a>
-              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $userid . '?\')">Remove</a>
+              <a class="btn" href="?o=users&m=list">&laquo; Back</a>
+              <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
               <button type="submit" name="m" value="update" class="btn btn-success">Update</button>';
 
         return '
-          <h2><a href="?o=users&m=read&i=0"><b>&laquo; ' . $header . '</b></a></h3>
+          <h2><a href="?o=users&m=list"><b>&laquo; ' . $header . '</b></a></h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
@@ -859,8 +899,8 @@ class Themes_None_Users extends Themes_None_Theme {
             <input type="hidden" name="webpw" value="' . $webpw . '">
 
             <p>
-              <label for="userid">UserID</label><br>
-              <input type="email" id="userid" name="userid" value="' . $userid . '" required>
+              <label for="login">UserID</label><br>
+              <input type="email" id="login" name="login" value="' . $login . '" required>
             </p>
             <p>
               <label for="fname">First Name</label><br>
@@ -893,7 +933,7 @@ class Themes_None_Users extends Themes_None_Theme {
     }
 }
 
-// lib/php/themes/none/news.php 20150101 - 20170305
+// lib/php/themes/none/news.php 20150101 - 20170317
 
 class Themes_None_News extends Themes_None_Theme
 {
@@ -902,7 +942,31 @@ class Themes_None_News extends Themes_None_Theme
         return $this->editor($in);
     }
 
-    public function read(array $in) : string
+    public function read(array $ary) : string
+    {
+        extract($ary);
+
+        return '
+          <h3><a href="?o=news&m=read&i=0">&laquo; ' . $title . '</a></h3>
+          <table>
+            <tbody>
+              <tr><td>' . nl2br($content) . '<br></td><tr>
+              </tr><td><small><i>by <b>' . $author . '</b> ' . util::now($updated) . '</i></small></td></tr>
+            </tbody>
+          </table>
+          <p>
+            <a href="?o=news&m=read&i=0">&laquo; Back</a>
+            | <a href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+            | <a href="?o=news&m=update&i=' . $id . '">Update</a>
+          </p>';
+    }
+
+    public function update(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
     {
         $buf = '';
         foreach ($in as $row) {
@@ -934,44 +998,19 @@ class Themes_None_News extends Themes_None_Theme
           </table>';
     }
 
-    public function read_one(array $ary) : string
-    {
-        extract($ary);
-
-        return '
-          <h3><a href="?o=news&m=read&i=0">&laquo; ' . $title . '</a></h3>
-          <table>
-            <tbody>
-              <tr><td>' . nl2br($content) . '<br></td><tr>
-              </tr><td><small><i>by <b>' . $author . '</b> ' . util::now($updated) . '</i></small></td></tr>
-            </tbody>
-          </table>
-          <p>
-            <a href="?o=news&m=read&i=0">&laquo; Back</a>
-            | <a href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-            | <a href="?o=news&m=update&i=' . $id . '">Update</a>
-          </p>';
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
     private function editor(array $ary) : string
     {
         extract($ary);
-        $itemid = $this->g->in['m'] === 'create' ? 0 : $id;
         $header = $this->g->in['m'] === 'create' ? 'Add News' : 'Update News';
         $submit = $this->g->in['m'] === 'create' ? '
-              <a href="?o=news&m=read&i=0">&laquo; Back</a>
+              <a href="?o=news&m=list">&laquo; Back</a>
               <button type="submit" name="i" value="0">Add This Item</button>' : '
-              <a href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
+              <a href="?o=news&m=list">&laquo; Back</a>
               <a href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
               <button type="submit" name="i" value="' . $id . '">Update</button>';
 
         return '
-          <h3><a href="?o=news&m=read&i=' . $itemid . '">&laquo; ' . $header . '</a></h3>
+          <h3><a href="?o=news&m=list">&laquo; ' . $header . '</a></h3>
           <form method="post" action="' . $this->g->self . '">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
             <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
@@ -1074,11 +1113,31 @@ class Themes_None_Auth extends Themes_None_Theme
     }
 }
 
-// lib/php/themes/bootstrap/contact.php 20150101 - 20170305
+// lib/php/themes/bootstrap/home.php 20150101 - 20170317
+
+class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
+{
+    public function list(array $in) : string
+    {
+        return $in['buf'];
+    }
+}
+
+// lib/php/themes/bootstrap/about.php 20150101 - 20170317
+
+class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
+{
+    public function list(array $in) : string
+    {
+        return $in['buf'];
+    }
+}
+
+// lib/php/themes/bootstrap/contact.php 20150101 - 20170317
 
 class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
 {
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
         return '
         <div class="col-md-4 offset-md-4">
@@ -1105,352 +1164,111 @@ class Themes_Bootstrap_Contact extends Themes_Bootstrap_Theme
     }
 }
 
-// lib/php/themes/bootstrap/about.php 20150101 - 20170305
+// lib/php/themes/bootstrap/auth.php 20150101
 
-class Themes_Bootstrap_About extends Themes_Bootstrap_Theme
+class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
 {
-    public function read(array $in) : string
-    {
-        return $in['buf'];
-    }
-}
-
-// lib/php/themes/bootstrap/home.php 20150101 - 20170305
-
-class Themes_Bootstrap_Home extends Themes_Bootstrap_Theme
-{
-    public function read(array $in) : string
-    {
-        return $in['buf'];
-    }
-}
-
-// lib/php/themes/bootstrap/news.php 20170225
-
-class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
-{
+    // forgotpw (create new pw)
     public function create(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function read(array $in) : string
-    {
-        $buf = '';
-        foreach ($in as $row) {
-            extract($row);
-            $author_buf = $fname && $lname
-                ? $fname . ' ' . $lname
-                : ($fname && empty($lname) ? $fname : $login);
-            $buf .= '
-                <tr>
-                  <td class="nowrap">
-                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">
-                      <strong>' . $title . '</strong>
-                    </a>
-                  </td>
-                  <td class="text-center nowrap bg-primary text-white w200" rowspan="2">
-                    <small>
-                      by <b><a class="text-white" href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
-                      <i>' . util::now($updated) . '</i>
-                    </small>
-                  </td>
-                </tr>
-                <tr>
-                  <td><p>' . nl2br($content) . '</p></td>
-                </tr>';
-        }
-
-        return '
-          <h3 class="min600">
-            <a href="?o=news&m=create" title="Add new item">
-              <i class="fa fa-newspaper-o fa-fw"></i> News
-              <small>
-                <i class="fa fa-plus-circle fa-fw"></i>
-              </small>
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table table-bordered min600">
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
-          </div>';
-    }
-
-    public function read_one(array $in) : string
     {
         extract($in);
-        $author_buf = $fname && $lname
-            ? $fname . ' ' . $lname
-            : ($fname && empty($lname) ? $fname : $login);
-            
-        return '
-          <h3 class="w30">
-            <a href="?o=news&m=read" title="Go back to list">
-              <i class="fa fa-newspaper-o fa-fw"></i> ' . $title . '
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table w30">
-              <tbody>
-                <tr>
-                  <td>' . nl2br($content) . '</td>
-                  <td class="text-center nowrap w200">
-                    <small>
-                      by <b><a href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
-                      <i>' . util::now($updated) . '</i>
-                    </small>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="row">
-            <div class="col-12 text-right">
-              <div class="btn-group">
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
-              </div>
-            </div>
-          </div>';
-    }
 
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    private function editor(array $ary) : string
-    {
-        extract($ary);
-            
-        if ($this->g->in['m'] === 'create') {
-            extract($_SESSION['usr']);
-            $author = $uid = $id;
-            $header = 'Add News';
-            $submit = '
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
-                <button type="submit" class="btn btn-primary">Add This Item</button>';                
-        } else {
-            $header = 'Update News';
-            $submit = '
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
-        }
-        
-        $author_label = $fname && $lname
-            ? $fname . ' ' . $lname
-            : ($fname && empty($lname) ? $fname : $login);
-            
-        $author_buf = '
-                  <p class="form-control-static"><b><a href="?o=users&m=update&i=' . $uid . '">' . $author_label . '</a></b></p>';
-            
         return '
-          <h3 class="w30">
-            <a href="?o=news&m=read">
-              <i class="fa fa-newspaper-o fa-fw"></i> ' . $header . '
-            </a>
-          </h3>
-          <form method="post" action="' . $this->g->self . '">
+        <div class="col-md-4 offset-md-4">
+          <h2><i class="fa fa-key"></i> Forgot password</h2>
+          <form action="' . $this->g->self . '" method="post">
             <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
-            <input type="hidden" name="author" value="' . $uid . '">
-            <div class="row">
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="title">Title</label>
-                  <input type="text" class="form-control" id="title" name="title" value="' . $title . '" required>
-                </div>
-                <div class="form-group">
-                  <label for="author">Author</label>' . $author_buf . '
-                </div>
-              </div>
-              <div class="col-md-8">
-                <div class="form-group">
-                  <label for="content">Content</label>
-                  <textarea class="form-control" id="content" name="content" rows="12" required>' . $content . '</textarea>
-                </div>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+                <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="' . $login . '" autofocus required>
               </div>
             </div>
-            <div class="row">
-              <div class="col-12 text-right">
-                <div class="btn-group">' . $submit . '
-                </div>
+            <div class="form-group">
+              <a tabindex="0" role="button" data-toggle="popover" data-trigger="hover" title="Please Note" data-content="You will receive an email with further instructions and please note that this only resets the password for this website interface."> <i class="fa fa-question-circle fa-fw"></i></a>
+              <div class="btn-group pull-right">
+                <a class="btn btn-outline-primary" href="?o=auth">&laquo; Back</a>
+                <button class="btn btn-primary" type="submit" name="m" value="create">Send</button>
               </div>
             </div>
-          </form>';
-    }
-}
-
-// lib/php/themes/bootstrap/users.php 20170225
-
-class Themes_Bootstrap_Users extends Themes_Bootstrap_Theme
-{
-    public function create(array $in) : string
-    {
-        return $this->editor($in);
+          </form>
+        </div>
+        <script>$(function() { $("[data-toggle=popover]").popover(); });</script>';
     }
 
-    public function read(array $in) : string
-    {
-        $buf = '';
-        $num = count($in);
-
-        foreach ($in as $a) {
-            extract($a);
-            $buf .= '
-        <tr>
-          <td>
-            <a href="?o=users&m=read&i=' . $id . '" title="Show user: ' . $id . '">
-              <strong>' . $login . '</strong>
-            </a>
-          </td>
-          <td>' . $fname . '</td>
-          <td>' . $lname . '</td>
-          <td>' . $altemail . '</td>
-          <td>' . $this->g->acl[$acl] . '</td>
-          <td>' . $grp . '</td>
-        </tr>';
-        }
-
-        return '
-          <h3 class="min60">
-            <a href="?o=users&m=create" title="Add new user">
-              <i class="fa fa-users fa-fw"></i> Users
-              <small>
-                <i class="fa fa-plus-circle fa-fw"></i>
-                <span class="badge badge-pill badge-default pull-right">' . $num . '</span>
-              </small>
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table table-sm min600">
-              <thead class="nowrap">
-                <tr class="bg-primary text-white">
-                  <th>User ID</th>
-                  <th>First Name</th>
-                  <th>Last Name</th>
-                  <th>Alt Email</th>
-                  <th>ACL</th>
-                  <th>Grp</th>
-                </tr>
-              </thead>
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
-          </div>';
-    }
-
-    public function read_one(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    public function update(array $in) : string
-    {
-        return $this->editor($in);
-    }
-
-    private function editor(array $in) : string
+    // signin (read current pw)
+    public function list(array $in) : string
     {
 
         extract($in);
-        $ary1 = $ary2 = [];
-        foreach($this->g->acl as $k => $v) $ary1[] = [$v, $k];
-
-        $res = db::qry("
- SELECT login,id FROM `users`
-  WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
-
-        foreach($res as $k => $v) $ary2[] = [$v['login'], $v['id']];
-
-        $acl = null ?? '2';
-        $grp = null ?? '';
-        
-        $aclbuf = $this->dropdown($ary1, 'acl', $acl, '', 'custom-select');
-        $grpbuf = $this->dropdown($ary2, 'grp', $grp, '', 'custom-select');
-
-        $header = $this->g->in['m'] === 'create' ? 'Add User' : 'Update User';
-        $submit = $this->g->in['m'] === 'create' ? '
-                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
-                <button type="submit" name="m" value="create" class="btn btn-primary">Add This Item</button>' : '
-                <a class="btn btn-outline-primary" href="?o=users&m=read">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
-                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
-
-        $switch_buf = '';
-        if ($this->g->in['m'] !== 'create')
-            if (util::is_adm() && (util::is_acl(0) or util::is_acl(1))) $switch_buf = '
-                  <a class="btn btn-outline-primary pull-left" href="?o=users&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>';
 
         return '
-          <h3 class="w30">
-            <a href="?o=users&m=read">
-              <i class="fa fa-users fa-fw"></i> ' . $header . '
-            </a>
-          </h3>
-          <form method="post" action="' . $this->g->self . '">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <input type="hidden" name="i" value="' . $id . '">
-            <input type="hidden" name="webpw" value="' . $webpw . '">
-            <div class="row">
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="login">UserID</label>
-                  <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
-                </div>
-                <div class="form-group">
-                  <label for="fname">First Name</label>
-                  <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
-                </div>
-                <div class="form-group">
-                  <label for="lname">Last Name</label>
-                  <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="altemail">Alt Email</label>
-                  <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
-                </div>
-                <div class="form-group">
-                  <label for="acl">ACL</label><br>' . $aclbuf . '
-                </div>
-                <div class="form-group">
-                  <label for="grp">Group</label><br>' . $grpbuf . '
-                </div>
-<!--
-                <div class="form-group">
-                  <label for="password1">Password</label>
-                  <input type="password" class="form-control" name="passwd1" id="passwd1" value="">
-                </div>
-                <div class="form-group">
-                  <label for="password2">Password Repeat</label>
-                  <input type="password" class="form-control" name="passwd2" id="passwd2" value="">
-                </div>
--->
-              </div>
-              <div class="col-md-4">
-                <div class="form-group">
-                  <label for="anote">Admin Notes</label>
-                  <textarea rows="9" class="form-control" id="anote" name="anote">' . nl2br($anote) . '</textarea>
-                </div>
+        <div class="col-md-4 offset-md-4">
+          <h2><i class="fa fa-sign-in"></i> Sign in</h2>
+          <form action="' . $this->g->self . '" method="post">
+            <input type="hidden" name="o" value="auth">
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+                <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="' . $login . '" required autofocus>
               </div>
             </div>
-            <div class="row">
-              <div class="col-md-12">' . $switch_buf . '
-                <div class="btn-group pull-right">' . $submit . '
-                </div>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+                <input type="password" name="webpw" id="webpw" class="form-control" placeholder="Your Password" required>
               </div>
             </div>
-          </form>';
+            <div class="form-group">
+              <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" name="remember" id="remember" value="yes">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">Remember me on this computer</span>
+              </label>
+            </div>
+            <div class="btn-group pull-right">
+              <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
+              <button class="btn btn-primary" type="submit" name="m" value="list">Sign in</button>
+            </div>
+          </form>
+        </div>';
+    }
+
+    // resetpw (update pw)
+    public function update(array $in) : string
+    {
+
+        extract($in);
+
+        return '
+        <div class="col-md-4 offset-md-4">
+          <h2><i class="fa fa-key"></i> Update Password</h2>
+          <form action="' . $this->g->self . '" method="post">
+            <input type="hidden" name="o" value="auth">
+            <input type="hidden" name="id" value="' . $id . '">
+            <input type="hidden" name="login" value="' . $login . '">
+            <p class="text-center"><b>For ' . $login . '</b></p>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
+                <input type="password" name="passwd1" id="passwd1" class="form-control" placeholder="New Password" value="" required autofocus>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
+                <input type="password" name="passwd2" id="passwd2" class="form-control" placeholder="Confirm Password" value="" required>
+              </div>
+            </div>
+            <div class="btn-group pull-right">
+              <button class="btn btn-primary" type="submit" name="m" value="update">Update my password</button>
+            </div>
+          </form>
+        </div>';
     }
 }
 
-// lib/php/themes/bootstrap/theme.php 20150101 - 20170305
+// lib/php/themes/bootstrap/theme.php 20150101 - 20170317
 
 class Themes_Bootstrap_Theme extends Theme
 {
@@ -1497,30 +1315,28 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
     {
         return '
     <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-      <div class="container">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
-          <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
-        </a>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-          <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
-            </li>
-          </ul>
-        </div>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
+        <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
+      </a>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
+          </li>
+        </ul>
       </div>
     </nav>';
     }
 
     public function nav1(array $a = []) : string
     {
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
+        $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
-        $t = '?t=' . $_SESSION['t'];
+        $t = '?t=' . util::ses('t');
         return join('', array_map(function ($n) use ($o, $t) {
             if (is_array($n[1])) return $this->nav_dropdown($n);
             $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
@@ -1541,8 +1357,9 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
             $usr[] = ['Change Profile', '?o=users&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-user fa-fw'];
             $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-key fa-fw'];
             $usr[] = ['Sign out', '?o=auth&m=delete', 'fa fa-sign-out fa-fw'];
-            if (util::is_adm() && !util::is_acl(0)) $usr[] = 
-                ['Switch to sysadm', '?o=users&m=switch_user&i=0', 'fa fa-user fa-fw'];
+
+            if (util::is_adm() && !util::is_acl(0)) $usr[] =
+                ['Switch to sysadm', '?o=users&m=switch_user&i=' . $_SESSION['adm'], 'fa fa-user fa-fw'];
 
             return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fa fa-user fa-fw']);
         } else return '';
@@ -1553,7 +1370,7 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
         return '
-          <li class="nav-item dropdown pull-right">
+          <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' active' : '';
@@ -1575,319 +1392,392 @@ body { font-family: "Roboto", sans-serif; font-size: 17px; font-weight: 300; pad
       </div>
     </main>';
     }
+
+    protected function pager(array $ary) : string
+    {
+        extract($ary);
+
+        $b = '';
+        $o = util::ses('o');
+
+        for($i = 1; $i <= $last; $i++) $b .= '
+              <li class="page-item' . ($i === $curr ? ' active' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>
+              </li>';
+
+        return '
+          <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm pull-right">
+              <li class="page-item' . ($curr === 1 ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $prev . '" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+              </li>' . $b . '
+              <li class="page-item' . ($curr === $last ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $next . '" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+            </ul>
+          </nav>';
+    }
 }
 
-// lib/php/themes/bootstrap/auth.php 20150101
+// lib/php/themes/bootstrap/users.php 20170225 - 20170317
 
-class Themes_Bootstrap_Auth extends Themes_Bootstrap_Theme
+class Themes_Bootstrap_Users extends Themes_Bootstrap_Theme
 {
-    // forgotpw (create new pw)
     public function create(array $in) : string
     {
-        extract($in);
-
-        return '
-        <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-key"></i> Forgot password</h2>
-          <form action="' . $this->g->self . '" method="post">
-            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-                <input type="email" name="login" id="login" class="form-control" placeholder="Your Login Email Address" value="' . $login . '" autofocus required>
-              </div>
-            </div>
-            <div class="form-group">
-              <a tabindex="0" role="button" data-toggle="popover" data-trigger="hover" title="Please Note" data-content="You will receive an email with further instructions and please note that this only resets the password for this website interface."> <i class="fa fa-question-circle fa-fw"></i></a>
-              <div class="btn-group pull-right">
-                <a class="btn btn-outline-primary" href="?o=auth">&laquo; Back</a>
-                <button class="btn btn-primary" type="submit" name="m" value="create">Send</button>
-              </div>
-            </div>
-          </form>
-        </div>
-        <script>$(function() { $("[data-toggle=popover]").popover(); });</script>';
+        return $this->editor($in);
     }
 
-    // signin (read current pw)
     public function read(array $in) : string
     {
-        extract($in);
-
-        return '
-        <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-sign-in"></i> Sign in</h2>
-          <form action="' . $this->g->self . '" method="post">
-            <input type="hidden" name="o" value="auth">
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-                <input type="email" name="login" id="login" class="form-control" placeholder="Your Email Address" value="' . $login . '" required autofocus>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-                <input type="password" name="webpw" id="webpw" class="form-control" placeholder="Your Password" required>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="custom-control custom-checkbox">
-                <input type="checkbox" class="custom-control-input" name="remember" id="remember" value="yes">
-                <span class="custom-control-indicator"></span>
-                <span class="custom-control-description">Remember me on this computer</span>
-              </label>
-            </div>
-            <div class="btn-group pull-right">
-              <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
-              <button class="btn btn-primary" type="submit" name="m" value="read">Sign in</button>
-            </div>
-          </form>
-        </div>';
+        return $this->editor($in);
     }
 
-    // resetpw (update pw)
     public function update(array $in) : string
     {
-
-        extract($in);
-
-        return '
-        <div class="col-md-4 offset-md-4">
-          <h2><i class="fa fa-key"></i> Update Password</h2>
-          <form action="' . $this->g->self . '" method="post">
-            <input type="hidden" name="o" value="auth">
-            <input type="hidden" name="id" value="' . $id . '">
-            <input type="hidden" name="login" value="' . $login . '">
-            <p class="text-center"><b>For ' . $login . '</b></p>
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                <input type="password" name="passwd1" id="passwd1" class="form-control" placeholder="New Password" value="" required autofocus>
-              </div>
-            </div>
-            <div class="form-group">
-              <div class="input-group">
-                <span class="input-group-addon"><span class="fa fa-key fa-fw"></span></span>
-                <input type="password" name="passwd2" id="passwd2" class="form-control" placeholder="Confirm Password" value="" required>
-              </div>
-            </div>
-            <div class="btn-group pull-right">
-              <button class="btn btn-primary" type="submit" name="m" value="update">Update my password</button>
-            </div>
-          </form>
-        </div>';
-    }
-}
-
-// lib/php/init.php 20150101 - 20170305
-
-class Init
-{
-    private $t = null;
-
-    public function __construct($g)
-    {
-        session_start();
-        //$_SESSION = []; // to reset session for testing
-        util::cfg($g);
-        $g->in = util::esc($g->in);
-        $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
-
-        util::ses('l', $g->in['l']);
-        $t = util::ses('t', $g->in['t']);
-
-        $t1 = 'themes_' . $t . '_' . $g->in['o'];
-        $t2 = 'themes_' . $t . '_theme';
-
-        $this->t = $thm = class_exists($t1) ? new $t1($g)
-            : (class_exists($t2) ? new $t2($g) : new Theme($g));
-
-        $p  = 'plugins_' . $g->in['o'];
-        if (class_exists($p)) {
-            util::remember($g);
-            $g->out['main'] = (string) new $p($thm);
-        } else $g->out['main'] = "Error: no plugin object!";
-
-        foreach ($g->out as $k => $v)
-            $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
+        return $this->editor($in);
     }
 
-    public function __toString() : string
+    public function list(array $in) : string
     {
-        $g = $this->t->g;
+        $buf = $pgr_top = $pgr_end = '';
+        $pgr = $in['pager']; unset($in['pager']);
+        $num = count($in);
 
-        if ($g->in['x']) {
-            $xhr = $g->out[$g->in['x']] ?? '';
-            if ($xhr) return $xhr;
-            header('Content-Type: application/json');
-            return json_encode($g->out, JSON_PRETTY_PRINT);
+        if ($pgr['last'] > 1) {
+            $pgr_top ='
+          <div class="col-md-6">' . $this->pager($pgr) . '
+          </div>';
+            $pgr_end = '
+          <div class="row">
+            <div class="col-12">' . $this->pager($pgr) . '
+            </div>
+          </div>';
         }
-        return $this->t->html();
-    }
-}
 
-// lib/php/theme.php 20150101 - 20170305
-
-class Theme
-{
-    private
-    $buf = '',
-    $in  = [];
-
-    public function __construct($g)
-    {
-        $this->g = $g;
-    }
-
-    public function __toString() : string
-    {
-        return $this->buf;
-    }
-
-    public function log() : string
-    {
-        list($lvl, $msg) = util::log();
-        return $msg ? '
-      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
-    }
-
-    public function nav1(array $a = []) : string
-    {
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $o = '?o=' . $this->g->in['o'];
-        $t = '?t=' . $_SESSION['t'];
-        return join('', array_map(function ($n) use ($o, $t) {
-            $c = $o === $n[1] || $t === $n[1] ? ' class="active"' : '';
-            return '
-        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $a));
-    }
-
-    public function nav2() : string
-    {
-        return '<form style="display: inline">' . $this->dropdown(
-            $this->g->nav2,
-            't',
-            $_SESSION['t'],
-            '',
-            '',
-            ' onchange="this.form.submit()"'
-        ) . '
-        </form>';
-    }
-
-    public function head() : string
-    {
-        return '
-    <header>
-      <h1>
-        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
-      </h1>
-      <nav>' . $this->g->out['nav1'] . $this->g->out['nav2'] . '
-      </nav>
-    </header>';
-    }
-
-    public function main() : string
-    {
-        return '
-    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
-    </main>';
-    }
-
-    public function foot() : string
-    {
-        return '
-    <footer class="text-center">
-      <br>
-      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
-    </footer>';
-    }
-
-    public function end() : string
-    {
-        return '
-    <pre>' . $this->g->out['end'] . '
-    </pre>';
-    }
-
-    public function html() : string
-    {
-        extract($this->g->out, EXTR_SKIP);
-        return '<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>' . $doc . '</title>' . $css . '
-  </head>
-  <body>' . $head . $main . $foot . $end . '
-  </body>
-</html>
-';
-    }
-
-    public static function dropdown(
-        array $ary,
-        string $name,
-        string $sel = '',
-        string $label = '',
-        string $class = '',
-        string $extra = '') : string
-    {
-        $opt = $label ? '
-          <option value="">' . ucfirst($label) . '</option>' : '';
-        $buf = '';
-        $c = $class ? ' class="' . $class . '"' : '';
-        foreach($ary as $k => $v) {
-            $t = str_replace('?t=', '', $v[1]);
-            $s = $sel === $t ? ' selected' : '';
+        foreach ($in as $a) {
+            extract($a);
             $buf .= '
-          <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+        <tr>
+          <td>
+            <a href="?o=users&m=read&i=' . $id . '" title="Show user: ' . $id . '">
+              <strong>' . $login . '</strong>
+            </a>
+          </td>
+          <td>' . $fname . '</td>
+          <td>' . $lname . '</td>
+          <td>' . $altemail . '</td>
+          <td>' . $this->g->acl[$acl] . '</td>
+          <td>' . $grp . '</td>
+        </tr>';
         }
+
         return '
-        <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
-        </select>';
-    }
-
-    public function create(array $in) : string
-    {
-        return 'Theme::create() not implemented';
-    }
-
-    public function read(array $in) : string
-    {
-        return 'Theme::read() not implemented';
-    }
-
-    public function read_one(array $in) : string
-    {
-        return 'Theme::read_one() not implemented';
-    }
-
-    public function read_all(array $in) : string
-    {
-        return 'Theme::read_all() not implemented';
-    }
-
-    public function update(array $in) : string
-    {
-        return 'Theme::update() not implemented';
-    }
-
-    public function delete(array $in) : string
-    {
-        return 'Theme::delete() not implemented';
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="min60">
+              <a href="?o=users&m=create" title="Add new user">
+                <i class="fa fa-users fa-fw"></i> Users
+                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h3>
+          </div>' . $pgr_top . '
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm min600">
+            <thead class="nowrap">
+              <tr class="bg-primary text-white">
+                <th>User ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Alt Email</th>
+                <th>ACL</th>
+                <th>Grp</th>
+              </tr>
+            </thead>
+            <tbody>' . $buf . '
+            </tbody>
+          </table>
+        </div>' . $pgr_end;
     }
 
     private function editor(array $in) : string
     {
-        return 'Theme::editor() not implemented';
+        extract($in);
+
+        if ($this->g->in['m'] === 'create') {
+            $header = 'Add User';
+            $switch = '';
+            $submit = '
+                <a class="btn btn-outline-primary" href="?o=users&m=list">&laquo; Back</a>
+                <button type="submit" name="m" value="create" class="btn btn-primary">Add This Item</button>';
+        } else {
+            $header = 'Update User';
+            $switch = !util::is_usr($id) && (util::is_acl(0) || util::is_acl(1)) ? '
+                  <a class="btn btn-outline-primary pull-left" href="?o=users&m=switch_user&i=' . $id . '">Switch to ' . $login . '</a>' : '';
+            $submit = '
+                <a class="btn btn-outline-primary" href="?o=users&m=list">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=users&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $login . '?\')">Remove</a>
+                <button type="submit" name="m" value="update" class="btn btn-primary">Update</button>';
+        }
+
+        if (util::is_adm()) {
+            $acl_ary = $grp_ary = [];
+            foreach($this->g->acl as $k => $v) $acl_ary[] = [$v, $k];
+            $acl_buf = $this->dropdown($acl_ary, 'acl', $acl, '', 'custom-select');
+            $res = db::qry("
+ SELECT login,id FROM `users`
+  WHERE acl = :0 OR acl = :1", ['0' => 0, "1" => 1]);
+
+            foreach($res as $k => $v) $grp_ary[] = [$v['login'], $v['id']];
+            $grp_buf = $this->dropdown($grp_ary, 'grp', $grp, '', 'custom-select');
+            $aclgrp_buf = '
+                <div class="form-group">
+                  <label for="acl">ACL</label><br>' . $acl_buf . '
+                </div>
+                <div class="form-group">
+                  <label for="grp">Group</label><br>' . $grp_buf . '
+                </div>';
+            $anotes_buf = '
+                <div class="form-group">
+                  <label for="anote">Admin Notes</label>
+                  <textarea rows="9" class="form-control" id="anote" name="anote">' . nl2br($anote) . '</textarea>
+                </div>';
+        } else {
+            $aclgrp_buf = '';
+            $anotes_buf = '';
+        }
+
+        return '
+          <h3 class="min600">
+            <a href="?o=users&m=list">
+              <i class="fa fa-users fa-fw"></i> ' . $header . '
+            </a>
+          </h3>
+          <form method="post" action="' . $this->g->self . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <input type="hidden" name="i" value="' . $id . '">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="login">UserID</label>
+                  <input type="email" class="form-control" id="login" name="login" value="' . $login . '" required>
+                </div>
+                <div class="form-group">
+                  <label for="fname">First Name</label>
+                  <input type="text" class="form-control" id="fname" name="fname" value="' . $fname . '" required>
+                </div>
+                <div class="form-group">
+                  <label for="lname">Last Name</label>
+                  <input type="text" class="form-control" id="lname" name="lname" value="' . $lname . '" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="altemail">Alt Email</label>
+                  <input type="text" class="form-control" id="altemail" name="altemail" value="' . $altemail . '">
+                </div>' . $aclgrp_buf . '
+              </div>
+              <div class="col-md-4">' . $anotes_buf . '
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">' . $switch . '
+                <div class="btn-group pull-right">' . $submit . '
+                </div>
+              </div>
+            </div>
+          </form>';
     }
 }
 
-// lib/php/db.php 20150225 - 20170306
+// lib/php/themes/bootstrap/news.php 20170225 - 20170317
+
+class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
+{
+    public function create(array $in) : string
+    {
+        return $this->editor($in);
+    }
+
+    public function read(array $in) : string
+    {
+        extract($in);
+
+        $author_buf = $fname && $lname
+            ? $fname . ' ' . $lname
+            : ($fname && empty($lname) ? $fname : $login);
+
+        return '
+          <h3 class="w30">
+            <a href="?o=news&m=list" title="Go back to list">
+              <i class="fa fa-newspaper-o fa-fw"></i> ' . $title . '
+            </a>
+          </h3>
+          <div class="table-responsive">
+            <table class="table w30">
+              <tbody>
+                <tr>
+                  <td>' . nl2br($content) . '</td>
+                  <td class="text-center nowrap w200">
+                    <small>
+                      by <b><a href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
+                      <i>' . util::now($updated) . '</i>
+                    </small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row">
+            <div class="col-12 text-right">
+              <div class="btn-group">
+                <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
+              </div>
+            </div>
+          </div>';
+    }
+
+    public function update(array $in) : string
+    {
+        if (!util::is_adm() && ($_SESSION['usr']['id'] !== $in['author'])) {
+            util::log('You do not have permissions to update this post');
+            return $this->read($in);
+        }
+
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+        $buf = $pgr_top = $pgr_end = '';
+        $pgr = $in['pager']; unset($in['pager']);
+
+        if ($pgr['last'] > 1) {
+            $pgr_top ='
+          <div class="col-md-6">' . $this->pager($pgr) . '
+          </div>';
+            $pgr_end = '
+          <div class="row">
+            <div class="col-12">' . $this->pager($pgr) . '
+            </div>
+          </div>';
+        }
+
+        foreach($in as $row) {
+            extract($row);
+            $author_buf = $fname && $lname
+                ? $fname . ' ' . $lname
+                : ($fname && empty($lname) ? $fname : $login);
+            $buf .= '
+                <tr>
+                  <td class="nowrap">
+                    <a href="?o=news&m=read&i=' . $id . '" title="Show item ' . $id . '">
+                      <strong>' . $title . '</strong>
+                    </a>
+                  </td>
+                  <td class="text-center nowrap bg-primary text-white w200" rowspan="2">
+                    <small>
+                      by <b><a class="text-white" href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
+                      <i>' . util::now($updated) . '</i>
+                    </small>
+                  </td>
+                </tr>
+                <tr>
+                  <td><p>' . nl2br($content) . '</p></td>
+                </tr>';
+        }
+
+        return '
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="min600">
+              <a href="?o=news&m=create" title="Add news item">
+                <i class="fa fa-newspaper-o fa-fw"></i> News
+                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h3>
+          </div>' . $pgr_top . '
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered min600">
+            <tbody>' . $buf . '
+            </tbody>
+          </table>
+        </div>' . $pgr_end;
+    }
+
+    private function editor(array $in) : string
+    {
+        if ($this->g->in['m'] === 'create') {
+            extract($_SESSION['usr']);
+            $author = $uid = $id;
+            $header = 'Add News';
+            $submit = '
+                <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
+                <button type="submit" class="btn btn-primary">Add This Item</button>';
+        } else {
+            extract($in);
+            $header = 'Update News';
+            $submit = '
+                <a class="btn btn-secondary" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
+        }
+
+        $author_label = $fname && $lname
+            ? $fname . ' ' . $lname
+            : ($fname && empty($lname) ? $fname : $login);
+
+        $author_buf = '
+                  <p class="form-control-static"><b><a href="?o=users&m=update&i=' . $uid . '">' . $author_label . '</a></b></p>';
+
+        return '
+          <h3 class="min600">
+            <a href="?o=news&m=list">
+              <i class="fa fa-newspaper-o fa-fw"></i> ' . $header . '
+            </a>
+          </h3>
+          <form method="post" action="' . $this->g->self . '">
+            <input type="hidden" name="o" value="' . $this->g->in['o'] . '">
+            <input type="hidden" name="m" value="' . $this->g->in['m'] . '">
+            <input type="hidden" name="author" value="' . $uid . '">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label for="title">Title</label>
+                  <input type="text" class="form-control" id="title" name="title" value="' . $title . '" required>
+                </div>
+                <div class="form-group">
+                  <label for="author">Author</label>' . $author_buf . '
+                </div>
+              </div>
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label for="content">Content</label>
+                  <textarea class="form-control" id="content" name="content" rows="12" required>' . $content . '</textarea>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-12 text-right">
+                <div class="btn-group">' . $submit . '
+                </div>
+              </div>
+            </div>
+          </form>';
+    }
+}
+
+// lib/php/db.php 20150225 - 20170316
 
 class Db extends \PDO
 {
@@ -1901,7 +1791,7 @@ class Db extends \PDO
             $dsn = $type === 'mysql'
                 ? 'mysql:' . ($sock ? 'unix_socket='. $sock : 'host=' . $host . ';port=' . $port) . ';dbname=' . $name
                 : 'sqlite:' . $path;
-            $pass = file_exists($pass) ? include $pass : $pass;
+            $pass = file_exists($pass) ? trim(file_get_contents($pass)) : $pass;
             try {
                 parent::__construct($dsn, $user, $pass, [
                     \PDO::ATTR_EMULATE_PREPARES => false,
@@ -1951,7 +1841,7 @@ class Db extends \PDO
     WHERE $where = :wval" : '';
 
         $a = ($wval || $wval == '0') ? ['wval' => $wval] : [];
-        
+
         $sql = "
  SELECT $field
    FROM `" . self::$tbl . "`$w $extra";
@@ -2043,26 +1933,64 @@ class Db extends \PDO
     }
 }
 
-// lib/php/plugin.php 20150101 - 20170305
+// lib/php/init.php 20150101 - 20170305
 
-class Plugin
+class Init
 {
-    protected
+    private $t = null;
+
+    public function __construct($g)
+    {
+        session_start();
+        //$_SESSION = []; // to reset session for testing
+        util::cfg($g);
+        $g->in = util::esc($g->in);
+        $g->self = str_replace('index.php', '', $_SERVER['PHP_SELF']);
+        util::ses('l');
+        $t = util::ses('t', '', $g->in['t']);
+        $t1 = 'themes_' . $t . '_' . $g->in['o'];
+        $t2 = 'themes_' . $t . '_theme';
+
+        $this->t = $thm = class_exists($t1) ? new $t1($g)
+            : (class_exists($t2) ? new $t2($g) : new Theme($g));
+
+        $p  = 'plugins_' . $g->in['o'];
+        if (class_exists($p)) {
+            util::remember($g);
+            $g->out['main'] = (string) new $p($thm);
+        } else $g->out['main'] = "Error: no plugin object!";
+
+//        $g->out['end'] = var_export($_SESSION['usr'], true); // debug
+
+        foreach ($g->out as $k => $v)
+            $g->out[$k] = method_exists($thm, $k) ? $thm->$k() : $v;
+    }
+
+    public function __toString() : string
+    {
+        $g = $this->t->g;
+
+        if ($g->in['x']) {
+            $xhr = $g->out[$g->in['x']] ?? '';
+            if ($xhr) return $xhr;
+            header('Content-Type: application/json');
+            return json_encode($g->out, JSON_PRETTY_PRINT);
+        }
+        return $this->t->html();
+    }
+}
+
+// lib/php/theme.php 20150101 - 20170305
+
+class Theme
+{
+    private
     $buf = '',
-    $tbl = '',
     $in  = [];
 
-    public function __construct(Theme $t)
+    public function __construct($g)
     {
-        $this->t    = $t;
-        $this->g    = $t->g;
-        $this->in = util::esc($this->in);
-        if ($this->tbl) {
-            db::$tbl = $this->tbl;
-            if (is_null(db::$dbh))
-                db::$dbh = new db($t->g->db);
-        }
-        $this->buf .= $this->{$t->g->in['m']}();
+        $this->g = $g;
     }
 
     public function __toString() : string
@@ -2070,56 +1998,100 @@ class Plugin
         return $this->buf;
     }
 
-    protected function create() : string
+    public function log() : string
     {
-        if ($_POST) {
-            $this->in['updated'] = date('Y-m-d H:i:s');
-            $this->in['created'] = date('Y-m-d H:i:s');
-            $lid = db::create($this->in);
-            util::log('Item number ' . $lid . ' created', 'success');
-            $this->g->in['i'] = $lid;
-            return $this->read();
-        } else return $this->t->create($this->in);
+        list($lvl, $msg) = util::log();
+        return $msg ? '
+      <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
     }
 
-    protected function read() : string
+    public function nav1() : string
     {
-        return is_null($this->g->in['i'])
-            ? $this->t->read($this->read_all())
-            : $this->t->read_one($this->read_one());
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
+            return '
+        <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
+        }, $this->g->nav1)) . '
+      </nav>';
     }
 
-    protected function read_one() : array
+    public function head() : string
     {
-        return db::read('*', 'id', $this->g->in['i'], '', 'one');
+        return '
+    <header>
+      <h1>
+        <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
+      </h1>' . $this->g->out['nav1'] . '
+    </header>';
     }
 
-    protected function read_all() : array
+    public function main() : string
     {
-        return db::read('*', '', '', 'ORDER BY `updated` DESC');
+        return '
+    <main>' . $this->g->out['log'] . $this->g->out['main'] . '
+    </main>';
     }
 
-    protected function update() : string
+    public function foot() : string
     {
-        if ($_POST) {
-            $this->in['updated'] = date('Y-m-d H:i:s');
-            db::update($this->in, [['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
-            $this->g->in['i'] = null;
-            return $this->read();
-        } elseif (!is_null($this->g->in['i'])) {
-            return $this->t->update($this->read_one());
-        } else return 'Error updating item';
+        return '
+    <footer class="text-center">
+      <br>
+      <p><em><small>' . $this->g->out['foot'] . '</small></em></p>
+    </footer>';
     }
 
-    protected function delete() : string
+    public function end() : string
     {
-        if ($this->g->in['i']) {
-            $res = db::delete([['id', '=', $this->g->in['i']]]);
-            util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
-            $this->g->in['i'] = null;
-            return $this->read();
-        } else return 'Error deleting item';
+        return '
+    <pre>' . $this->g->out['end'] . '
+    </pre>';
+    }
+
+    public function html() : string
+    {
+        extract($this->g->out, EXTR_SKIP);
+        return '<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>' . $doc . '</title>' . $css . '
+  </head>
+  <body>' . $head . $main . $foot . $end . '
+  </body>
+</html>
+';
+    }
+
+    public static function dropdown(
+        array $ary,
+        string $name,
+        string $sel = '',
+        string $label = '',
+        string $class = '',
+        string $extra = '') : string
+    {
+        $opt = $label ? '
+          <option value="">' . ucfirst($label) . '</option>' : '';
+        $buf = '';
+        $c = $class ? ' class="' . $class . '"' : '';
+        foreach($ary as $k => $v) {
+            $t = str_replace('?t=', '', $v[1]);
+            $s = $sel === $t ? ' selected' : '';
+            $buf .= '
+          <option value="' . $t . '"' . $s . '>' . $v[0] . '</option>';
+        }
+        return '
+        <select' . $c . ' name="' . $name . '" id="' . $name . '"' . $extra . '>' . $opt . $buf . '
+        </select>';
+    }
+
+    public function __call(string $name, array $args) : string
+    {
+        return 'Theme::' . $name . '() not implemented';
     }
 }
 
@@ -2146,11 +2118,15 @@ class Util
         return $in;
     }
 
-    public static function ses(string $k, $v) : string
+    public static function ses(string $k, string $v = '', string $x = null) : string
     {
-        return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x :
+                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                    || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                : ($_SESSION[$k] ?? $v));
     }
 
     public static function cfg($g) : void
@@ -2196,28 +2172,71 @@ class Util
         return implode(' ', $result) . ' ago';
     }
 
+    public static function pager(int $curr, int $perp, int $total) : array
+    {
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
+    }
+
+    public static function is_adm() : bool
+    {
+        return isset($_SESSION['adm']);
+    }
+
+    public static function is_usr(int $id = null) : bool
+    {
+        return (is_null($id))
+            ? isset($_SESSION['usr'])
+            : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
+    }
+
+    public static function is_acl(int $acl) : bool
+    {
+        return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
+    }
+
     // 09-Auth
 
-    public static function which_usr(array $nav = []) : array
+    public static function genpw()
+    {
+        return str_replace('.', '_',
+            substr(password_hash((string)time(), PASSWORD_DEFAULT),
+                rand(10, 50), 10));
+    }
+
+    public static function get_nav(array $nav = []) : array
     {
         return isset($_SESSION['usr'])
             ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
             : $nav['non'];
     }
 
-    public static function cookie_get(string $name, string $default='') : string
+    public static function get_cookie(string $name, string $default='') : string
     {
         return $_COOKIE[$name] ?? $default;
     }
 
-    public static function cookie_put(string $name, string $value, int $expiry=604800) : string
+    public static function put_cookie(string $name, string $value, int $expiry=604800) : string
     {
         return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
     }
 
-    public static function cookie_del(string $name) : string
+    public static function del_cookie(string $name) : string
     {
-        return self::cookie_put($name, '', time() - 1);
+        return self::put_cookie($name, '', time() - 1);
     }
 
     public static function chkpw($pw, $pw2)
@@ -2236,51 +2255,118 @@ class Util
         return false;
     }
 
-    public static function genpw()
-    {
-        return str_replace('.', '_',
-            substr(password_hash((string)time(), PASSWORD_DEFAULT),
-                rand(10, 50), 10));
-    }
-    
-    public static function is_adm() : bool
-    {
-        return isset($_SESSION['adm']);
-    }
-
-    public static function is_usr(int $id = null) : bool
-    {
-        return (is_null($id))
-            ? isset($_SESSION['usr'])
-            : isset($_SESSION['usr']['id']) && $_SESSION['usr']['id'] == $id;
-    }
-
-    public static function is_acl(int $acl) : bool
-    {
-        return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
-    }
-    
     public static function remember($g)
     {
         if (!self::is_usr()) {
-            if ($c = self::cookie_get('remember')) {
+            if ($c = self::get_cookie('remember')) {
                 if (is_null(db::$dbh)) db::$dbh = new db($g->db);
                 db::$tbl = 'users';
                 if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
-//error_log(var_export($usr,true));
                     extract($usr);
                     $_SESSION['usr'] = $usr;
-//error_log(var_export($_SESSION,true));
                     if ($acl == 0) $_SESSION['adm'] = $id;
                     self::log($login . ' is remembered and logged back in', 'success');
-                    self::ses('o', $g->in['o']);
-                    self::ses('m', $g->in['m']);
+                    self::ses('o', '', $g->in['o']);
+                    self::ses('m', '', $g->in['m']);
                 }
             }
-//        } else {
-//            self::ses('o', 'auth');
-//            self::ses('m', 'read');
         }
+    }
+}
+
+// lib/php/plugin.php 20150101 - 20170316
+
+class Plugin
+{
+    protected
+    $buf = '',
+    $tbl = '',
+    $in  = [];
+
+    public function __construct(Theme $t)
+    {
+        $o = $t->g->in['o'];
+        $m = $t->g->in['m'];
+
+        if (!util::is_usr() && $o !== 'auth' && $m !== 'list' && $m !== 'read') {
+            util::log('You must <a href="?o=auth">Sign in</a> to create, update or delete items');
+            header('Location: ' . $t->g->self . '?o=auth');
+            exit();
+        }
+
+        $this->t  = $t;
+        $this->g  = $t->g;
+        $this->in = util::esc($this->in);
+        if ($this->tbl) {
+            if (is_null(db::$dbh))
+                db::$dbh = new db($t->g->db);
+            db::$tbl = $this->tbl;
+        }
+        $this->buf .= $this->{$t->g->in['m']}();
+    }
+
+    public function __toString() : string
+    {
+        return $this->buf;
+    }
+
+    protected function create() : string
+    {
+        if ($_POST) {
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            $this->in['created'] = date('Y-m-d H:i:s');
+            $lid = db::create($this->in);
+            util::log('Item number ' . $lid . ' created', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } else return $this->t->create($this->in);
+    }
+
+    protected function read() : string
+    {
+        return $this->t->read(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+    }
+
+    protected function update() : string
+    {
+        if ($_POST) {
+            $this->in['updated'] = date('Y-m-d H:i:s');
+            db::update($this->in, [['id', '=', $this->g->in['i']]]);
+            util::log('Item number ' . $this->g->in['i'] . ' updated', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } elseif ($this->g->in['i']) {
+            return $this->t->update(db::read('*', 'id', $this->g->in['i'], '', 'one'));
+        } else return 'Error updating item';
+    }
+
+    protected function delete() : string
+    {
+        if ($this->g->in['i']) {
+            $res = db::delete([['id', '=', $this->g->in['i']]]);
+            util::log('Item number ' . $this->g->in['i'] . ' removed', 'success');
+            util::ses('p', '', '1');
+            return $this->list();
+        } else return 'Error deleting item';
+    }
+
+    protected function list() : string
+    {
+        $pager = util::pager(
+            (int) util::ses('p'),
+            (int) $this->g->perp,
+            (int) db::read('count(id)', '', '', '', 'col')
+        );
+
+        return $this->t->list(array_merge(
+            db::read('*', '', '', 'ORDER BY `updated` DESC LIMIT ' . $pager['start'] . ',' . $pager['perp']),
+            ['pager' => $pager]
+        ));
+    }
+
+    public function __call(string $name, array $args) : string
+    {
+        return 'Plugin::' . $name . '() not implemented';
     }
 }
 
@@ -2298,14 +2384,15 @@ spl_autoload_register(function ($c) {
 echo new Init(new class
 {
     public
-    $email      = 'admin@goldcoast.org',
+    $email      = 'markc@renta.net',
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $perp       = 5,
     $self       = '',
     $in = [
         'i'     => null,        // Item or ID
         'g'     => null,        // Group/Category
         'l'     => '',          // Log (message)
-        'm'     => 'read',      // Method (action)
+        'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
@@ -2324,12 +2411,12 @@ echo new Init(new class
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'name'  => 'spe_08',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_spe.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
@@ -2341,7 +2428,6 @@ echo new Init(new class
         ],
         'usr' => [
             ['News',        '?o=news', 'fa fa-file-text fa-fw'],
-            ['Sign out',    '?o=auth&m=delete', 'fa fa-sign-out fa-fw'],
         ],
         'adm' => [
             ['News',        '?o=news', 'fa fa-file-text fa-fw'],

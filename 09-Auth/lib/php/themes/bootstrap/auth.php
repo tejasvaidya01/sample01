@@ -35,9 +35,10 @@ error_log(__METHOD__);
     }
 
     // signin (read current pw)
-    public function read(array $in) : string
+    public function list(array $in) : string
     {
 error_log(__METHOD__);
+error_log(var_export($in,true));
 
         extract($in);
 
@@ -67,7 +68,7 @@ error_log(__METHOD__);
             </div>
             <div class="btn-group pull-right">
               <a class="btn btn-outline-primary" href="?o=auth&m=create">Forgot password</a>
-              <button class="btn btn-primary" type="submit" name="m" value="read">Sign in</button>
+              <button class="btn btn-primary" type="submit" name="m" value="list">Sign in</button>
             </div>
           </form>
         </div>';

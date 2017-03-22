@@ -36,7 +36,7 @@ error_log(__METHOD__);
                             ], [['id', '=', $usr['id']]]);
                             util::log('Sent reset password key for "' . $u . '" so please check your mailbox and click on the supplied link.', 'success');
                         } else util::log('Problem sending message to ' . $u, 'danger');
-                        return $this->t->read(['login' => $u]);
+                        return $this->t->list(['login' => $u]);
                     } else util::log('Account is disabled, contact your System Administrator');
                 } else util::log('User does not exist');
             } else util::log('You must provide a valid email address');
@@ -44,7 +44,7 @@ error_log(__METHOD__);
         return $this->t->create(['login' => $u]);
     }
 
-    public function read() : string
+    public function list() : string
     {
 error_log(__METHOD__);
 
@@ -54,29 +54,27 @@ error_log(__METHOD__);
 
         if ($u) {
             if ($usr = db::read('id,grp,acl,login,fname,lname,webpw,cookie', 'login', $u, '', 'one')) {
-error_log(var_export($usr,true));
                 extract($usr);
                 if ($acl !== 9) {
-                    if ($p === $usr['webpw']) { // for testing a clear text password
-//                    if (password_verify(html_entity_decode($p), $webpw)) {
+//                    if ($p === $usr['webpw']) { // for testing a clear text password
+                    if (password_verify(html_entity_decode($p), $webpw)) {
                         $uniq = md5(uniqid());
                         if ($c) {
                             db::update(['cookie' => $uniq], [['login', '=', $u]]);
-                            util::cookie_put('remember', $uniq, 60*60*24*7);
+                            util::put_cookie('remember', $uniq, 60*60*24*7);
                             $tmp = $uniq;
                         } else $tmp = '';
                         $_SESSION['usr'] = $usr;
                         util::log($login.' is now logged in', 'success');
                         if ((int) $acl === 0) $_SESSION['adm'] = $id;
-                        $_SESSION['m'] = 'read';
-error_log('auth::read _SESSION = '.var_export($_SESSION,true));
+                        $_SESSION['m'] = 'list';
                         header('Location: ' . $_SERVER['PHP_SELF']);
                         exit();
                     } else util::log('Incorrect password');
                 } else util::log('Account is disabled, contact your System Administrator');
             } else util::log('Username does not exist');
         }
-        return $this->t->read(['login' => $u]);
+        return $this->t->list(['login' => $u]);
     }
 
     public function update() : string
@@ -103,7 +101,7 @@ error_log(__METHOD__);
                                 if (util::is_usr()) {
                                     header('Location: ' . $_SERVER['PHP_SELF']);
                                     exit();
-                                } else return $this->t->read(['login' => $usr['login']]);
+                                } else return $this->t->list(['login' => $usr['login']]);
                             } else util::log('Problem updating database');
                         } else util::log($usr['login'] . ' is not allowed access');
                     } else util::log('Your one time password key has expired');
@@ -118,10 +116,10 @@ error_log(__METHOD__);
 error_log(__METHOD__);
 
         $u = $_SESSION['usr']['login'];
-        if (isset($_SESSION['adm']) and $_SESSION['usr'][0] === $_SESSION['adm'])
+        if (isset($_SESSION['adm']) and $_SESSION['usr']['id'] === $_SESSION['adm'])
             unset($_SESSION['adm']);
         unset($_SESSION['usr']);
-        util::cookie_del('remember');
+        util::del_cookie('remember');
         util::log($u . ' is now logged out', 'success');
         header('Location: ' . $this->g->self);
         exit();
@@ -138,7 +136,7 @@ error_log(__METHOD__);
             if ($usr = db::read('id,acl,login,otp,otpttl', 'otp', $otp, '', 'one')) {
                 extract($usr);
                 if ($otpttl && (($otpttl + 3600) > time())) {
-                    if ($acl) {
+                    if ($acl != 3) { // suspended
                         return $this->t->update(['id' => $id, 'login' => $login]);
                     } else util::log($login . ' is not allowed access');
                 } else util::log('Your one time password key has expired');

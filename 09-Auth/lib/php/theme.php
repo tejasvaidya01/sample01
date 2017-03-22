@@ -31,33 +31,18 @@ error_log(__METHOD__);
       <p class="alert ' . $lvl . '">' . $msg . '</p>' : '';
     }
 
-    public function nav1(array $a = []) : string
+    public function nav1() : string
     {
 error_log(__METHOD__);
 
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
-        $o = '?o=' . $this->g->in['o'];
-        $t = '?t=' . $_SESSION['t'];
-        return join('', array_map(function ($n) use ($o, $t) {
-            $c = $o === $n[1] || $t === $n[1] ? ' class="active"' : '';
+        $o = '?o='.$this->g->in['o'];
+        return '
+      <nav>' . join('', array_map(function ($n) use ($o) {
+            $c = $o === $n[1] ? ' class="active"' : '';
             return '
         <a' . $c . ' href="' . $n[1] . '">' . $n[0] . '</a>';
-        }, $a));
-    }
-
-    public function nav2() : string
-    {
-error_log(__METHOD__);
-
-        return '<form style="display: inline">' . $this->dropdown(
-            $this->g->nav2,
-            't',
-            $_SESSION['t'],
-            '',
-            '',
-            ' onchange="this.form.submit()"'
-        ) . '
-        </form>';
+        }, $this->g->nav1)) . '
+      </nav>';
     }
 
     public function head() : string
@@ -68,9 +53,7 @@ error_log(__METHOD__);
     <header>
       <h1>
         <a href="' . $this->g->self . '">' . $this->g->out['head'] . '</a>
-      </h1>
-      <nav>' . $this->g->out['nav1'] . $this->g->out['nav2'] . '
-      </nav>
+      </h1>' . $this->g->out['nav1'] . '
     </header>';
     }
 
@@ -146,53 +129,11 @@ error_log(__METHOD__);
         </select>';
     }
 
-    public function create(array $in) : string
+    public function __call(string $name, array $args) : string
     {
-error_log(__METHOD__);
+error_log(__METHOD__ . '() name = ' . $name . ', args = '. var_export($args,true));
 
-        return 'Theme::create() not implemented';
-    }
-
-    public function read(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::read() not implemented';
-    }
-
-    public function read_one(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::read_one() not implemented';
-    }
-
-    public function read_all(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::read_all() not implemented';
-    }
-
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::update() not implemented';
-    }
-
-    public function delete(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::delete() not implemented';
-    }
-
-    private function editor(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return 'Theme::editor() not implemented';
+        return 'Theme::' . $name . '() not implemented';
     }
 }
 

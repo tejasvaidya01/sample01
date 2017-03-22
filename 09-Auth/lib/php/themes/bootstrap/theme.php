@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/theme.php 20150101 - 20170305
+// lib/php/themes/bootstrap/theme.php 20150101 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_Theme extends Theme
@@ -53,21 +53,19 @@ error_log(__METHOD__);
 
         return '
     <nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse fixed-top">
-      <div class="container">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
-          <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
-        </a>
-        <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-          <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
-            </li>
-          </ul>
-        </div>
+      <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="' . $this->g->self . '" title="Home Page">
+        <b><i class="fa fa-home"></i> ' . $this->g->out['head'] . '</b>
+      </a>
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">' . $this->g->out['nav1'] . '
+        </ul>
+        <ul class="navbar-nav">
+          <li class="nav-item pull-right">' . $this->g->out['nav2'] . $this->g->out['nav3'] . '
+          </li>
+        </ul>
       </div>
     </nav>';
     }
@@ -76,9 +74,9 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $a = isset($a[0]) ? $a : util::which_usr($this->g->nav1);
+        $a = isset($a[0]) ? $a : util::get_nav($this->g->nav1);
         $o = '?o=' . $this->g->in['o'];
-        $t = '?t=' . $_SESSION['t'];
+        $t = '?t=' . util::ses('t');
         return join('', array_map(function ($n) use ($o, $t) {
             if (is_array($n[1])) return $this->nav_dropdown($n);
             $c = $o === $n[1] || $t === $n[1] ? ' active' : '';
@@ -103,8 +101,9 @@ error_log(__METHOD__);
             $usr[] = ['Change Profile', '?o=users&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-user fa-fw'];
             $usr[] = ['Change Password', '?o=auth&m=update&i=' . $_SESSION['usr']['id'], 'fa fa-key fa-fw'];
             $usr[] = ['Sign out', '?o=auth&m=delete', 'fa fa-sign-out fa-fw'];
-            if (util::is_adm() && !util::is_acl(0)) $usr[] = 
-                ['Switch to sysadm', '?o=users&m=switch_user&i=0', 'fa fa-user fa-fw'];
+
+            if (util::is_adm() && !util::is_acl(0)) $usr[] =
+                ['Switch to sysadm', '?o=users&m=switch_user&i=' . $_SESSION['adm'], 'fa fa-user fa-fw'];
 
             return $this->nav_dropdown([$_SESSION['usr']['login'], $usr, 'fa fa-user fa-fw']);
         } else return '';
@@ -117,7 +116,7 @@ error_log(__METHOD__);
         $o = '?o=' . $this->g->in['o'];
         $i = isset($a[2]) ? '<i class="' . $a[2] . '"></i> ' : '';
         return '
-          <li class="nav-item dropdown pull-right">
+          <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' . $i . $a[0] . '</a>
             <div class="dropdown-menu" aria-labelledby="dropdown01">'.join('', array_map(function ($n) use ($o) {
             $c = $o === $n[1] ? ' active' : '';
@@ -140,6 +139,39 @@ error_log(__METHOD__);
         </div>
       </div>
     </main>';
+    }
+
+    protected function pager(array $ary) : string
+    {
+error_log(__METHOD__);
+
+        extract($ary);
+
+        $b = '';
+        $o = util::ses('o');
+
+        for($i = 1; $i <= $last; $i++) $b .= '
+              <li class="page-item' . ($i === $curr ? ' active' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $i . '">' . $i . '</a>
+              </li>';
+
+        return '
+          <nav aria-label="Page navigation">
+            <ul class="pagination pagination-sm pull-right">
+              <li class="page-item' . ($curr === 1 ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $prev . '" aria-label="Previous">
+                  <span aria-hidden="true">&laquo;</span>
+                  <span class="sr-only">Previous</span>
+                </a>
+              </li>' . $b . '
+              <li class="page-item' . ($curr === $last ? ' disabled' : '') . '">
+                <a class="page-link" href="?o=' . $o . '&m=list&p=' . $next . '" aria-label="Next">
+                  <span aria-hidden="true">&raquo;</span>
+                  <span class="sr-only">Next</span>
+                </a>
+              </li>
+            </ul>
+          </nav>';
     }
 }
 

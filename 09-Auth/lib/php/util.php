@@ -27,13 +27,17 @@ error_log(__METHOD__);
         return $in;
     }
 
-    public static function ses(string $k, $v) : string
+    public static function ses(string $k, string $v = '', string $x = null) : string
     {
-error_log(__METHOD__." k=$k, v=$v");
+error_log(__METHOD__."($k, $v, $x)");
 
-        return (string) $_SESSION[$k] =
-            (isset($_REQUEST[$k]) && isset($_SESSION[$k]) && ($_REQUEST[$k] !== $_SESSION[$k]))
-                ? $_REQUEST[$k] : $_SESSION[$k] ?? $v;
+        return $_SESSION[$k] =
+            (!is_null($x) && (!isset($_SESSION[$k]) || ($_SESSION[$k] != $x))) ? $x :
+                (((isset($_REQUEST[$k]) && !isset($_SESSION[$k]))
+                    || (isset($_REQUEST[$k]) && isset($_SESSION[$k])
+                    && ($_REQUEST[$k] != $_SESSION[$k])))
+                ? htmlentities(trim($_REQUEST[$k]), ENT_QUOTES, 'UTF-8')
+                : ($_SESSION[$k] ?? $v));
     }
 
     public static function cfg($g) : void
@@ -83,65 +87,27 @@ error_log(__METHOD__);
         return implode(' ', $result) . ' ago';
     }
 
-    // 09-Auth
-
-    public static function which_usr(array $nav = []) : array
+    public static function pager(int $curr, int $perp, int $total) : array
     {
 error_log(__METHOD__);
 
-        return isset($_SESSION['usr'])
-            ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
-            : $nav['non'];
+        $start = ($curr - 1) * $perp;
+        $last  = intval(ceil($total / $perp));
+        $curr  = $curr < 1 ? 1 : ($curr > $last ? $last : $curr);
+        $prev  = $curr < 2 ? 1 : $curr - 1;
+        $next  = $curr > ($last - 1) ? $last : $curr + 1;
+
+        return [
+            'start' => $start,
+            'prev'  => $prev,
+            'curr'  => $curr,
+            'next'  => $next,
+            'last'  => $last,
+            'perp'  => $perp,
+            'total' => $total
+        ];
     }
 
-    public static function cookie_get(string $name, string $default='') : string
-    {
-error_log(__METHOD__);
-
-        return $_COOKIE[$name] ?? $default;
-    }
-
-    public static function cookie_put(string $name, string $value, int $expiry=604800) : string
-    {
-error_log(__METHOD__);
-
-        return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
-    }
-
-    public static function cookie_del(string $name) : string
-    {
-error_log(__METHOD__);
-
-        return self::cookie_put($name, '', time() - 1);
-    }
-
-    public static function chkpw($pw, $pw2)
-    {
-error_log(__METHOD__);
-
-        if (strlen($pw) > 9) {
-            if (preg_match('/[0-9]+/', $pw)) {
-                if (preg_match('/[A-Z]+/', $pw)) {
-                    if (preg_match('/[a-z]+/', $pw)) {
-                        if ($pw === $pw2) {
-                            return true;
-                        } else util::log('Passwords do not match, please try again');
-                    } else util::log('Password must contains at least one lower case letter');
-                } else util::log('Password must contains at least one captital letter');
-            } else util::log('Password must contains at least one number');
-        } else util::log('Passwords must be at least 10 characters');
-        return false;
-    }
-
-    public static function genpw()
-    {
-error_log(__METHOD__);
-
-        return str_replace('.', '_',
-            substr(password_hash((string)time(), PASSWORD_DEFAULT),
-                rand(10, 50), 10));
-    }
-    
     public static function is_adm() : bool
     {
 error_log(__METHOD__);
@@ -164,29 +130,71 @@ error_log(__METHOD__);
 
         return isset($_SESSION['usr']['acl']) && $_SESSION['usr']['acl'] == $acl;
     }
-    
-    public static function remember($g)
+
+    // 09-Auth
+
+    public static function genpw()
     {
 error_log(__METHOD__);
 
+        return str_replace('.', '_',
+            substr(password_hash((string)time(), PASSWORD_DEFAULT),
+                rand(10, 50), 10));
+    }
+
+    public static function get_nav(array $nav = []) : array
+    {
+        return isset($_SESSION['usr'])
+            ? (isset($_SESSION['adm']) ? $nav['adm'] : $nav['usr'])
+            : $nav['non'];
+    }
+
+    public static function get_cookie(string $name, string $default='') : string
+    {
+        return $_COOKIE[$name] ?? $default;
+    }
+
+    public static function put_cookie(string $name, string $value, int $expiry=604800) : string
+    {
+        return setcookie($name, $value, time() + $expiry, '/') ? $value : '';
+    }
+
+    public static function del_cookie(string $name) : string
+    {
+        return self::put_cookie($name, '', time() - 1);
+    }
+
+    public static function chkpw($pw, $pw2)
+    {
+        if (strlen($pw) > 9) {
+            if (preg_match('/[0-9]+/', $pw)) {
+                if (preg_match('/[A-Z]+/', $pw)) {
+                    if (preg_match('/[a-z]+/', $pw)) {
+                        if ($pw === $pw2) {
+                            return true;
+                        } else util::log('Passwords do not match, please try again');
+                    } else util::log('Password must contains at least one lower case letter');
+                } else util::log('Password must contains at least one captital letter');
+            } else util::log('Password must contains at least one number');
+        } else util::log('Passwords must be at least 10 characters');
+        return false;
+    }
+
+    public static function remember($g)
+    {
         if (!self::is_usr()) {
-            if ($c = self::cookie_get('remember')) {
+            if ($c = self::get_cookie('remember')) {
                 if (is_null(db::$dbh)) db::$dbh = new db($g->db);
                 db::$tbl = 'users';
                 if ($usr = db::read('id,grp,acl,login,fname,lname,cookie', 'cookie', $c, '', 'one')) {
-//error_log(var_export($usr,true));
                     extract($usr);
                     $_SESSION['usr'] = $usr;
-//error_log(var_export($_SESSION,true));
                     if ($acl == 0) $_SESSION['adm'] = $id;
                     self::log($login . ' is remembered and logged back in', 'success');
-                    self::ses('o', $g->in['o']);
-                    self::ses('m', $g->in['m']);
+                    self::ses('o', '', $g->in['o']);
+                    self::ses('m', '', $g->in['m']);
                 }
             }
-//        } else {
-//            self::ses('o', 'auth');
-//            self::ses('m', 'read');
         }
     }
 }

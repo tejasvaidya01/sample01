@@ -41,12 +41,12 @@ echo new Init(new class
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
+        'name'  => 'spe_08',    // DB name
         'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_spe.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [

@@ -14,14 +14,15 @@ spl_autoload_register(function ($c) {
 echo new Init(new class
 {
     public
-    $email      = 'admin@goldcoast.org',
+    $email      = 'markc@renta.net',
     $file       = 'lib' . DS . '.ht_conf.php', // settings override
+    $perp       = 5,
     $self       = '',
     $in = [
         'i'     => null,        // Item or ID
         'g'     => null,        // Group/Category
         'l'     => '',          // Log (message)
-        'm'     => 'read',      // Method (action)
+        'm'     => 'list',      // Method (action)
         'o'     => 'home',      // Object (content)
         't'     => 'bootstrap', // Theme
         'x'     => '',          // XHR (request)
@@ -40,12 +41,12 @@ echo new Init(new class
     ],
     $db = [
         'host'  => '127.0.0.1', // DB site
-        'name'  => 'sysadm',    // DB name
-        'pass'  => 'lib' . DS . '.ht_pw.php', // MySQL password override
+        'name'  => 'spe_08',    // DB name
+        'pass'  => 'lib' . DS . '.ht_pw', // MySQL password override
         'path'  => 'lib' . DS . '.ht_spe.sqlite', // SQLite DB
         'port'  => '3306',      // DB port
         'sock'  => '',          // '/run/mysqld/mysqld.sock',
-        'type'  => 'sqlite',    // mysql | sqlite
+        'type'  => 'mysql',    // mysql | sqlite
         'user'  => 'sysadm',    // DB user
     ],
     $nav1 = [
@@ -57,7 +58,6 @@ echo new Init(new class
         ],
         'usr' => [
             ['News',        '?o=news', 'fa fa-file-text fa-fw'],
-            ['Sign out',    '?o=auth&m=delete', 'fa fa-sign-out fa-fw'],
         ],
         'adm' => [
             ['News',        '?o=news', 'fa fa-file-text fa-fw'],

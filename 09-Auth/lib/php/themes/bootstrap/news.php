@@ -1,5 +1,5 @@
 <?php
-// lib/php/themes/bootstrap/news.php 20170225
+// lib/php/themes/bootstrap/news.php 20170225 - 20170317
 // Copyright (C) 2015-2017 Mark Constable <markc@renta.net> (AGPL-3.0)
 
 class Themes_Bootstrap_News extends Themes_Bootstrap_Theme
@@ -15,8 +15,77 @@ error_log(__METHOD__);
     {
 error_log(__METHOD__);
 
-        $buf = '';
-        foreach ($in as $row) {
+        extract($in);
+
+        $author_buf = $fname && $lname
+            ? $fname . ' ' . $lname
+            : ($fname && empty($lname) ? $fname : $login);
+
+        return '
+          <h3 class="w30">
+            <a href="?o=news&m=list" title="Go back to list">
+              <i class="fa fa-newspaper-o fa-fw"></i> ' . $title . '
+            </a>
+          </h3>
+          <div class="table-responsive">
+            <table class="table w30">
+              <tbody>
+                <tr>
+                  <td>' . nl2br($content) . '</td>
+                  <td class="text-center nowrap w200">
+                    <small>
+                      by <b><a href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
+                      <i>' . util::now($updated) . '</i>
+                    </small>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="row">
+            <div class="col-12 text-right">
+              <div class="btn-group">
+                <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
+                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
+                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
+              </div>
+            </div>
+          </div>';
+    }
+
+    public function update(array $in) : string
+    {
+error_log(__METHOD__);
+
+error_log('bootstrap news update ='.var_export($in , true));
+
+        if (!util::is_adm() && ($_SESSION['usr']['id'] !== $in['author'])) {
+            util::log('You do not have permissions to update this post');
+            return $this->read($in);
+        }
+
+        return $this->editor($in);
+    }
+
+    public function list(array $in) : string
+    {
+error_log(__METHOD__);
+
+        $buf = $pgr_top = $pgr_end = '';
+        $pgr = $in['pager']; unset($in['pager']);
+
+        if ($pgr['last'] > 1) {
+            $pgr_top ='
+          <div class="col-md-6">' . $this->pager($pgr) . '
+          </div>';
+            $pgr_end = '
+          <div class="row">
+            <div class="col-12">' . $this->pager($pgr) . '
+            </div>
+          </div>';
+        }
+
+        foreach($in as $row) {
             extract($row);
             $author_buf = $fname && $lname
                 ? $fname . ' ' . $lname
@@ -41,101 +110,54 @@ error_log(__METHOD__);
         }
 
         return '
-          <h3 class="min600">
-            <a href="?o=news&m=create" title="Add new item">
-              <i class="fa fa-newspaper-o fa-fw"></i> News
-              <small>
-                <i class="fa fa-plus-circle fa-fw"></i>
-              </small>
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table table-bordered min600">
-              <tbody>' . $buf . '
-              </tbody>
-            </table>
-          </div>';
+        <div class="row">
+          <div class="col-md-6">
+            <h3 class="min600">
+              <a href="?o=news&m=create" title="Add news item">
+                <i class="fa fa-newspaper-o fa-fw"></i> News
+                <small><i class="fa fa-plus-circle fa-fw"></i></small>
+              </a>
+            </h3>
+          </div>' . $pgr_top . '
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered min600">
+            <tbody>' . $buf . '
+            </tbody>
+          </table>
+        </div>' . $pgr_end;
     }
 
-    public function read_one(array $in) : string
+    private function editor(array $in) : string
     {
 error_log(__METHOD__);
 
-        extract($in);
-        $author_buf = $fname && $lname
-            ? $fname . ' ' . $lname
-            : ($fname && empty($lname) ? $fname : $login);
-            
-        return '
-          <h3 class="w30">
-            <a href="?o=news&m=read" title="Go back to list">
-              <i class="fa fa-newspaper-o fa-fw"></i> ' . $title . '
-            </a>
-          </h3>
-          <div class="table-responsive">
-            <table class="table w30">
-              <tbody>
-                <tr>
-                  <td>' . nl2br($content) . '</td>
-                  <td class="text-center nowrap w200">
-                    <small>
-                      by <b><a href="?o=users&m=update&i=' . $uid . '">' . $author_buf . '</a></b><br>
-                      <i>' . util::now($updated) . '</i>
-                    </small>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="row">
-            <div class="col-12 text-right">
-              <div class="btn-group">
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
-                <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
-                <a class="btn btn-primary" href="?o=news&m=update&i=' . $id . '">Update</a>
-              </div>
-            </div>
-          </div>';
-    }
-
-    public function update(array $in) : string
-    {
-error_log(__METHOD__);
-
-        return $this->editor($in);
-    }
-
-    private function editor(array $ary) : string
-    {
-error_log(__METHOD__);
-
-        extract($ary);
-            
         if ($this->g->in['m'] === 'create') {
             extract($_SESSION['usr']);
             $author = $uid = $id;
             $header = 'Add News';
             $submit = '
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
-                <button type="submit" class="btn btn-primary">Add This Item</button>';                
+                <a class="btn btn-secondary" href="?o=news&m=list">&laquo; Back</a>
+                <button type="submit" class="btn btn-primary">Add This Item</button>';
         } else {
+            extract($in);
             $header = 'Update News';
             $submit = '
-                <a class="btn btn-secondary" href="?o=news&m=read">&laquo; Back</a>
+                <a class="btn btn-secondary" href="?o=news&m=read&i=' . $id . '">&laquo; Back</a>
                 <a class="btn btn-danger" href="?o=news&m=delete&i=' . $id . '" title="Remove this item" onClick="javascript: return confirm(\'Are you sure you want to remove ' . $title . '?\')">Remove</a>
                 <button type="submit" name="i" value="' . $id . '" class="btn btn-primary">Update</button>';
         }
-        
+
         $author_label = $fname && $lname
             ? $fname . ' ' . $lname
             : ($fname && empty($lname) ? $fname : $login);
-            
+
         $author_buf = '
                   <p class="form-control-static"><b><a href="?o=users&m=update&i=' . $uid . '">' . $author_label . '</a></b></p>';
-            
+
         return '
-          <h3 class="w30">
-            <a href="?o=news&m=read">
+          <h3 class="min600">
+            <a href="?o=news&m=list">
               <i class="fa fa-newspaper-o fa-fw"></i> ' . $header . '
             </a>
           </h3>
