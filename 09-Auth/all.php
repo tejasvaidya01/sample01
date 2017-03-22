@@ -341,6 +341,8 @@ class Plugins_News extends Plugin
 
     protected function update() : string
     {
+        if ($_POST) return parent::update();
+
         $sql = "
  SELECT n.*, u.id as uid, u.login, u.fname, u.lname
    FROM news n
@@ -357,7 +359,7 @@ class Plugins_News extends Plugin
             $author = db::read('author', 'id', $this->g->in['i'], '', 'col');
             if ($_SESSION['usr']['id'] !== $author) {
                 util::log('You do not have permissions to delete this post');
-                return $this->list();
+                return $this->read();
             }
         }
 
