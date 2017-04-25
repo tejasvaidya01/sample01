@@ -40,7 +40,8 @@ error_log(__METHOD__."($k, $v, $x)");
                 : ($_SESSION[$k] ?? $v));
     }
 
-    public static function cfg($g) : void
+//    public static function cfg($g) : void // php7.1 only
+    public static function cfg($g)
     {
 error_log(__METHOD__);
 
